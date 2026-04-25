@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 180" width="620" height="180">
+  <defs>
+    
+  </defs>
+  <g fill="#000000">
+    <path d="M 20,155 L 85,25 L 85,30.2 L 22.7,155 Z"></path>
+    <path d="M 150,155 L 85,25 L 85,30.2 L 147.3,155 Z"></path>
+  </g>
+  <text x="210" y="90" class="arateki-text" text-anchor="start" dominant-baseline="central" fill="#000000">ARATEKI</text>
+</svg>

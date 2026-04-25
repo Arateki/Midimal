@@ -1,0 +1,302 @@
+/* =========================================================================
+   ARATEKI — Colors & Type
+   v1.0 — 2026
+   Philosophy: essentialismo. Black, white, and silence. Nothing decorative.
+   ========================================================================= */
+
+/* Montserrat — official brand typeface (Julieta Ulanovsky, SIL OFL 1.1)
+   Self-hosted from fonts/. Full family: 100/200/300/400/500/600/700/800/900 + italics. */
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 100; src: url('fonts/Montserrat-Thin.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 100; src: url('fonts/Montserrat-ThinItalic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 200; src: url('fonts/Montserrat-ExtraLight.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 200; src: url('fonts/Montserrat-ExtraLightItalic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 300; src: url('fonts/Montserrat-Light.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 300; src: url('fonts/Montserrat-LightItalic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 400; src: url('fonts/Montserrat-Regular.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 400; src: url('fonts/Montserrat-Italic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 500; src: url('fonts/Montserrat-Medium.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 500; src: url('fonts/Montserrat-MediumItalic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 600; src: url('fonts/Montserrat-SemiBold.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 600; src: url('fonts/Montserrat-SemiBoldItalic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 700; src: url('fonts/Montserrat-Bold.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 700; src: url('fonts/Montserrat-BoldItalic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 800; src: url('fonts/Montserrat-ExtraBold.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 800; src: url('fonts/Montserrat-ExtraBoldItalic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 900; src: url('fonts/Montserrat-Black.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 900; src: url('fonts/Montserrat-BlackItalic.ttf') format('truetype'); font-display: swap; }
+
+:root {
+  /* ---------- PRIMARY PALETTE ---------- */
+  --ark-black:          #000000;   /* Preto — primary */
+  --ark-white:          #FFFFFF;   /* Branco — primary */
+
+  /* ---------- EXTENDED PRIMARY ---------- */
+  --ark-graphite:       #1A1A1A;   /* Preto premium — softer black for large surfaces */
+  --ark-offwhite:       #F5F2ED;   /* Branco papelaria — stationery white */
+
+  /* ---------- AUXILIARY NEUTRALS ---------- */
+  --ark-gray-medium:    #666666;   /* Cinza médio — secondary text */
+  --ark-gray-light:     #999999;   /* Cinza claro — tertiary text, captions */
+  --ark-gray-border:    #E0E0E0;   /* Cinza borda — hairlines, dividers */
+  --ark-gray-bg:        #FAFAFA;   /* Cinza fundo — subtle panels */
+
+  /* ---------- SEMANTIC FOREGROUNDS (light theme) ---------- */
+  --fg-1:               var(--ark-black);        /* primary text */
+  --fg-2:               var(--ark-gray-medium);  /* secondary text */
+  --fg-3:               var(--ark-gray-light);   /* tertiary / captions */
+  --fg-inverse:         var(--ark-white);
+
+  /* ---------- SEMANTIC BACKGROUNDS ---------- */
+  --bg-1:               var(--ark-white);        /* canvas */
+  --bg-2:               var(--ark-gray-bg);      /* subtle panel */
+  --bg-3:               var(--ark-offwhite);     /* warm paper */
+  --bg-inverse:         var(--ark-black);
+
+  /* ---------- LINES ---------- */
+  --line-1:             var(--ark-gray-border);  /* hairline divider */
+  --line-2:             var(--ark-black);        /* emphatic rule */
+  --line-hair:          0.5px;                   /* true hairline */
+  --line-thin:          1px;
+  --line-medium:        2px;
+
+  /* ---------- TYPE FAMILIES ---------- */
+  --font-sans:          'Montserrat', system-ui, -apple-system, Segoe UI, sans-serif;
+  --font-mono:          'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ---------- TYPE SCALE (px) ---------- */
+  --fs-hairline:        10px;   /* micro-labels, file meta */
+  --fs-caption:         11px;
+  --fs-small:           13px;
+  --fs-body:            15px;
+  --fs-body-lg:         17px;
+  --fs-h4:              20px;
+  --fs-h3:              24px;
+  --fs-h2:              32px;
+  --fs-h1:              48px;
+  --fs-display:         72px;
+  --fs-display-xl:      120px;
+
+  /* ---------- WEIGHTS ---------- */
+  --fw-light:           300;
+  --fw-regular:         400;
+  --fw-medium:          500;
+  --fw-semibold:        600;
+  --fw-bold:            700;
+
+  /* ---------- LETTER SPACING ---------- */
+  /* Brand-signature: wide tracking on uppercase labels, tight on display */
+  --ls-tight:           -0.02em;
+  --ls-normal:          0;
+  --ls-wide:            0.08em;
+  --ls-wider:           0.18em;
+  --ls-widest:          0.34em;   /* logo-level tracking, per brand manual */
+
+  /* ---------- LINE HEIGHTS ---------- */
+  --lh-tight:           1.05;
+  --lh-snug:            1.25;
+  --lh-normal:          1.5;
+  --lh-relaxed:         1.7;
+
+  /* ---------- SPACING SCALE (8pt-ish, with half-steps) ---------- */
+  --sp-0:               0;
+  --sp-1:               4px;
+  --sp-2:               8px;
+  --sp-3:               12px;
+  --sp-4:               16px;
+  --sp-5:               24px;
+  --sp-6:               32px;
+  --sp-7:               48px;
+  --sp-8:               64px;
+  --sp-9:               96px;
+  --sp-10:              128px;
+
+  /* ---------- RADII — brand is essentialist; radii stay minimal ---------- */
+  --radius-0:           0;
+  --radius-1:           2px;
+  --radius-2:           4px;
+  --radius-round:       999px;
+
+  /* ---------- ELEVATION — flat first. Shadows used sparingly. ---------- */
+  --shadow-0:           none;
+  --shadow-1:           0 1px 0 rgba(0,0,0,0.04);
+  --shadow-2:           0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-3:           0 8px 24px rgba(0,0,0,0.08);
+  --shadow-press:       inset 0 0 0 1px rgba(0,0,0,0.12);
+
+  /* ---------- MOTION ---------- */
+  --ease-standard:      cubic-bezier(0.2, 0, 0, 1);   /* default */
+  --ease-emphasis:      cubic-bezier(0.3, 0, 0, 1);
+  --dur-fast:           120ms;
+  --dur-base:           200ms;
+  --dur-slow:           360ms;
+
+  /* ---------- LAYOUT ---------- */
+  --container:          1200px;
+  --gutter:             24px;
+}
+
+/* =========================================================================
+   DARK THEME — inversion, per brand manual (black canvas, white ink)
+   ========================================================================= */
+:root.dark,
+.ark-dark {
+  --fg-1:               var(--ark-white);
+  --fg-2:               #B3B3B3;
+  --fg-3:               #808080;
+  --fg-inverse:         var(--ark-black);
+
+  --bg-1:               var(--ark-black);
+  --bg-2:               var(--ark-graphite);
+  --bg-3:               #0D0D0D;
+  --bg-inverse:         var(--ark-white);
+
+  --line-1:             #262626;
+  --line-2:             var(--ark-white);
+}
+
+/* =========================================================================
+   BASE ELEMENT STYLES — the semantic type system
+   ========================================================================= */
+html, body {
+  background: var(--bg-1);
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* H1 — reserved for brand statements / hero.
+   Tight tracking, regular weight. Rarely shouted; size does the work. */
+h1, .ark-h1 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  margin: 0;
+}
+
+h2, .ark-h2 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
+  margin: 0;
+}
+
+h3, .ark-h3 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-normal);
+  margin: 0;
+}
+
+h4, .ark-h4 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-h4);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-normal);
+  margin: 0;
+}
+
+p, .ark-body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-relaxed);
+  color: var(--fg-1);
+  margin: 0;
+}
+
+.ark-body-lg {
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-relaxed);
+}
+
+.ark-caption {
+  font-size: var(--fs-caption);
+  color: var(--fg-2);
+  line-height: var(--lh-normal);
+}
+
+/* Eyebrow / label — the brand signature.
+   ALL CAPS, wide tracking, medium weight. Used everywhere above headings. */
+.ark-eyebrow,
+.ark-label {
+  font-size: var(--fs-hairline);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+/* Meta rail — thin divider + tracked label, pairs visually with the logo */
+.ark-meta {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+/* Display — hero/marketing-scale ARATEKI-style text.
+   Wide tracking honors the logotype. */
+.ark-display {
+  font-family: var(--font-sans);
+  font-size: var(--fs-display);
+  font-weight: var(--fw-regular);
+  line-height: 0.95;
+  letter-spacing: var(--ls-tight);
+}
+
+.ark-display-xl {
+  font-family: var(--font-sans);
+  font-size: var(--fs-display-xl);
+  font-weight: var(--fw-regular);
+  line-height: 0.9;
+  letter-spacing: var(--ls-tight);
+}
+
+/* Logo-tracked label — mirrors the ARATEKI wordmark exactly.
+   Use sparingly — this is the brand signature. */
+.ark-logotype {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--ls-widest);
+  text-transform: uppercase;
+}
+
+code, pre, .ark-mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  font-weight: var(--fw-regular);
+}
+
+/* Horizontal rule — a thin, emphatic line. A core brand motif. */
+hr, .ark-rule {
+  border: 0;
+  border-top: 1px solid var(--line-1);
+  margin: var(--sp-5) 0;
+}
+
+.ark-rule-strong {
+  border-top: 1px solid var(--line-2);
+}
+
+/* Link style — understated; no decoration until hover */
+a, .ark-link {
+  color: var(--fg-1);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-1);
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+a:hover, .ark-link:hover { border-bottom-color: var(--fg-1); }
+
+/* Selection — black slab, no fuss */
+::selection { background: var(--ark-black); color: var(--ark-white); }
