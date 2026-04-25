@@ -84,6 +84,15 @@ const __TWEAKS_STYLE = `
 
   .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
     border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider-line{display:flex;align-items:center;gap:8px}
+  .twk-slider-line .twk-slider{flex:1;min-width:0}
+  .twk-slider-input{width:52px;height:24px;border:.5px solid rgba(0,0,0,.1);
+    border-radius:7px;background:rgba(255,255,255,.62);font:inherit;
+    font-variant-numeric:tabular-nums;text-align:right;padding:0 6px;
+    color:inherit;outline:none;-moz-appearance:textfield}
+  .twk-slider-input:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.88)}
+  .twk-slider-input::-webkit-inner-spin-button,.twk-slider-input::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0}
   .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
     width:14px;height:14px;border-radius:50%;background:#fff;
     border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
@@ -130,6 +139,31 @@ const __TWEAKS_STYLE = `
   .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
   .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
   .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
+
+  .twk-color-pop{position:fixed;z-index:2147483647;width:224px;padding:10px;
+    border:.5px solid rgba(0,0,0,.12);border-radius:12px;
+    background:rgba(250,249,247,.96);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    box-shadow:0 12px 42px rgba(0,0,0,.22),0 1px 0 rgba(255,255,255,.65) inset}
+  .twk-color-area{position:relative;height:132px;border-radius:8px;overflow:hidden;
+    box-shadow:inset 0 0 0 .5px rgba(0,0,0,.16);cursor:crosshair}
+  .twk-color-dot{position:absolute;width:12px;height:12px;border:2px solid #fff;border-radius:50%;
+    box-shadow:0 0 0 1px rgba(0,0,0,.35),0 1px 4px rgba(0,0,0,.35);
+    transform:translate(-6px,-6px);pointer-events:none}
+  .twk-hue{appearance:none;-webkit-appearance:none;width:100%;height:10px;margin:10px 0 8px;
+    border-radius:999px;outline:none;background:linear-gradient(to right,red,#ff0,#0f0,#0ff,#00f,#f0f,red)}
+  .twk-hue::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;
+    border-radius:50%;background:#fff;border:.5px solid rgba(0,0,0,.2);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+  .twk-hue::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.2);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+  .twk-color-line{display:flex;align-items:center;gap:8px}
+  .twk-color-preview{width:26px;height:26px;border-radius:7px;border:.5px solid rgba(0,0,0,.14);flex-shrink:0}
+  .twk-color-hex{height:26px;flex:1;min-width:0;border:.5px solid rgba(0,0,0,.1);
+    border-radius:7px;background:rgba(255,255,255,.72);font:inherit;text-transform:uppercase;
+    padding:0 8px;color:inherit;outline:none}
+  .twk-color-presets{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-top:10px}
+  .twk-color-preset{appearance:none;border:.5px solid rgba(0,0,0,.14);border-radius:5px;
+    height:18px;padding:0;cursor:default}
 `;
 
 // ── useTweaks ───────────────────────────────────────────────────────────────
@@ -265,10 +299,30 @@ function TweakRow({ label, value, children, inline = false }) {
 // ── Controls ────────────────────────────────────────────────────────────────
 
 function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  const [draft, setDraft] = React.useState(String(value));
+  React.useEffect(() => setDraft(String(value)), [value]);
+  const commit = (next) => {
+    const n = Number(next);
+    if (Number.isNaN(n)) {
+      setDraft(String(value));
+      return;
+    }
+    onChange(Math.min(max, Math.max(min, n)));
+  };
   return (
     <TweakRow label={label} value={`${value}${unit}`}>
-      <input type="range" className="twk-slider" min={min} max={max} step={step}
-             value={value} onChange={(e) => onChange(Number(e.target.value))} />
+      <div className="twk-slider-line">
+        <input type="range" className="twk-slider" min={min} max={max} step={step}
+               value={value} onChange={(e) => onChange(Number(e.target.value))} />
+        <input type="text" className="twk-slider-input" inputMode="decimal"
+               value={draft}
+               onChange={(e) => setDraft(e.target.value)}
+               onBlur={() => commit(draft)}
+               onKeyDown={(e) => {
+                 if (e.key === 'Enter') e.currentTarget.blur();
+                 if (e.key === 'Escape') setDraft(String(value));
+               }} />
+      </div>
     </TweakRow>
   );
 }
@@ -395,12 +449,136 @@ function TweakNumber({ label, value, min, max, step = 1, unit = '', onChange }) 
   );
 }
 
+function clamp01(n) {
+  return Math.max(0, Math.min(1, n));
+}
+
+function hexToRgb(hex) {
+  const raw = String(hex || '').replace('#', '').trim();
+  if (!/^[0-9a-fA-F]{6}$/.test(raw)) return { r: 0, g: 0, b: 0 };
+  return {
+    r: parseInt(raw.slice(0, 2), 16),
+    g: parseInt(raw.slice(2, 4), 16),
+    b: parseInt(raw.slice(4, 6), 16),
+  };
+}
+
+function rgbToHex({ r, g, b }) {
+  return '#' + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+}
+
+function rgbToHsv({ r, g, b }) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+    if (h < 0) h += 360;
+  }
+  return { h, s: max === 0 ? 0 : d / max, v: max };
+}
+
+function hsvToRgb({ h, s, v }) {
+  const c = v * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = v - c;
+  let r = 0, g = 0, b = 0;
+  if (h < 60) [r, g, b] = [c, x, 0];
+  else if (h < 120) [r, g, b] = [x, c, 0];
+  else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c];
+  else if (h < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+  return { r: (r + m) * 255, g: (g + m) * 255, b: (b + m) * 255 };
+}
+
+function positionColorPopover(anchor) {
+  const PAD = 12, W = 224, H = 244;
+  const r = anchor.getBoundingClientRect();
+  const fitsRight = window.innerWidth - r.right >= W + PAD;
+  const fitsLeft = r.left >= W + PAD;
+  const left = fitsRight ? r.right + 8 : fitsLeft ? r.left - W - 8 : Math.max(PAD, window.innerWidth - W - PAD);
+  const preferredTop = r.top + r.height / 2 - H / 2;
+  const top = Math.max(PAD, Math.min(window.innerHeight - H - PAD, preferredTop));
+  return { left, top };
+}
+
 function TweakColor({ label, value, onChange }) {
+  const [open, setOpen] = React.useState(false);
+  const [pos, setPos] = React.useState({ left: 0, top: 0 });
+  const btnRef = React.useRef(null);
+  const areaRef = React.useRef(null);
+  const hsv = rgbToHsv(hexToRgb(value));
+  const presets = ['#000000', '#ffffff', '#1f2937', '#6b7280', '#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#6366f1', '#a855f7', '#ec4899', '#7c3aed', '#b45309', '#0f172a'];
+
+  const openPicker = () => {
+    if (btnRef.current) setPos(positionColorPopover(btnRef.current));
+    setOpen(true);
+  };
+
+  React.useEffect(() => {
+    if (!open) return;
+    const close = (e) => {
+      if (btnRef.current && btnRef.current.contains(e.target)) return;
+      if (e.target.closest?.('.twk-color-pop')) return;
+      setOpen(false);
+    };
+    const reposition = () => btnRef.current && setPos(positionColorPopover(btnRef.current));
+    window.addEventListener('pointerdown', close, true);
+    window.addEventListener('resize', reposition);
+    window.addEventListener('scroll', reposition, true);
+    return () => {
+      window.removeEventListener('pointerdown', close, true);
+      window.removeEventListener('resize', reposition);
+      window.removeEventListener('scroll', reposition, true);
+    };
+  }, [open]);
+
+  const setHsv = (next) => onChange(rgbToHex(hsvToRgb(next)));
+  const pickArea = (e) => {
+    const r = areaRef.current.getBoundingClientRect();
+    setHsv({ h: hsv.h, s: clamp01((e.clientX - r.left) / r.width), v: 1 - clamp01((e.clientY - r.top) / r.height) });
+  };
+  const startArea = (e) => {
+    e.preventDefault();
+    pickArea(e);
+    const move = (ev) => pickArea(ev);
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
   return (
     <div className="twk-row twk-row-h">
       <div className="twk-lbl"><span>{label}</span></div>
-      <input type="color" className="twk-swatch" value={value}
-             onChange={(e) => onChange(e.target.value)} />
+      <button ref={btnRef} type="button" className="twk-swatch" aria-label={label}
+              style={{ background: value }} onClick={openPicker} />
+      {open && ReactDOM.createPortal(
+        <div className="twk-color-pop" style={{ left: pos.left, top: pos.top }}>
+          <div ref={areaRef} className="twk-color-area" onPointerDown={startArea}
+               style={{ background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${hsv.h}, 100%, 50%))` }}>
+            <i className="twk-color-dot" style={{ left: `${hsv.s * 100}%`, top: `${(1 - hsv.v) * 100}%` }} />
+          </div>
+          <input className="twk-hue" type="range" min="0" max="360" step="1" value={Math.round(hsv.h)}
+                 onChange={(e) => setHsv({ ...hsv, h: Number(e.target.value) })} />
+          <div className="twk-color-line">
+            <div className="twk-color-preview" style={{ background: value }} />
+            <input className="twk-color-hex" value={value}
+                   onChange={(e) => /^#[0-9a-fA-F]{6}$/.test(e.target.value) && onChange(e.target.value)} />
+          </div>
+          <div className="twk-color-presets">
+            {presets.map((c) => <button key={c} type="button" className="twk-color-preset" style={{ background: c }} onClick={() => onChange(c)} />)}
+          </div>
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

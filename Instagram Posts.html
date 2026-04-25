@@ -70,31 +70,211 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 // ─── Tweaks defaults ───────────────────────────────────────────────
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "light",
+  "bgColor": "#ffffff",
+  "bgColor2": "#ece7dd",
+  "bgFill": "solid",
+  "bgAngle": 135,
   "weight": 700,
   "weightSmall": 600,
   "sizeScale": 1,
   "smallScale": 1,
   "chromePad": 80,
+  "secondaryTextColor": "",
   "decorGrid": true,       "decorGridIntensity": 1,
   "decorDots": false,      "decorDotsIntensity": 1,
   "decorDiagonals": false, "decorDiagonalsIntensity": 1,
   "decorScanlines": false, "decorScanlinesIntensity": 1,
+  "decorGrain": false,     "decorGrainIntensity": 1,
+  "decorTopography": false,"decorTopographyIntensity": 1,
+  "decorAxes": false,      "decorAxesIntensity": 1,
+  "decorDataBars": false,  "decorDataBarsIntensity": 1,
+  "decorIsoMesh": false,   "decorIsoMeshIntensity": 1,
+  "decorOrbits": false,    "decorOrbitsIntensity": 1,
+  "decorSignal": false,    "decorSignalIntensity": 1,
+  "decorCircuit": false,   "decorCircuitIntensity": 1,
+  "decorModules": false,   "decorModulesIntensity": 1,
+  "decorBarcode": false,   "decorBarcodeIntensity": 1,
+  "decorCropMarks": false, "decorCropMarksIntensity": 1,
+  "decorColumns": false,   "decorColumnsIntensity": 1,
+  "decorFocusWindow": false,"decorFocusWindowIntensity": 1,
+  "decorMarginNotes": false,"decorMarginNotesIntensity": 1,
+  "decorGhostBand": false, "decorGhostBandIntensity": 1,
+  "decorSoftBlob": false,  "decorSoftBlobIntensity": 1,
+  "decorPaperFold": false, "decorPaperFoldIntensity": 1,
+  "decorInkSpread": false, "decorInkSpreadIntensity": 1,
+  "decorRibbon": false,    "decorRibbonIntensity": 1,
+  "decorBurst": false,     "decorBurstIntensity": 1,
+  "decorThread": false,    "decorThreadIntensity": 1,
+  "decorCalendar": false,  "decorCalendarIntensity": 1,
+  "decorStack": false,     "decorStackIntensity": 1,
+  "decorQuoteMarks": false,"decorQuoteMarksIntensity": 1,
+  "decorSteps": false,     "decorStepsIntensity": 1,
+  "decorFineFrame": false, "decorFineFrameIntensity": 1,
+  "decorHairline": false,  "decorHairlineIntensity": 1,
+  "decorMedallion": false, "decorMedallionIntensity": 1,
+  "decorGuilloche": false, "decorGuillocheIntensity": 1,
+  "decorLinen": false,     "decorLinenIntensity": 1,
+  "decorMatte": false,     "decorMatteIntensity": 1,
+  "decorPriceSeal": false, "decorPriceSealIntensity": 1,
+  "decorShelf": false,     "decorShelfIntensity": 1,
+  "decorHangTag": false,   "decorHangTagIntensity": 1,
+  "decorCatalog": false,   "decorCatalogIntensity": 1,
+  "decorPlinth": false,    "decorPlinthIntensity": 1,
+  "decorMindMap": false,   "decorMindMapIntensity": 1,
+  "decorChalk": false,     "decorChalkIntensity": 1,
+  "decorMarker": false,    "decorMarkerIntensity": 1,
+  "decorDecision": false,  "decorDecisionIntensity": 1,
+  "decorLayers": false,    "decorLayersIntensity": 1,
+  "decorTicket": false,    "decorTicketIntensity": 1,
+  "decorSeatMap": false,   "decorSeatMapIntensity": 1,
+  "decorWristband": false, "decorWristbandIntensity": 1,
+  "decorAgenda": false,    "decorAgendaIntensity": 1,
+  "decorConstellation": false,"decorConstellationIntensity": 1,
+  "decorCertSeal": false,  "decorCertSealIntensity": 1,
+  "decorSignature": false, "decorSignatureIntensity": 1,
+  "decorStamp": false,     "decorStampIntensity": 1,
+  "decorArchive": false,   "decorArchiveIntensity": 1,
+  "decorAudit": false,     "decorAuditIntensity": 1,
+  "decorReactions": false, "decorReactionsIntensity": 1,
+  "decorBubbles": false,   "decorBubblesIntensity": 1,
+  "decorStoryFrame": false,"decorStoryFrameIntensity": 1,
+  "decorComments": false,  "decorCommentsIntensity": 1,
+  "decorSocialStats": false,"decorSocialStatsIntensity": 1,
   "decorCorners": false,   "decorCornersIntensity": 1,
   "decorVignette": false,  "decorVignetteIntensity": 1,
   "decorWatermark": false, "decorWatermarkIntensity": 1,
   "decorParticles": true,  "decorParticlesIntensity": 1,
   "decorGlow": true,       "decorGlowIntensity": 1,
+  "decorOrbitsSize": 100, "decorOrbitsX": 0, "decorOrbitsY": 0,
+  "decorGhostBandSize": 100, "decorGhostBandX": 0, "decorGhostBandY": 0,
+  "decorSoftBlobSize": 100, "decorSoftBlobX": 0, "decorSoftBlobY": 0,
+  "decorInkSpreadSize": 100, "decorInkSpreadX": 0, "decorInkSpreadY": 0,
+  "decorBurstSize": 100, "decorBurstX": 0, "decorBurstY": 0,
+  "decorMedallionSize": 100, "decorMedallionX": 0, "decorMedallionY": 0,
+  "decorPriceSealSize": 100, "decorPriceSealX": 0, "decorPriceSealY": 0,
+  "decorHangTagSize": 100, "decorHangTagX": 0, "decorHangTagY": 0,
+  "decorMindMapSize": 100, "decorMindMapX": 0, "decorMindMapY": 0,
+  "decorConstellationSize": 100, "decorConstellationX": 0, "decorConstellationY": 0,
+  "decorSignatureSize": 100, "decorSignatureX": 0, "decorSignatureY": 0,
+  "decorStampSize": 100, "decorStampX": 0, "decorStampY": 0,
+  "decorReactionsSize": 100, "decorReactionsX": 0, "decorReactionsY": 0,
+  "decorBubblesSize": 100, "decorBubblesX": 0, "decorBubblesY": 0,
+  "decorDataBarsSize": 100, "decorDataBarsX": 0, "decorDataBarsY": 0,
+  "decorSignalSize": 100, "decorSignalX": 0, "decorSignalY": 0,
+  "decorCircuitSize": 100, "decorCircuitX": 0, "decorCircuitY": 0,
+  "decorModulesSize": 100, "decorModulesX": 0, "decorModulesY": 0,
+  "decorBarcodeSize": 100, "decorBarcodeX": 0, "decorBarcodeY": 0,
+  "decorFocusWindowSize": 100, "decorFocusWindowX": 0, "decorFocusWindowY": 0,
+  "decorMarginNotesSize": 100, "decorMarginNotesX": 0, "decorMarginNotesY": 0,
+  "decorRibbonSize": 100, "decorRibbonX": 0, "decorRibbonY": 0,
+  "decorThreadSize": 100, "decorThreadX": 0, "decorThreadY": 0,
+  "decorCalendarSize": 100, "decorCalendarX": 0, "decorCalendarY": 0,
+  "decorStackSize": 100, "decorStackX": 0, "decorStackY": 0,
+  "decorQuoteMarksSize": 100, "decorQuoteMarksX": 0, "decorQuoteMarksY": 0,
+  "decorStepsSize": 100, "decorStepsX": 0, "decorStepsY": 0,
+  "decorShelfSize": 100, "decorShelfX": 0, "decorShelfY": 0,
+  "decorCatalogSize": 100, "decorCatalogX": 0, "decorCatalogY": 0,
+  "decorPlinthSize": 100, "decorPlinthX": 0, "decorPlinthY": 0,
+  "decorChalkSize": 100, "decorChalkX": 0, "decorChalkY": 0,
+  "decorMarkerSize": 100, "decorMarkerX": 0, "decorMarkerY": 0,
+  "decorDecisionSize": 100, "decorDecisionX": 0, "decorDecisionY": 0,
+  "decorLayersSize": 100, "decorLayersX": 0, "decorLayersY": 0,
+  "decorTicketSize": 100, "decorTicketX": 0, "decorTicketY": 0,
+  "decorSeatMapSize": 100, "decorSeatMapX": 0, "decorSeatMapY": 0,
+  "decorWristbandSize": 100, "decorWristbandX": 0, "decorWristbandY": 0,
+  "decorAgendaSize": 100, "decorAgendaX": 0, "decorAgendaY": 0,
+  "decorCertSealSize": 100, "decorCertSealX": 0, "decorCertSealY": 0,
+  "decorArchiveSize": 100, "decorArchiveX": 0, "decorArchiveY": 0,
+  "decorAuditSize": 100, "decorAuditX": 0, "decorAuditY": 0,
+  "decorCommentsSize": 100, "decorCommentsX": 0, "decorCommentsY": 0,
+  "decorSocialStatsSize": 100, "decorSocialStatsX": 0, "decorSocialStatsY": 0,
   "accent": false,
-  "textColor": ""
+  "textColor": "",
+  "exportScale": 2,
+  "format": "square"
 }/*EDITMODE-END*/;
 
-// Tema por slot ("mix" = alternar, "light" = tudo branco, "dark" = tudo preto)
-function themeFor(tw, index) {
-  if (tw.theme === 'light') return 'light';
-  if (tw.theme === 'dark') return 'dark';
-  // mix: alterna a cada ~2
-  return index % 3 === 1 ? 'dark' : 'light';
-}
+const DECOR_GROUPS = [
+  { key: 'minimal', label: 'Minimalismo' },
+  { key: 'system', label: 'Técnico / sistema' },
+  { key: 'editorial', label: 'Editorial / movimento' },
+  { key: 'organic', label: 'Orgânico / humano' },
+  { key: 'campaign', label: 'Campanha / impacto' },
+  { key: 'luxury', label: 'Luxo / editorial' },
+  { key: 'commerce', label: 'Comercial / produto' },
+  { key: 'education', label: 'Educação / conteúdo' },
+  { key: 'event', label: 'Evento / comunidade' },
+  { key: 'trust', label: 'Institucional / confiança' },
+  { key: 'creator', label: 'Creator / social' },
+];
+
+const DECOR_TWEAKS = [
+  { group: 'minimal', key: 'grid',       label: 'Grid',             tweak: 'decorGrid',       intensity: 'decorGridIntensity' },
+  { group: 'minimal', key: 'dots',       label: 'Grade de pontos',  tweak: 'decorDots',       intensity: 'decorDotsIntensity' },
+  { group: 'minimal', key: 'diagonals',  label: 'Diagonais',        tweak: 'decorDiagonals',  intensity: 'decorDiagonalsIntensity' },
+  { group: 'minimal', key: 'scanlines',  label: 'Scan lines',       tweak: 'decorScanlines',  intensity: 'decorScanlinesIntensity' },
+  { group: 'minimal', key: 'grain',      label: 'Microgranulado',   tweak: 'decorGrain',      intensity: 'decorGrainIntensity' },
+  { group: 'minimal', key: 'topography', label: 'Topografia',       tweak: 'decorTopography', intensity: 'decorTopographyIntensity' },
+  { group: 'minimal', key: 'corners',    label: 'Marcas de canto',  tweak: 'decorCorners',    intensity: 'decorCornersIntensity' },
+  { group: 'minimal', key: 'vignette',   label: 'Vinheta',          tweak: 'decorVignette',   intensity: 'decorVignetteIntensity' },
+  { group: 'minimal', key: 'watermark',  label: "Marca d'água",    tweak: 'decorWatermark',  intensity: 'decorWatermarkIntensity' },
+  { group: 'minimal', key: 'particles',  label: 'Rede neural',      tweak: 'decorParticles',  intensity: 'decorParticlesIntensity' },
+  { group: 'minimal', key: 'glow',       label: 'Glow',             tweak: 'decorGlow',       intensity: 'decorGlowIntensity' },
+  { group: 'system', key: 'axes',        label: 'Eixos técnicos',   tweak: 'decorAxes',       intensity: 'decorAxesIntensity' },
+  { group: 'system', key: 'dataBars',    label: 'Barras de dados',  tweak: 'decorDataBars',   intensity: 'decorDataBarsIntensity', transform: true },
+  { group: 'system', key: 'isoMesh',     label: 'Malha isométrica', tweak: 'decorIsoMesh',    intensity: 'decorIsoMeshIntensity' },
+  { group: 'system', key: 'signal',      label: 'Onda de sinal',    tweak: 'decorSignal',     intensity: 'decorSignalIntensity', transform: true },
+  { group: 'system', key: 'circuit',     label: 'Circuito linear',  tweak: 'decorCircuit',    intensity: 'decorCircuitIntensity', transform: true },
+  { group: 'system', key: 'barcode',     label: 'Código marginal',  tweak: 'decorBarcode',    intensity: 'decorBarcodeIntensity', transform: true },
+  { group: 'editorial', key: 'orbits',   label: 'Órbitas',          tweak: 'decorOrbits',     intensity: 'decorOrbitsIntensity', transform: true },
+  { group: 'editorial', key: 'modules',  label: 'Blocos modulares', tweak: 'decorModules',    intensity: 'decorModulesIntensity', transform: true },
+  { group: 'editorial', key: 'cropMarks', label: 'Recorte editorial', tweak: 'decorCropMarks', intensity: 'decorCropMarksIntensity' },
+  { group: 'editorial', key: 'columns',  label: 'Colunas de leitura', tweak: 'decorColumns',   intensity: 'decorColumnsIntensity' },
+  { group: 'editorial', key: 'focusWindow', label: 'Janela de foco', tweak: 'decorFocusWindow', intensity: 'decorFocusWindowIntensity', transform: true },
+  { group: 'editorial', key: 'marginNotes', label: 'Notas marginais', tweak: 'decorMarginNotes', intensity: 'decorMarginNotesIntensity', transform: true },
+  { group: 'editorial', key: 'ghostBand', label: 'Faixa fantasma',   tweak: 'decorGhostBand', intensity: 'decorGhostBandIntensity', transform: true },
+  { group: 'organic', key: 'softBlob',     label: 'Mancha suave',     tweak: 'decorSoftBlob',  intensity: 'decorSoftBlobIntensity', transform: true },
+  { group: 'organic', key: 'paperFold',    label: 'Dobra de papel',   tweak: 'decorPaperFold', intensity: 'decorPaperFoldIntensity' },
+  { group: 'organic', key: 'inkSpread',    label: 'Tinta difusa',     tweak: 'decorInkSpread', intensity: 'decorInkSpreadIntensity', transform: true },
+  { group: 'campaign', key: 'ribbon',      label: 'Faixa diagonal',   tweak: 'decorRibbon',    intensity: 'decorRibbonIntensity', transform: true },
+  { group: 'campaign', key: 'burst',       label: 'Explosão radial',  tweak: 'decorBurst',     intensity: 'decorBurstIntensity', transform: true },
+  { group: 'campaign', key: 'thread',      label: 'Fio social',       tweak: 'decorThread',    intensity: 'decorThreadIntensity', transform: true },
+  { group: 'campaign', key: 'calendar',    label: 'Calendário',       tweak: 'decorCalendar',  intensity: 'decorCalendarIntensity', transform: true },
+  { group: 'campaign', key: 'stack',       label: 'Stack de cards',   tweak: 'decorStack',     intensity: 'decorStackIntensity', transform: true },
+  { group: 'campaign', key: 'quoteMarks',  label: 'Aspas gigantes',   tweak: 'decorQuoteMarks', intensity: 'decorQuoteMarksIntensity', transform: true },
+  { group: 'campaign', key: 'steps',       label: 'Passos numerados', tweak: 'decorSteps',     intensity: 'decorStepsIntensity', transform: true },
+  { group: 'luxury', key: 'fineFrame',     label: 'Moldura fina',     tweak: 'decorFineFrame', intensity: 'decorFineFrameIntensity' },
+  { group: 'luxury', key: 'hairline',      label: 'Filete editorial', tweak: 'decorHairline',  intensity: 'decorHairlineIntensity' },
+  { group: 'luxury', key: 'medallion',     label: 'Medalhão',         tweak: 'decorMedallion', intensity: 'decorMedallionIntensity', transform: true },
+  { group: 'luxury', key: 'guilloche',     label: 'Guilloché',        tweak: 'decorGuilloche', intensity: 'decorGuillocheIntensity' },
+  { group: 'luxury', key: 'linen',         label: 'Textura linho',    tweak: 'decorLinen',     intensity: 'decorLinenIntensity' },
+  { group: 'luxury', key: 'matte',         label: 'Passe-partout',    tweak: 'decorMatte',     intensity: 'decorMatteIntensity' },
+  { group: 'commerce', key: 'priceSeal',   label: 'Selo comercial',   tweak: 'decorPriceSeal', intensity: 'decorPriceSealIntensity', transform: true },
+  { group: 'commerce', key: 'shelf',       label: 'Vitrine',          tweak: 'decorShelf',     intensity: 'decorShelfIntensity', transform: true },
+  { group: 'commerce', key: 'hangTag',     label: 'Etiqueta suspensa', tweak: 'decorHangTag',  intensity: 'decorHangTagIntensity', transform: true },
+  { group: 'commerce', key: 'catalog',     label: 'Grid de catálogo', tweak: 'decorCatalog',   intensity: 'decorCatalogIntensity', transform: true },
+  { group: 'commerce', key: 'plinth',      label: 'Base de produto',  tweak: 'decorPlinth',    intensity: 'decorPlinthIntensity', transform: true },
+  { group: 'education', key: 'mindMap',    label: 'Mapa mental',      tweak: 'decorMindMap',   intensity: 'decorMindMapIntensity', transform: true },
+  { group: 'education', key: 'chalk',      label: 'Quadro anotado',   tweak: 'decorChalk',     intensity: 'decorChalkIntensity', transform: true },
+  { group: 'education', key: 'marker',     label: 'Marca-texto',      tweak: 'decorMarker',    intensity: 'decorMarkerIntensity', transform: true },
+  { group: 'education', key: 'decision',   label: 'Fluxo de decisão', tweak: 'decorDecision',  intensity: 'decorDecisionIntensity', transform: true },
+  { group: 'education', key: 'layers',     label: 'Camadas didáticas', tweak: 'decorLayers',   intensity: 'decorLayersIntensity', transform: true },
+  { group: 'event', key: 'ticket',         label: 'Ingresso',         tweak: 'decorTicket',    intensity: 'decorTicketIntensity', transform: true },
+  { group: 'event', key: 'seatMap',        label: 'Mapa de assentos', tweak: 'decorSeatMap',   intensity: 'decorSeatMapIntensity', transform: true },
+  { group: 'event', key: 'wristband',      label: 'Credencial',       tweak: 'decorWristband', intensity: 'decorWristbandIntensity', transform: true },
+  { group: 'event', key: 'agenda',         label: 'Linha de agenda',  tweak: 'decorAgenda',    intensity: 'decorAgendaIntensity', transform: true },
+  { group: 'event', key: 'constellation',  label: 'Participantes',    tweak: 'decorConstellation', intensity: 'decorConstellationIntensity', transform: true },
+  { group: 'trust', key: 'certSeal',       label: 'Selo institucional', tweak: 'decorCertSeal', intensity: 'decorCertSealIntensity', transform: true },
+  { group: 'trust', key: 'signature',      label: 'Rubrica',          tweak: 'decorSignature', intensity: 'decorSignatureIntensity', transform: true },
+  { group: 'trust', key: 'stamp',          label: 'Documento carimbado', tweak: 'decorStamp',  intensity: 'decorStampIntensity', transform: true },
+  { group: 'trust', key: 'archive',        label: 'Arquivo',          tweak: 'decorArchive',   intensity: 'decorArchiveIntensity', transform: true },
+  { group: 'trust', key: 'audit',          label: 'Linha de auditoria', tweak: 'decorAudit',   intensity: 'decorAuditIntensity', transform: true },
+  { group: 'creator', key: 'reactions',    label: 'Reações',          tweak: 'decorReactions', intensity: 'decorReactionsIntensity', transform: true },
+  { group: 'creator', key: 'bubbles',      label: 'Balões abstratos', tweak: 'decorBubbles',   intensity: 'decorBubblesIntensity', transform: true },
+  { group: 'creator', key: 'storyFrame',   label: 'Moldura story',    tweak: 'decorStoryFrame', intensity: 'decorStoryFrameIntensity' },
+  { group: 'creator', key: 'comments',     label: 'Comentários',      tweak: 'decorComments',  intensity: 'decorCommentsIntensity', transform: true },
+  { group: 'creator', key: 'socialStats',  label: 'Métricas sociais', tweak: 'decorSocialStats', intensity: 'decorSocialStatsIntensity', transform: true },
+];
 
 // Hook: cria estado editável para um template, com persistência em memória
 function useTemplateData(key) {
@@ -179,8 +359,67 @@ function mixHex(hex1, hex2, t) {
   return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
+function isCustomTheme(theme) {
+  return (theme && typeof theme === 'object' && theme.kind === 'color') ||
+    (typeof theme === 'string' && theme.startsWith('color:'));
+}
+
+function themeBg(theme) {
+  if (theme && typeof theme === 'object' && theme.kind === 'color') return theme.color || '#ffffff';
+  return isCustomTheme(theme) ? theme.slice(6) : theme === 'dark' ? '#000000' : '#ffffff';
+}
+
+function themeBg2(theme) {
+  if (theme && typeof theme === 'object' && theme.kind === 'color') return theme.color2 || theme.color || '#ffffff';
+  return themeBg(theme);
+}
+
+function hexAlpha(hex, alpha) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function themeBackground(theme) {
+  if (!(theme && typeof theme === 'object' && theme.kind === 'color')) return themeBg(theme);
+  const c1 = theme.color || '#ffffff';
+  const c2 = theme.color2 || '#ece7dd';
+  const angle = Number(theme.angle ?? 135);
+  switch (theme.fill || 'solid') {
+    case 'linear':
+      return `linear-gradient(${angle}deg, ${c1} 0%, ${mixHex(c1, c2, 0.35)} 48%, ${c2} 100%)`;
+    case 'radial':
+      return `radial-gradient(circle at 32% 24%, ${c2} 0%, ${mixHex(c1, c2, 0.45)} 36%, ${c1} 78%)`;
+    case 'split':
+      return `linear-gradient(${angle}deg, ${c1} 0 49.7%, ${c2} 50.3% 100%)`;
+    case 'bands':
+      return [
+        `linear-gradient(${angle}deg, ${hexAlpha(c2, 0.26)} 0 12%, transparent 12% 28%, ${hexAlpha(c2, 0.18)} 28% 43%, transparent 43% 100%)`,
+        `linear-gradient(${angle + 90}deg, ${c1} 0%, ${mixHex(c1, c2, 0.22)} 100%)`,
+      ].join(', ');
+    case 'wash':
+      return [
+        `linear-gradient(${angle}deg, ${hexAlpha(c2, 0.36)} 0%, transparent 44%)`,
+        `radial-gradient(ellipse at 78% 18%, ${hexAlpha(c2, 0.42)} 0%, transparent 48%)`,
+        c1,
+      ].join(', ');
+    default:
+      return c1;
+  }
+}
+
+function colorRole(hex) {
+  const [r, g, b] = [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)]
+    .map((v) => {
+      const c = v / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.5 ? 'dark' : 'light';
+}
+
 // Conteúdo interno (só o que vai dentro do DCArtboard)
-function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, exportScale }) {
+function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, exportScale }) {
   const [data, edit] = useTemplateData(tplKey);
   // Padding unificado via variável CSS — herdado por todos os elementos de chrome inline
   const pad = 'var(--ig-chrome-pad, 80px)';
@@ -190,21 +429,27 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
     for (let i = 0; i < slotId.length; i++) s = (s * 31 + slotId.charCodeAt(i)) >>> 0;
     return (s % 9973) + 1;
   }, [slotId]);
-  const bgColor = theme === 'dark' ? '#000000' : '#ffffff';
-  const effectiveColor = textColor || (theme === 'dark' ? '#ffffff' : '#000000');
+  const bgColor = themeBg(theme);
+  const bgColor2 = themeBg2(theme);
+  const bgPaint = themeBackground(theme);
+  const monoTheme = theme === 'dark' ? 'dark' : 'light';
+  const effectiveColor = textColor || (monoTheme === 'dark' ? '#ffffff' : '#000000');
+  const decorTheme = isCustomTheme(theme) ? colorRole(effectiveColor) : monoTheme;
   // fg-2 e fg-3: interpolam entre a cor do texto e o fundo, preservando hierarquia
-  const fg2 = mixHex(effectiveColor, bgColor, 0.38);
-  const fg3 = mixHex(effectiveColor, bgColor, 0.58);
+  const fg2 = secondaryTextColor || mixHex(effectiveColor, bgColor, 0.38);
+  const fg3 = secondaryTextColor ? mixHex(secondaryTextColor, bgColor, 0.34) : mixHex(effectiveColor, bgColor, 0.58);
   return (
     <TplFrame id={`frame-${slotId}`} format={format} exportScale={exportScale}>
-      <div className={theme === 'dark' ? 'inverse' : ''}
+      <div className={monoTheme === 'dark' ? 'inverse' : ''}
         style={{
           position: 'absolute', inset: 0,
-          background: bgColor,
+          background: bgPaint,
           color: effectiveColor,
           '--fg-1': effectiveColor,
           '--fg-2': fg2,
           '--fg-3': fg3,
+          '--bg-1': bgColor,
+          '--bg-2': bgColor2,
           '--ig-weight': weight,
           '--ig-weight-light': Math.max(300, weight - 100),
           '--ig-weight-small': weightSmall,
@@ -213,9 +458,9 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
           '--ig-chrome-pad': chromePad + 'px',
           boxSizing: 'border-box',
         }}
-        data-theme={theme}>
+        data-theme={monoTheme}>
         {/* Decor em bleed — cobre o canvas inteiro, por trás do padding */}
-        <IgDecor decor={decor} theme={theme} seed={seed} />
+        <IgDecor decor={decor} theme={decorTheme} seed={seed} />
         <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: pad, boxSizing: 'border-box' }}>
           <Tpl data={data} onEdit={edit} format={format} />
         </div>
@@ -226,25 +471,35 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
 
 // Factory: retorna o JSX do DCArtboard diretamente (necessário pois
 // DCSection filtra filhos por type === DCArtboard).
-function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, exportScale }) {
+function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, exportScale }) {
   const dims = IG_DIMS[format];
   const artboardW = format === 'story' ? 540 : 720;
   const renderedH = dims.h * (artboardW / dims.w);
   return (
     <DCArtboard key={slotId} id={slotId} label={label} width={artboardW} height={renderedH}>
-      <TplInner slotId={slotId} tplKey={tplKey} Tpl={Tpl} format={format} theme={theme} weight={weight} weightSmall={weightSmall} sizeScale={sizeScale} smallScale={smallScale} chromePad={chromePad} decor={decor} textColor={textColor} exportScale={exportScale} />
+      <TplInner slotId={slotId} tplKey={tplKey} Tpl={Tpl} format={format} theme={theme} weight={weight} weightSmall={weightSmall} sizeScale={sizeScale} smallScale={smallScale} chromePad={chromePad} decor={decor} textColor={textColor} secondaryTextColor={secondaryTextColor} exportScale={exportScale} />
     </DCArtboard>
   );
 }
 
 function App() {
   const [tw, setTw] = useTweaks(TWEAK_DEFAULTS);
+  const selectedTheme = tw.theme === 'color'
+    ? {
+        kind: 'color',
+        fill: tw.bgFill || 'solid',
+        color: tw.bgColor || '#ffffff',
+        color2: tw.bgColor2 || '#ece7dd',
+        angle: Number(tw.bgAngle ?? 135),
+      }
+    : tw.theme;
+  const selectedBgColor = themeBg(selectedTheme);
+  const selectedTextColor = tw.textColor || (tw.theme === 'dark' ? '#ffffff' : '#000000');
+  const selectedSecondaryColor = mixHex(selectedTextColor, selectedBgColor, 0.38);
+  const card = (args) => makeCard({ ...args, secondaryTextColor: tw.secondaryTextColor });
 
   const themes = (count) => {
-    if (tw.theme === 'light') return Array(count).fill('light');
-    if (tw.theme === 'dark')  return Array(count).fill('dark');
-    // mix: padrão de 2 claros, 1 escuro
-    return Array.from({ length: count }, (_, i) => (i % 3 === 1 ? 'dark' : 'light'));
+    return Array(count).fill(selectedTheme);
   };
 
   const mfThemes = themes(8);
@@ -260,175 +515,175 @@ function App() {
   const tuThemes = themes(8);
   const qzThemes = themes(8);
 
-  // Para o carrossel: 5 cards com tema consistente (alternado suave)
-  const cThemes = tw.theme === 'light' ? Array(5).fill('light')
-                 : tw.theme === 'dark' ? Array(5).fill('dark')
-                 : ['light','dark','light','dark','light'];
+  // Para o carrossel: 5 cards com tema consistente.
+  const cThemes = Array(5).fill(selectedTheme);
 
-  const decor = {
-    grid: tw.decorGrid,           gridI: tw.decorGridIntensity,
-    dots: tw.decorDots,           dotsI: tw.decorDotsIntensity,
-    diagonals: tw.decorDiagonals, diagonalsI: tw.decorDiagonalsIntensity,
-    scanlines: tw.decorScanlines, scanlinesI: tw.decorScanlinesIntensity,
-    corners: tw.decorCorners,     cornersI: tw.decorCornersIntensity,
-    vignette: tw.decorVignette,   vignetteI: tw.decorVignetteIntensity,
-    watermark: tw.decorWatermark, watermarkI: tw.decorWatermarkIntensity,
-    particles: tw.decorParticles, particlesI: tw.decorParticlesIntensity,
-    glow: tw.decorGlow,           glowI: tw.decorGlowIntensity,
-  };
+  const decor = DECOR_TWEAKS.reduce((acc, item) => {
+    acc[item.key] = !!tw[item.tweak];
+    acc[item.key + 'I'] = Number(tw[item.intensity] ?? 1);
+    if (item.transform) {
+      acc[item.key + 'Size'] = Number(tw[item.tweak + 'Size'] ?? 100);
+      acc[item.key + 'X'] = Number(tw[item.tweak + 'X'] ?? 0);
+      acc[item.key + 'Y'] = Number(tw[item.tweak + 'Y'] ?? 0);
+    }
+    return acc;
+  }, {});
+
+  const dims = IG_DIMS[tw.format];
+  const resLabel = `${dims.w}×${dims.h}`;
 
   return (
     <>
       <DesignCanvas>
-        <DCSection id="manifesto" title="Frase / Manifesto" subtitle="7 variações · 1080×1080">
-          {makeCard({ slotId: "m01", label: "M · 01 Declaração", tplKey: "manifesto01", Tpl: IgManifesto01, theme: mfThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "m02", label: "M · 02 Citação", tplKey: "manifesto02", Tpl: IgManifesto02, theme: mfThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "m03", label: "M · 03 Princípio", tplKey: "manifesto03", Tpl: IgManifesto03, theme: mfThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "m04", label: "M · 04 Valores", tplKey: "manifesto04", Tpl: IgManifesto04, theme: mfThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "m05", label: "M · 05 Dividido", tplKey: "manifesto05", Tpl: IgManifesto05, theme: mfThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "m06", label: "M · 06 Essência", tplKey: "manifesto06", Tpl: IgManifesto06, theme: mfThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "m07", label: "M · 07 Spread editorial", tplKey: "manifesto07", Tpl: IgManifesto07, theme: mfThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "m08", label: "M · 08 Escada", tplKey: "manifesto08", Tpl: IgManifesto08, theme: mfThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="manifesto" title="Frase / Manifesto" subtitle={`7 variações · ${resLabel}`}>
+          {card({ slotId: "m01", label: "M · 01 Declaração", tplKey: "manifesto01", Tpl: IgManifesto01, format: tw.format, theme: mfThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m02", label: "M · 02 Citação", tplKey: "manifesto02", Tpl: IgManifesto02, format: tw.format, theme: mfThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m03", label: "M · 03 Princípio", tplKey: "manifesto03", Tpl: IgManifesto03, format: tw.format, theme: mfThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m04", label: "M · 04 Valores", tplKey: "manifesto04", Tpl: IgManifesto04, format: tw.format, theme: mfThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m05", label: "M · 05 Dividido", tplKey: "manifesto05", Tpl: IgManifesto05, format: tw.format, theme: mfThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m06", label: "M · 06 Essência", tplKey: "manifesto06", Tpl: IgManifesto06, format: tw.format, theme: mfThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m07", label: "M · 07 Spread editorial", tplKey: "manifesto07", Tpl: IgManifesto07, format: tw.format, theme: mfThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m08", label: "M · 08 Escada", tplKey: "manifesto08", Tpl: IgManifesto08, format: tw.format, theme: mfThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="announce" title="Anúncio de produto / lançamento" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "a01", label: "A · 01 Specs", tplKey: "announce01", Tpl: IgAnnounce01, theme: anThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "a02", label: "A · 02 Categoria", tplKey: "announce02", Tpl: IgAnnounce02, theme: anThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "a03", label: "A · 03 Ficha técnica", tplKey: "announce03", Tpl: IgAnnounce03, theme: anThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "a04", label: "A · 04 CTA", tplKey: "announce04", Tpl: IgAnnounce04, theme: anThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "a05", label: "A · 05 Manifesto", tplKey: "announce05", Tpl: IgAnnounce05, theme: anThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "a06", label: "A · 06 Versão", tplKey: "announce06", Tpl: IgAnnounce06, theme: anThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "a07", label: "A · 07 Etiqueta postal", tplKey: "announce07", Tpl: IgAnnounce07, theme: anThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "a08", label: "A · 08 Vista explodida", tplKey: "announce08", Tpl: IgAnnounce08, theme: anThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="announce" title="Anúncio de produto / lançamento" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "a01", label: "A · 01 Specs", tplKey: "announce01", Tpl: IgAnnounce01, format: tw.format, theme: anThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a02", label: "A · 02 Categoria", tplKey: "announce02", Tpl: IgAnnounce02, format: tw.format, theme: anThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a03", label: "A · 03 Ficha técnica", tplKey: "announce03", Tpl: IgAnnounce03, format: tw.format, theme: anThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a04", label: "A · 04 CTA", tplKey: "announce04", Tpl: IgAnnounce04, format: tw.format, theme: anThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a05", label: "A · 05 Manifesto", tplKey: "announce05", Tpl: IgAnnounce05, format: tw.format, theme: anThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a06", label: "A · 06 Versão", tplKey: "announce06", Tpl: IgAnnounce06, format: tw.format, theme: anThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a07", label: "A · 07 Etiqueta postal", tplKey: "announce07", Tpl: IgAnnounce07, format: tw.format, theme: anThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a08", label: "A · 08 Vista explodida", tplKey: "announce08", Tpl: IgAnnounce08, format: tw.format, theme: anThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="educational" title="Dica técnica / educativo" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "e01", label: "E · 01 Como funciona", tplKey: "educational01", Tpl: IgEducational01, theme: edThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "e02", label: "E · 02 Glossário", tplKey: "educational02", Tpl: IgEducational02, theme: edThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "e03", label: "E · 03 Comparação", tplKey: "educational03", Tpl: IgEducational03, theme: edThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "e04", label: "E · 04 Dica", tplKey: "educational04", Tpl: IgEducational04, theme: edThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "e05", label: "E · 05 Fluxo", tplKey: "educational05", Tpl: IgEducational05, theme: edThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "e06", label: "E · 06 Dado", tplKey: "educational06", Tpl: IgEducational06, theme: edThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "e07", label: "E · 07 Mito × fato", tplKey: "educational07", Tpl: IgEducational07, theme: edThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "e08", label: "E · 08 Intersecção", tplKey: "educational08", Tpl: IgEducational08, theme: edThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="educational" title="Dica técnica / educativo" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "e01", label: "E · 01 Como funciona", tplKey: "educational01", Tpl: IgEducational01, format: tw.format, theme: edThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e02", label: "E · 02 Glossário", tplKey: "educational02", Tpl: IgEducational02, format: tw.format, theme: edThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e03", label: "E · 03 Comparação", tplKey: "educational03", Tpl: IgEducational03, format: tw.format, theme: edThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e04", label: "E · 04 Dica", tplKey: "educational04", Tpl: IgEducational04, format: tw.format, theme: edThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e05", label: "E · 05 Fluxo", tplKey: "educational05", Tpl: IgEducational05, format: tw.format, theme: edThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e06", label: "E · 06 Dado", tplKey: "educational06", Tpl: IgEducational06, format: tw.format, theme: edThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e07", label: "E · 07 Mito × fato", tplKey: "educational07", Tpl: IgEducational07, format: tw.format, theme: edThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e08", label: "E · 08 Intersecção", tplKey: "educational08", Tpl: IgEducational08, format: tw.format, theme: edThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="carousel" title="Carrossel explicativo" subtitle="Capa + 3 páginas + CTA · 1080×1080">
-          {makeCard({ slotId: "c01", label: "Capa", tplKey: "carouselCover", Tpl: IgCarouselA_Cover, theme: cThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "c02", label: "Página 1", tplKey: "carouselPage1", Tpl: IgCarouselA_Page, theme: cThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "c03", label: "Página 2", tplKey: "carouselPage2", Tpl: IgCarouselA_Page, theme: cThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "c04", label: "Página 3", tplKey: "carouselPage3", Tpl: IgCarouselA_Page, theme: cThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "c05", label: "CTA", tplKey: "carouselCTA", Tpl: IgCarouselA_CTA, theme: cThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="carousel" title="Carrossel explicativo" subtitle={`Capa + 3 páginas + CTA · ${resLabel}`}>
+          {card({ slotId: "c01", label: "Capa", tplKey: "carouselCover", Tpl: IgCarouselA_Cover, format: tw.format, theme: cThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "c02", label: "Página 1", tplKey: "carouselPage1", Tpl: IgCarouselA_Page, format: tw.format, theme: cThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "c03", label: "Página 2", tplKey: "carouselPage2", Tpl: IgCarouselA_Page, format: tw.format, theme: cThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "c04", label: "Página 3", tplKey: "carouselPage3", Tpl: IgCarouselA_Page, format: tw.format, theme: cThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "c05", label: "CTA", tplKey: "carouselCTA", Tpl: IgCarouselA_CTA, format: tw.format, theme: cThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="event" title="Evento / Save the date" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "v01", label: "V · 01 Data grande", tplKey: "event01", Tpl: IgEvent01, theme: evThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "v02", label: "V · 02 Metadados", tplKey: "event02", Tpl: IgEvent02, theme: evThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "v03", label: "V · 03 Programação", tplKey: "event03", Tpl: IgEvent03, theme: evThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "v04", label: "V · 04 RSVP", tplKey: "event04", Tpl: IgEvent04, theme: evThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "v05", label: "V · 05 Data composta", tplKey: "event05", Tpl: IgEvent05, theme: evThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "v06", label: "V · 06 Centralizado", tplKey: "event06", Tpl: IgEvent06, theme: evThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "v07", label: "V · 07 Bilhete", tplKey: "event07", Tpl: IgEvent07, theme: evThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "v08", label: "V · 08 Agenda", tplKey: "event08", Tpl: IgEvent08, theme: evThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="event" title="Evento / Save the date" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "v01", label: "V · 01 Data grande", tplKey: "event01", Tpl: IgEvent01, format: tw.format, theme: evThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v02", label: "V · 02 Metadados", tplKey: "event02", Tpl: IgEvent02, format: tw.format, theme: evThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v03", label: "V · 03 Programação", tplKey: "event03", Tpl: IgEvent03, format: tw.format, theme: evThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v04", label: "V · 04 RSVP", tplKey: "event04", Tpl: IgEvent04, format: tw.format, theme: evThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v05", label: "V · 05 Data composta", tplKey: "event05", Tpl: IgEvent05, format: tw.format, theme: evThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v06", label: "V · 06 Centralizado", tplKey: "event06", Tpl: IgEvent06, format: tw.format, theme: evThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v07", label: "V · 07 Bilhete", tplKey: "event07", Tpl: IgEvent07, format: tw.format, theme: evThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v08", label: "V · 08 Agenda", tplKey: "event08", Tpl: IgEvent08, format: tw.format, theme: evThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="job" title="Vaga / Oportunidade" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "j01", label: "J · 01 Ficha", tplKey: "job01", Tpl: IgJob01, theme: joThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "j02", label: "J · 02 CTA", tplKey: "job02", Tpl: IgJob02, theme: joThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "j03", label: "J · 03 Requisitos", tplKey: "job03", Tpl: IgJob03, theme: joThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "j04", label: "J · 04 Centralizado", tplKey: "job04", Tpl: IgJob04, theme: joThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "j05", label: "J · 05 Procura-se", tplKey: "job05", Tpl: IgJob05, theme: joThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "j06", label: "J · 06 Múltiplas vagas", tplKey: "job06", Tpl: IgJob06, theme: joThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "j07", label: "J · 07 Benefícios", tplKey: "job07", Tpl: IgJob07, theme: joThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "j08", label: "J · 08 Níveis", tplKey: "job08", Tpl: IgJob08, theme: joThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="job" title="Vaga / Oportunidade" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "j01", label: "J · 01 Ficha", tplKey: "job01", Tpl: IgJob01, format: tw.format, theme: joThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j02", label: "J · 02 CTA", tplKey: "job02", Tpl: IgJob02, format: tw.format, theme: joThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j03", label: "J · 03 Requisitos", tplKey: "job03", Tpl: IgJob03, format: tw.format, theme: joThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j04", label: "J · 04 Centralizado", tplKey: "job04", Tpl: IgJob04, format: tw.format, theme: joThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j05", label: "J · 05 Procura-se", tplKey: "job05", Tpl: IgJob05, format: tw.format, theme: joThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j06", label: "J · 06 Múltiplas vagas", tplKey: "job06", Tpl: IgJob06, format: tw.format, theme: joThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j07", label: "J · 07 Benefícios", tplKey: "job07", Tpl: IgJob07, format: tw.format, theme: joThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j08", label: "J · 08 Níveis", tplKey: "job08", Tpl: IgJob08, format: tw.format, theme: joThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="blog" title="Novidade do blog / Artigo" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "b01", label: "B · 01 Resumo", tplKey: "blog01", Tpl: IgBlog01, theme: blThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "b02", label: "B · 02 Tags", tplKey: "blog02", Tpl: IgBlog02, theme: blThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "b03", label: "B · 03 Leitura", tplKey: "blog03", Tpl: IgBlog03, theme: blThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "b04", label: "B · 04 Série", tplKey: "blog04", Tpl: IgBlog04, theme: blThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "b05", label: "B · 05 Ensaio", tplKey: "blog05", Tpl: IgBlog05, theme: blThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "b06", label: "B · 06 Índice", tplKey: "blog06", Tpl: IgBlog06, theme: blThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "b07", label: "B · 07 Jornal", tplKey: "blog07", Tpl: IgBlog07, theme: blThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "b08", label: "B · 08 Sumário", tplKey: "blog08", Tpl: IgBlog08, theme: blThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="blog" title="Novidade do blog / Artigo" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "b01", label: "B · 01 Resumo", tplKey: "blog01", Tpl: IgBlog01, format: tw.format, theme: blThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b02", label: "B · 02 Tags", tplKey: "blog02", Tpl: IgBlog02, format: tw.format, theme: blThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b03", label: "B · 03 Leitura", tplKey: "blog03", Tpl: IgBlog03, format: tw.format, theme: blThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b04", label: "B · 04 Série", tplKey: "blog04", Tpl: IgBlog04, format: tw.format, theme: blThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b05", label: "B · 05 Ensaio", tplKey: "blog05", Tpl: IgBlog05, format: tw.format, theme: blThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b06", label: "B · 06 Índice", tplKey: "blog06", Tpl: IgBlog06, format: tw.format, theme: blThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b07", label: "B · 07 Jornal", tplKey: "blog07", Tpl: IgBlog07, format: tw.format, theme: blThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b08", label: "B · 08 Sumário", tplKey: "blog08", Tpl: IgBlog08, format: tw.format, theme: blThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="transparency" title="Transparência" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "tr01", label: "TR · 01 Barras", tplKey: "transp01", Tpl: IgTransp01, theme: xpThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "tr02", label: "TR · 02 Mosaico", tplKey: "transp02", Tpl: IgTransp02, theme: xpThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "tr03", label: "TR · 03 Timeline vertical", tplKey: "transp03", Tpl: IgTransp03, theme: xpThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "tr04", label: "TR · 04 Faixa diagonal", tplKey: "transp04", Tpl: IgTransp04, theme: xpThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "tr05", label: "TR · 05 Notas de rodapé", tplKey: "transp05", Tpl: IgTransp05, theme: xpThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "tr06", label: "TR · 06 Linhas invertidas", tplKey: "transp06", Tpl: IgTransp06, theme: xpThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "tr07", label: "TR · 07 Donut", tplKey: "transp07", Tpl: IgTransp07, theme: xpThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "tr08", label: "TR · 08 Mapa de calor", tplKey: "transp08", Tpl: IgTransp08, theme: xpThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="transparency" title="Transparência" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "tr01", label: "TR · 01 Barras", tplKey: "transp01", Tpl: IgTransp01, format: tw.format, theme: xpThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr02", label: "TR · 02 Mosaico", tplKey: "transp02", Tpl: IgTransp02, format: tw.format, theme: xpThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr03", label: "TR · 03 Timeline vertical", tplKey: "transp03", Tpl: IgTransp03, format: tw.format, theme: xpThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr04", label: "TR · 04 Faixa diagonal", tplKey: "transp04", Tpl: IgTransp04, format: tw.format, theme: xpThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr05", label: "TR · 05 Notas de rodapé", tplKey: "transp05", Tpl: IgTransp05, format: tw.format, theme: xpThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr06", label: "TR · 06 Linhas invertidas", tplKey: "transp06", Tpl: IgTransp06, format: tw.format, theme: xpThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr07", label: "TR · 07 Donut", tplKey: "transp07", Tpl: IgTransp07, format: tw.format, theme: xpThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr08", label: "TR · 08 Mapa de calor", tplKey: "transp08", Tpl: IgTransp08, format: tw.format, theme: xpThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="product" title="Produto" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "prd01", label: "P · 01 Grade de specs", tplKey: "product01", Tpl: IgProduct01, theme: prThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "prd02", label: "P · 02 Número hero", tplKey: "product02", Tpl: IgProduct02, theme: prThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "prd03", label: "P · 03 Roadmap", tplKey: "product03", Tpl: IgProduct03, theme: prThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "prd04", label: "P · 04 Nome vertical", tplKey: "product04", Tpl: IgProduct04, theme: prThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "prd05", label: "P · 05 Versões", tplKey: "product05", Tpl: IgProduct05, theme: prThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "prd06", label: "P · 06 Ficha + selo", tplKey: "product06", Tpl: IgProduct06, theme: prThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "prd07", label: "P · 07 Comparativo", tplKey: "product07", Tpl: IgProduct07, theme: prThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "prd08", label: "P · 08 Arquitetura", tplKey: "product08", Tpl: IgProduct08, theme: prThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="product" title="Produto" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "prd01", label: "P · 01 Grade de specs", tplKey: "product01", Tpl: IgProduct01, format: tw.format, theme: prThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd02", label: "P · 02 Número hero", tplKey: "product02", Tpl: IgProduct02, format: tw.format, theme: prThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd03", label: "P · 03 Roadmap", tplKey: "product03", Tpl: IgProduct03, format: tw.format, theme: prThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd04", label: "P · 04 Nome vertical", tplKey: "product04", Tpl: IgProduct04, format: tw.format, theme: prThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd05", label: "P · 05 Versões", tplKey: "product05", Tpl: IgProduct05, format: tw.format, theme: prThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd06", label: "P · 06 Ficha + selo", tplKey: "product06", Tpl: IgProduct06, format: tw.format, theme: prThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd07", label: "P · 07 Comparativo", tplKey: "product07", Tpl: IgProduct07, format: tw.format, theme: prThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd08", label: "P · 08 Arquitetura", tplKey: "product08", Tpl: IgProduct08, format: tw.format, theme: prThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="testimonial" title="Depoimento" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "d01", label: "D · 01 Inicial", tplKey: "testimonial01", Tpl: IgTestimonial01, theme: dpThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "d02", label: "D · 02 Pull-quote", tplKey: "testimonial02", Tpl: IgTestimonial02, theme: dpThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "d03", label: "D · 03 Assimétrico", tplKey: "testimonial03", Tpl: IgTestimonial03, theme: dpThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "d04", label: "D · 04 Carta", tplKey: "testimonial04", Tpl: IgTestimonial04, theme: dpThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "d05", label: "D · 05 Sobre o produto", tplKey: "testimonial05", Tpl: IgTestimonial05, theme: dpThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "d06", label: "D · 06 Credencial", tplKey: "testimonial06", Tpl: IgTestimonial06, theme: dpThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "d07", label: "D · 07 Cartão", tplKey: "testimonial07", Tpl: IgTestimonial07, theme: dpThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "d08", label: "D · 08 Vozes", tplKey: "testimonial08", Tpl: IgTestimonial08, theme: dpThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="testimonial" title="Depoimento" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "d01", label: "D · 01 Inicial", tplKey: "testimonial01", Tpl: IgTestimonial01, format: tw.format, theme: dpThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d02", label: "D · 02 Pull-quote", tplKey: "testimonial02", Tpl: IgTestimonial02, format: tw.format, theme: dpThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d03", label: "D · 03 Assimétrico", tplKey: "testimonial03", Tpl: IgTestimonial03, format: tw.format, theme: dpThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d04", label: "D · 04 Carta", tplKey: "testimonial04", Tpl: IgTestimonial04, format: tw.format, theme: dpThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d05", label: "D · 05 Sobre o produto", tplKey: "testimonial05", Tpl: IgTestimonial05, format: tw.format, theme: dpThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d06", label: "D · 06 Credencial", tplKey: "testimonial06", Tpl: IgTestimonial06, format: tw.format, theme: dpThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d07", label: "D · 07 Cartão", tplKey: "testimonial07", Tpl: IgTestimonial07, format: tw.format, theme: dpThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d08", label: "D · 08 Vozes", tplKey: "testimonial08", Tpl: IgTestimonial08, format: tw.format, theme: dpThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="usecase" title="Caso de uso" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "u01", label: "U · 01 Persona", tplKey: "usecase01", Tpl: IgUseCase01, theme: ucThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "u02", label: "U · 02 Fluxo narrativo", tplKey: "usecase02", Tpl: IgUseCase02, theme: ucThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "u03", label: "U · 03 Setor hero", tplKey: "usecase03", Tpl: IgUseCase03, theme: ucThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "u04", label: "U · 04 Linha do tempo", tplKey: "usecase04", Tpl: IgUseCase04, theme: ucThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "u05", label: "U · 05 Ficha", tplKey: "usecase05", Tpl: IgUseCase05, theme: ucThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "u06", label: "U · 06 Três cenários", tplKey: "usecase06", Tpl: IgUseCase06, theme: ucThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "u07", label: "U · 07 KPIs", tplKey: "usecase07", Tpl: IgUseCase07, theme: ucThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "u08", label: "U · 08 Feed", tplKey: "usecase08", Tpl: IgUseCase08, theme: ucThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="usecase" title="Caso de uso" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "u01", label: "U · 01 Persona", tplKey: "usecase01", Tpl: IgUseCase01, format: tw.format, theme: ucThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u02", label: "U · 02 Fluxo narrativo", tplKey: "usecase02", Tpl: IgUseCase02, format: tw.format, theme: ucThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u03", label: "U · 03 Setor hero", tplKey: "usecase03", Tpl: IgUseCase03, format: tw.format, theme: ucThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u04", label: "U · 04 Linha do tempo", tplKey: "usecase04", Tpl: IgUseCase04, format: tw.format, theme: ucThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u05", label: "U · 05 Ficha", tplKey: "usecase05", Tpl: IgUseCase05, format: tw.format, theme: ucThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u06", label: "U · 06 Três cenários", tplKey: "usecase06", Tpl: IgUseCase06, format: tw.format, theme: ucThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u07", label: "U · 07 KPIs", tplKey: "usecase07", Tpl: IgUseCase07, format: tw.format, theme: ucThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u08", label: "U · 08 Feed", tplKey: "usecase08", Tpl: IgUseCase08, format: tw.format, theme: ucThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="tutorial" title="Tutorial / Como fazer" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "t01", label: "T · 01 Passos", tplKey: "tutorial01", Tpl: IgTutorial01, theme: tuThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "t02", label: "T · 02 Antes × Depois", tplKey: "tutorial02", Tpl: IgTutorial02, theme: tuThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "t03", label: "T · 03 Terminal", tplKey: "tutorial03", Tpl: IgTutorial03, theme: tuThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "t04", label: "T · 04 Destaque único", tplKey: "tutorial04", Tpl: IgTutorial04, theme: tuThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "t05", label: "T · 05 Checklist", tplKey: "tutorial05", Tpl: IgTutorial05, theme: tuThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "t06", label: "T · 06 Fluxo", tplKey: "tutorial06", Tpl: IgTutorial06, theme: tuThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "t07", label: "T · 07 Decisão", tplKey: "tutorial07", Tpl: IgTutorial07, theme: tuThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "t08", label: "T · 08 Estrutura", tplKey: "tutorial08", Tpl: IgTutorial08, theme: tuThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="tutorial" title="Tutorial / Como fazer" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "t01", label: "T · 01 Passos", tplKey: "tutorial01", Tpl: IgTutorial01, format: tw.format, theme: tuThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t02", label: "T · 02 Antes × Depois", tplKey: "tutorial02", Tpl: IgTutorial02, format: tw.format, theme: tuThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t03", label: "T · 03 Terminal", tplKey: "tutorial03", Tpl: IgTutorial03, format: tw.format, theme: tuThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t04", label: "T · 04 Destaque único", tplKey: "tutorial04", Tpl: IgTutorial04, format: tw.format, theme: tuThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t05", label: "T · 05 Checklist", tplKey: "tutorial05", Tpl: IgTutorial05, format: tw.format, theme: tuThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t06", label: "T · 06 Fluxo", tplKey: "tutorial06", Tpl: IgTutorial06, format: tw.format, theme: tuThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t07", label: "T · 07 Decisão", tplKey: "tutorial07", Tpl: IgTutorial07, format: tw.format, theme: tuThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t08", label: "T · 08 Estrutura", tplKey: "tutorial08", Tpl: IgTutorial08, format: tw.format, theme: tuThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        <DCSection id="quote" title="Citação externa" subtitle="8 variações · 1080×1080">
-          {makeCard({ slotId: "q01", label: "Q · 01 Aspas + mini-bio", tplKey: "quote01", Tpl: IgQuote01, theme: qzThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "q02", label: "Q · 02 Ano histórico", tplKey: "quote02", Tpl: IgQuote02, theme: qzThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "q03", label: "Q · 03 Punch card", tplKey: "quote03", Tpl: IgQuote03, theme: qzThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "q04", label: "Q · 04 Split autor", tplKey: "quote04", Tpl: IgQuote04, theme: qzThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "q05", label: "Q · 05 Duas vozes", tplKey: "quote05", Tpl: IgQuote05, theme: qzThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "q06", label: "Q · 06 Editorial longo", tplKey: "quote06", Tpl: IgQuote06, theme: qzThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "q07", label: "Q · 07 Marginália", tplKey: "quote07", Tpl: IgQuote07, theme: qzThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "q08", label: "Q · 08 Selo", tplKey: "quote08", Tpl: IgQuote08, theme: qzThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        <DCSection id="quote" title="Citação externa" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "q01", label: "Q · 01 Aspas + mini-bio", tplKey: "quote01", Tpl: IgQuote01, format: tw.format, theme: qzThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q02", label: "Q · 02 Ano histórico", tplKey: "quote02", Tpl: IgQuote02, format: tw.format, theme: qzThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q03", label: "Q · 03 Punch card", tplKey: "quote03", Tpl: IgQuote03, format: tw.format, theme: qzThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q04", label: "Q · 04 Split autor", tplKey: "quote04", Tpl: IgQuote04, format: tw.format, theme: qzThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q05", label: "Q · 05 Duas vozes", tplKey: "quote05", Tpl: IgQuote05, format: tw.format, theme: qzThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q06", label: "Q · 06 Editorial longo", tplKey: "quote06", Tpl: IgQuote06, format: tw.format, theme: qzThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q07", label: "Q · 07 Marginália", tplKey: "quote07", Tpl: IgQuote07, format: tw.format, theme: qzThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q08", label: "Q · 08 Selo", tplKey: "quote08", Tpl: IgQuote08, format: tw.format, theme: qzThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
 
-        {/* Formatos alternativos — mostra 1 template em portrait e story */}
-        <DCSection id="formats" title="Formatos alternativos (retrato · story)" subtitle="Os templates adaptam para 1080×1350 e 1080×1920">
-          {makeCard({ slotId: "p01", label: "Retrato · Manifesto 01", tplKey: "manifesto01", Tpl: IgManifesto01, format: "portrait", theme: "light", weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "p02", label: "Retrato · Anúncio 02", tplKey: "announce02", Tpl: IgAnnounce02, format: "portrait", theme: "dark", weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "p03", label: "Retrato · Blog 03", tplKey: "blog03", Tpl: IgBlog03, format: "portrait", theme: "light", weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "s01", label: "Story · Manifesto 06", tplKey: "manifesto06", Tpl: IgManifesto06, format: "story", theme: "light", weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "s02", label: "Story · Evento 01", tplKey: "event01", Tpl: IgEvent01, format: "story", theme: "dark", weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "s03", label: "Story · Dica 04", tplKey: "educational04", Tpl: IgEducational04, format: "story", theme: "light", weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
-          {makeCard({ slotId: "s04", label: "Story · Vaga 04", tplKey: "job04", Tpl: IgJob04, format: "story", theme: "dark", weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor })}
+        {/* Seção de Exemplos Adicionais — mostra adaptabilidade */}
+        <DCSection id="formats" title="Exemplos Adicionais" subtitle={`Adaptabilidade do layout · ${resLabel}`}>
+          {card({ slotId: "p01", label: "Extra · Manifesto 01", tplKey: "manifesto01", Tpl: IgManifesto01, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "p02", label: "Extra · Anúncio 02", tplKey: "announce02", Tpl: IgAnnounce02, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "p03", label: "Extra · Blog 03", tplKey: "blog03", Tpl: IgBlog03, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "s01", label: "Extra · Manifesto 06", tplKey: "manifesto06", Tpl: IgManifesto06, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "s02", label: "Extra · Evento 01", tplKey: "event01", Tpl: IgEvent01, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "s03", label: "Extra · Dica 04", tplKey: "educational04", Tpl: IgEducational04, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "s04", label: "Extra · Vaga 04", tplKey: "job04", Tpl: IgJob04, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
         </DCSection>
       </DesignCanvas>
 
@@ -438,17 +693,75 @@ function App() {
             label="Fundo"
             value={tw.theme}
             options={[
-              { value: 'mix',   label: 'Misto' },
               { value: 'light', label: 'Branco' },
               { value: 'dark',  label: 'Preto' },
+              { value: 'color', label: 'Cor' },
             ]}
-            onChange={(v) => { setTw('theme', v); setTw('textColor', ''); }}
+            onChange={(v) => {
+              setTw('theme', v);
+              if (v === 'light') setTw('textColor', '#000000');
+              if (v === 'dark') setTw('textColor', '#ffffff');
+            }}
           />
+          {tw.theme === 'color' && (
+            <>
+              <TweakSelect
+                label="Preenchimento"
+                value={tw.bgFill || 'solid'}
+                options={[
+                  { value: 'solid', label: 'Sólido' },
+                  { value: 'linear', label: 'Degradê' },
+                  { value: 'radial', label: 'Radial' },
+                  { value: 'split', label: 'Corte' },
+                  { value: 'bands', label: 'Lâminas' },
+                  { value: 'wash', label: 'Véu' },
+                ]}
+                onChange={(v) => setTw('bgFill', v)}
+              />
+              <TweakColor
+                label="Fundo"
+                value={tw.bgColor || '#ffffff'}
+                onChange={(v) => setTw('bgColor', v)}
+              />
+              {(tw.bgFill || 'solid') !== 'solid' && (
+                <>
+                  <TweakColor
+                    label="Cor 2"
+                    value={tw.bgColor2 || '#ece7dd'}
+                    onChange={(v) => setTw('bgColor2', v)}
+                  />
+                  {['linear', 'split', 'bands', 'wash'].includes(tw.bgFill || 'solid') && (
+                    <TweakSlider
+                      label="Ângulo"
+                      value={tw.bgAngle}
+                      min={0}
+                      max={360}
+                      step={5}
+                      unit="°"
+                      onChange={(v) => setTw('bgAngle', v)}
+                    />
+                  )}
+                </>
+              )}
+            </>
+          )}
           <TweakColor
             label="Texto"
             value={tw.textColor || (tw.theme === 'dark' ? '#ffffff' : '#000000')}
             onChange={(v) => setTw('textColor', v)}
           />
+          <TweakColor
+            label="Secundário"
+            value={tw.secondaryTextColor || selectedSecondaryColor}
+            onChange={(v) => setTw('secondaryTextColor', v)}
+          />
+          {tw.secondaryTextColor && (
+            <TweakButton
+              label="Resetar cor secundária"
+              secondary
+              onClick={() => setTw('secondaryTextColor', '')}
+            />
+          )}
         </TweakSection>
         <TweakSection label="Tipografia">
           <TweakRadio
@@ -492,6 +805,18 @@ function App() {
           />
         </TweakSection>
         <TweakSection label="Layout">
+          <TweakRadio
+            label="Formato (Rede Social)"
+            value={tw.format}
+            options={[
+              { value: 'square',    label: 'Quadrado (1:1)' },
+              { value: 'portrait',  label: 'Retrato (4:5)' },
+              { value: 'landscape', label: 'Landscape (16:9)' },
+              { value: 'story',     label: 'Story/Mobile (9:16)' },
+              { value: 'banner',    label: 'Banner (3:1)' },
+            ]}
+            onChange={(v) => setTw('format', v)}
+          />
           <TweakSlider
             label="Margem dos cantos"
             value={tw.chromePad}
@@ -517,26 +842,58 @@ function App() {
             Passe o cursor sobre qualquer post e clique em <strong>↓ PNG</strong> para baixar.
           </div>
         </TweakSection>
-        <TweakSection label="Minimalismo">
-          <TweakToggle label="Grid"            value={tw.decorGrid}      onChange={(v) => setTw('decorGrid', v)} />
-          {tw.decorGrid      && <TweakSlider label="↳ intensidade" value={tw.decorGridIntensity}      min={0.1} max={2} step={0.1} onChange={(v) => setTw('decorGridIntensity', v)} />}
-          <TweakToggle label="Grade de pontos" value={tw.decorDots}      onChange={(v) => setTw('decorDots', v)} />
-          {tw.decorDots      && <TweakSlider label="↳ intensidade" value={tw.decorDotsIntensity}      min={0.1} max={2} step={0.1} onChange={(v) => setTw('decorDotsIntensity', v)} />}
-          <TweakToggle label="Diagonais"       value={tw.decorDiagonals} onChange={(v) => setTw('decorDiagonals', v)} />
-          {tw.decorDiagonals && <TweakSlider label="↳ intensidade" value={tw.decorDiagonalsIntensity} min={0.1} max={2} step={0.1} onChange={(v) => setTw('decorDiagonalsIntensity', v)} />}
-          <TweakToggle label="Scan lines"      value={tw.decorScanlines} onChange={(v) => setTw('decorScanlines', v)} />
-          {tw.decorScanlines && <TweakSlider label="↳ intensidade" value={tw.decorScanlinesIntensity} min={0.1} max={2} step={0.1} onChange={(v) => setTw('decorScanlinesIntensity', v)} />}
-          <TweakToggle label="Marcas de canto" value={tw.decorCorners}   onChange={(v) => setTw('decorCorners', v)} />
-          {tw.decorCorners   && <TweakSlider label="↳ intensidade" value={tw.decorCornersIntensity}   min={0.1} max={2} step={0.1} onChange={(v) => setTw('decorCornersIntensity', v)} />}
-          <TweakToggle label="Vinheta"         value={tw.decorVignette}  onChange={(v) => setTw('decorVignette', v)} />
-          {tw.decorVignette  && <TweakSlider label="↳ intensidade" value={tw.decorVignetteIntensity}  min={0.1} max={2} step={0.1} onChange={(v) => setTw('decorVignetteIntensity', v)} />}
-          <TweakToggle label="Marca d'água"    value={tw.decorWatermark} onChange={(v) => setTw('decorWatermark', v)} />
-          {tw.decorWatermark && <TweakSlider label="↳ intensidade" value={tw.decorWatermarkIntensity} min={0.1} max={2} step={0.1} onChange={(v) => setTw('decorWatermarkIntensity', v)} />}
-          <TweakToggle label="Rede neural"     value={tw.decorParticles} onChange={(v) => setTw('decorParticles', v)} />
-          {tw.decorParticles && <TweakSlider label="↳ intensidade" value={tw.decorParticlesIntensity} min={0.1} max={2} step={0.1} onChange={(v) => setTw('decorParticlesIntensity', v)} />}
-          <TweakToggle label="Glow"            value={tw.decorGlow}      onChange={(v) => setTw('decorGlow', v)} />
-          {tw.decorGlow      && <TweakSlider label="↳ intensidade" value={tw.decorGlowIntensity}      min={0.1} max={2} step={0.1} onChange={(v) => setTw('decorGlowIntensity', v)} />}
-        </TweakSection>
+        {DECOR_GROUPS.map((group) => (
+          <TweakSection key={group.key} label={group.label}>
+            {DECOR_TWEAKS.filter((item) => item.group === group.key).map((item) => (
+              <React.Fragment key={item.key}>
+                <TweakToggle label={item.label} value={tw[item.tweak]} onChange={(v) => setTw(item.tweak, v)} />
+                {tw[item.tweak] && (
+                  <>
+                    <TweakSlider
+                      label="↳ intensidade"
+                      value={tw[item.intensity]}
+                      min={0.1}
+                      max={2}
+                      step={0.1}
+                      onChange={(v) => setTw(item.intensity, v)}
+                    />
+                    {item.transform && (
+                      <>
+                        <TweakSlider
+                          label="↳ tamanho"
+                          value={tw[item.tweak + 'Size'] ?? 100}
+                          min={50}
+                          max={200}
+                          step={5}
+                          unit="%"
+                          onChange={(v) => setTw(item.tweak + 'Size', v)}
+                        />
+                        <TweakSlider
+                          label="↳ horizontal"
+                          value={tw[item.tweak + 'X'] ?? 0}
+                          min={-50}
+                          max={50}
+                          step={2}
+                          unit="%"
+                          onChange={(v) => setTw(item.tweak + 'X', v)}
+                        />
+                        <TweakSlider
+                          label="↳ vertical"
+                          value={tw[item.tweak + 'Y'] ?? 0}
+                          min={-50}
+                          max={50}
+                          step={2}
+                          unit="%"
+                          onChange={(v) => setTw(item.tweak + 'Y', v)}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+              </React.Fragment>
+            ))}
+          </TweakSection>
+        ))}
         <TweakSection label="Exportar">
           <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}>
             Passe o cursor sobre qualquer post e clique em <strong>↓ PNG</strong> (canto superior direito) para baixar em 1080px nativo.

@@ -221,12 +221,12 @@ function IgManifesto04({ data, onEdit, format = 'square' }) {
 }
 
 // ─────────── M05 · Dividido ao meio · assimétrico ────────────────────
-// Metade superior preta (com eyebrow), metade inferior branca (frase).
+// Metade superior usa a cor de fundo atual (com eyebrow), metade inferior branca (frase).
 function IgManifesto05({ data, onEdit, format = 'square' }) {
   const halfH = format === 'story' ? 960 : format === 'portrait' ? 675 : 540;
   return (
     <div style={{ position: 'absolute', inset: 0, background: 'var(--bg-1)' }}>
-      {/* Bloco superior preto */}
+      {/* Bloco superior com a cor de fundo atual */}
       <div
         style={{
           position: 'absolute',
@@ -234,7 +234,7 @@ function IgManifesto05({ data, onEdit, format = 'square' }) {
           left: 0,
           right: 0,
           height: halfH,
-          background: '#000',
+          background: 'var(--bg-1)',
           color: '#fff',
           padding: format === 'story' ? '100px' : '80px',
           display: 'flex',

@@ -115,9 +115,11 @@ function IgCanvas({ format = 'square', theme = 'light', weight = 400, className 
 
 // Dimensões nativas por formato
 const IG_DIMS = {
-  square:   { w: 1080, h: 1080 },
-  portrait: { w: 1080, h: 1350 },
-  story:    { w: 1080, h: 1920 },
+  square:    { w: 1080, h: 1080 },
+  portrait:  { w: 1080, h: 1350 },
+  story:     { w: 1080, h: 1920 },
+  landscape: { w: 1920, h: 1080 },
+  banner:    { w: 1920, h: 640 },
 };
 
 // Wrapper que renderiza um IgCanvas em seu tamanho nativo e escala para

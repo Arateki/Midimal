@@ -25,7 +25,7 @@ Instagram Posts.html      # entrypoint — loads all scripts and mounts the app
 design-canvas.jsx         # Figma-like canvas (pan/zoom, artboards, sections, post-its)
 tweaks-panel.jsx          # global tweaks sidebar (theme, weight, decor…)
 ig-common.jsx             # shared primitives: IgCanvas, IgHeader, IgFooter, IgEdit, IgMono, IgRule…
-ig-decor.jsx              # 9 independent decoration effects; exports IgDecor
+ig-decor.jsx              # independent decoration effects; exports IgDecor
 ig-data.jsx               # default data for all templates (IG_DEFAULTS)
 ig-posts.css              # post base classes (.ig-canvas, .ig-chrome-top…)
 colors_and_type.css       # Arateki brand color and typography tokens
@@ -113,24 +113,85 @@ The `TweaksPanel` (bottom-right corner) controls CSS variables applied to all po
 
 | Tweak key | Type | Effect |
 |---|---|---|
-| `theme` | `light / dark / mix` | inverts post palette |
+| `theme` | `light / dark / color` | selects white, black, or custom post background |
+| `bgColor` | hex | custom background color used when `theme` is `color` |
+| `bgColor2` | hex | secondary color for gradient and patterned fills |
+| `bgFill` | `solid / linear / radial / split / bands / wash` | custom background fill mode |
+| `bgAngle` | 0–360 | angle for directional custom background fills |
 | `weight` | 300/400/500/700 | `--ig-weight` (display text weight) |
 | `weightSmall` | 300/400/500/600/700 | `--ig-weight-small` (labels/logo) |
 | `sizeScale` | float 0.7–1.4 | `--ig-size-scale` (display type scale) |
 | `smallScale` | float 0.7–1.4 | `--ig-small-scale` (label scale) |
 | `chromePad` | 40–140px | `--ig-chrome-pad` (top/bottom chrome padding) |
-| `textColor` | hex | custom text color (overrides black/white from theme) |
+| `textColor` | hex | text color; monochrome background controls set it to the inverse color |
+| `secondaryTextColor` | hex / empty | optional override for `--fg-2`; empty keeps automatic secondary color |
 | `decorGrid` | bool | dashed SVG grid |
 | `decorDots` | bool | dot pattern grid |
 | `decorDiagonals` | bool | 45° hatch lines |
 | `decorScanlines` | bool | horizontal scan lines |
+| `decorGrain` | bool | subtle micrograin texture |
+| `decorTopography` | bool | abstract contour lines |
+| `decorAxes` | bool | technical ruler ticks and center axes |
+| `decorDataBars` | bool | sparse analytical data bars |
+| `decorIsoMesh` | bool | subtle isometric wire mesh |
+| `decorOrbits` | bool | editorial orbital arcs |
+| `decorSignal` | bool | waveform/signal traces |
+| `decorCircuit` | bool | linear circuit paths |
+| `decorModules` | bool | modular editorial blocks |
+| `decorBarcode` | bool | marginal barcode system |
+| `decorCropMarks` | bool | editorial crop/safe-area marks |
+| `decorColumns` | bool | reading-column composition guides |
+| `decorFocusWindow` | bool | framed focus window |
+| `decorMarginNotes` | bool | marginal annotation marks |
+| `decorGhostBand` | bool | large ghosted typographic band |
+| `decorSoftBlob` | bool | soft organic abstract shapes |
+| `decorPaperFold` | bool | folded-paper corner planes |
+| `decorInkSpread` | bool | diffuse ink-like marks |
+| `decorRibbon` | bool | diagonal campaign ribbon |
+| `decorBurst` | bool | radial burst accent |
+| `decorThread` | bool | social proof / connection thread |
+| `decorCalendar` | bool | event calendar marker |
+| `decorStack` | bool | stacked product/content cards |
+| `decorQuoteMarks` | bool | oversized quote marks |
+| `decorSteps` | bool | numbered process path |
+| `decorFineFrame` | bool | luxury double hairline frame |
+| `decorHairline` | bool | editorial ornamental hairlines |
+| `decorMedallion` | bool | centered seal/medallion rings |
+| `decorGuilloche` | bool | fine security-print wave pattern |
+| `decorLinen` | bool | subtle woven linen texture |
+| `decorMatte` | bool | passe-partout border mask |
+| `decorPriceSeal` | bool | commerce seal/star mark |
+| `decorShelf` | bool | product shelf/vitrine |
+| `decorHangTag` | bool | hanging retail tag |
+| `decorCatalog` | bool | product catalog grid |
+| `decorPlinth` | bool | product display base |
+| `decorMindMap` | bool | learning mind-map nodes |
+| `decorChalk` | bool | chalkboard-style notes |
+| `decorMarker` | bool | translucent highlight strokes |
+| `decorDecision` | bool | decision-flow diagram |
+| `decorLayers` | bool | didactic stacked layers |
+| `decorTicket` | bool | event ticket stub |
+| `decorSeatMap` | bool | venue seat map |
+| `decorWristband` | bool | event wristband/credential |
+| `decorAgenda` | bool | event agenda timeline |
+| `decorConstellation` | bool | participant constellation |
+| `decorCertSeal` | bool | institutional certification seal |
+| `decorSignature` | bool | signature/rubric stroke |
+| `decorStamp` | bool | stamped document mark |
+| `decorArchive` | bool | archive/folder stack |
+| `decorAudit` | bool | audit/check trail |
+| `decorReactions` | bool | social reaction marks |
+| `decorBubbles` | bool | abstract chat bubbles |
+| `decorStoryFrame` | bool | story-style frame |
+| `decorComments` | bool | stacked comment rows |
+| `decorSocialStats` | bool | social metrics lines |
 | `decorCorners` | bool | L-bracket corner marks |
 | `decorVignette` | bool | radial vignette |
 | `decorWatermark` | bool | diagonal ARATEKI watermark |
 | `decorParticles` | bool | neural-net dot network |
 | `decorGlow` | bool | radial glow (also animates particles when active) |
 
-Every `decorXxx` boolean has a paired `decorXxxIntensity` float (0.1–2) that appears inline below the toggle when active.
+Every `decorXxx` boolean has a paired `decorXxxIntensity` float (0.1–2) that appears inline below the toggle when active. Transformable effects also expose `decorXxxSize` (50–200%), `decorXxxX` (-50–50%), and `decorXxxY` (-50–50%).
 
 Defaults live in `TWEAK_DEFAULTS` at the top of the inline `<script>` in `Instagram Posts.html`.
 
@@ -138,7 +199,7 @@ Defaults live in `TWEAK_DEFAULTS` at the top of the inline `<script>` in `Instag
 
 ## 6. Decoration layers (`ig-decor.jsx`)
 
-Nine independent effects, each with its own component and `intensity` multiplier:
+Independent effects, each with its own component and `intensity` multiplier:
 
 | Effect | Component | Default opacity | Notes |
 |---|---|---|---|
@@ -146,6 +207,62 @@ Nine independent effects, each with its own component and `intensity` multiplier
 | `dots` | `DecorDots` | `0.22 × intensity` | Dot grid 54×54px, r=1.8 |
 | `diagonals` | `DecorDiagonals` | `0.09 × intensity` | 45° hatch, 24px repeat |
 | `scanlines` | `DecorScanlines` | `0.07 × intensity` | 5px horizontal bands |
+| `grain` | `DecorGrain` | `0.18 × intensity` (max 0.42) | layered micro-dot texture |
+| `topography` | `DecorTopography` | `0.28 × intensity` | abstract contour/isoline paths |
+| `axes` | `DecorAxes` | `0.48 × intensity` (max 0.90) | technical ticks, axes, micro labels |
+| `dataBars` | `DecorDataBars` | `0.42 × intensity` (max 0.75) | sparse edge charts/data bars |
+| `isoMesh` | `DecorIsoMesh` | `0.18 × intensity` | isometric wire pattern |
+| `orbits` | `DecorOrbits` | `0.36 × intensity` (max 0.68) | editorial orbital arcs |
+| `signal` | `DecorSignal` | `0.38 × intensity` (max 0.72) | waveform/signal trace |
+| `circuit` | `DecorCircuit` | `0.34 × intensity` (max 0.70) | linear schematic paths |
+| `modules` | `DecorModules` | `0.42 × intensity` (max 0.78) | modular edge blocks |
+| `barcode` | `DecorBarcode` | `0.46 × intensity` (max 0.86) | marginal barcode marks |
+| `cropMarks` | `DecorCropMarks` | `0.42 × intensity` (max 0.80) | editorial crop/safe-area marks |
+| `columns` | `DecorColumns` | `0.23 × intensity` (max 0.45) | reading-column guides |
+| `focusWindow` | `DecorFocusWindow` | `0.38 × intensity` (max 0.72) | framed focus window |
+| `marginNotes` | `DecorMarginNotes` | `0.40 × intensity` (max 0.76) | marginal annotation marks |
+| `ghostBand` | `DecorGhostBand` | `0.26 × intensity` (max 0.50) | ghosted typographic band |
+| `softBlob` | `DecorSoftBlob` | `0.24 × intensity` (max 0.50) | soft organic abstract shapes |
+| `paperFold` | `DecorPaperFold` | `0.32 × intensity` (max 0.62) | folded-paper corner planes |
+| `inkSpread` | `DecorInkSpread` | `0.30 × intensity` (max 0.58) | diffuse ink-like marks |
+| `ribbon` | `DecorRibbon` | `0.30 × intensity` (max 0.60) | diagonal campaign ribbon |
+| `burst` | `DecorBurst` | `0.38 × intensity` (max 0.74) | radial burst accent |
+| `thread` | `DecorThread` | `0.38 × intensity` (max 0.72) | social proof / connection thread |
+| `calendar` | `DecorCalendar` | `0.42 × intensity` (max 0.78) | event calendar marker |
+| `stack` | `DecorStack` | `0.34 × intensity` (max 0.68) | stacked product/content cards |
+| `quoteMarks` | `DecorQuoteMarks` | `0.24 × intensity` (max 0.48) | oversized quote marks |
+| `steps` | `DecorSteps` | `0.40 × intensity` (max 0.76) | numbered process path |
+| `fineFrame` | `DecorFineFrame` | `0.42 × intensity` (max 0.82) | luxury double hairline frame |
+| `hairline` | `DecorHairline` | `0.36 × intensity` (max 0.72) | editorial ornamental hairlines |
+| `medallion` | `DecorMedallion` | `0.36 × intensity` (max 0.70) | centered seal/medallion rings |
+| `guilloche` | `DecorGuilloche` | `0.24 × intensity` (max 0.48) | fine security-print wave pattern |
+| `linen` | `DecorLinen` | `0.18 × intensity` (max 0.34) | subtle woven linen texture |
+| `matte` | `DecorMatte` | `0.30 × intensity` (max 0.58) | passe-partout border mask |
+| `priceSeal` | `DecorPriceSeal` | `0.40 × intensity` (max 0.78) | commerce seal/star mark |
+| `shelf` | `DecorShelf` | `0.36 × intensity` (max 0.70) | product shelf/vitrine |
+| `hangTag` | `DecorHangTag` | `0.40 × intensity` (max 0.76) | hanging retail tag |
+| `catalog` | `DecorCatalog` | `0.28 × intensity` (max 0.54) | product catalog grid |
+| `plinth` | `DecorPlinth` | `0.30 × intensity` (max 0.56) | product display base |
+| `mindMap` | `DecorMindMap` | `0.38 × intensity` (max 0.72) | learning mind-map nodes |
+| `chalk` | `DecorChalk` | `0.30 × intensity` (max 0.58) | chalkboard-style notes |
+| `marker` | `DecorMarker` | `0.32 × intensity` (max 0.62) | translucent highlight strokes |
+| `decision` | `DecorDecision` | `0.38 × intensity` (max 0.72) | decision-flow diagram |
+| `layers` | `DecorLayers` | `0.34 × intensity` (max 0.64) | didactic stacked layers |
+| `ticket` | `DecorTicket` | `0.42 × intensity` (max 0.78) | event ticket stub |
+| `seatMap` | `DecorSeatMap` | `0.36 × intensity` (max 0.70) | venue seat map |
+| `wristband` | `DecorWristband` | `0.34 × intensity` (max 0.68) | event wristband/credential |
+| `agenda` | `DecorAgenda` | `0.38 × intensity` (max 0.74) | event agenda timeline |
+| `constellation` | `DecorConstellation` | `0.38 × intensity` (max 0.72) | participant constellation |
+| `certSeal` | `DecorCertSeal` | `0.40 × intensity` (max 0.76) | institutional certification seal |
+| `signature` | `DecorSignature` | `0.34 × intensity` (max 0.68) | signature/rubric stroke |
+| `stamp` | `DecorStamp` | `0.42 × intensity` (max 0.78) | stamped document mark |
+| `archive` | `DecorArchive` | `0.34 × intensity` (max 0.66) | archive/folder stack |
+| `audit` | `DecorAudit` | `0.38 × intensity` (max 0.72) | audit/check trail |
+| `reactions` | `DecorReactions` | `0.38 × intensity` (max 0.72) | social reaction marks |
+| `bubbles` | `DecorBubbles` | `0.34 × intensity` (max 0.68) | abstract chat bubbles |
+| `storyFrame` | `DecorStoryFrame` | `0.40 × intensity` (max 0.76) | story-style frame |
+| `comments` | `DecorComments` | `0.34 × intensity` (max 0.68) | stacked comment rows |
+| `socialStats` | `DecorSocialStats` | `0.38 × intensity` (max 0.72) | social metrics lines |
 | `corners` | `DecorCorners` | `0.40 × intensity` | L-brackets at 4 corners |
 | `vignette` | `DecorVignette` | `0.55 × intensity` (max 1) | Radial fade, theme-aware |
 | `watermark` | `DecorWatermark` | `0.045 × intensity` | Diagonal ARATEKI text, −22° |
@@ -164,6 +281,62 @@ IgDecor({ decor, theme, seed })
   dots, dotsI,
   diagonals, diagonalsI,
   scanlines, scanlinesI,
+  grain, grainI,
+  topography, topographyI,
+  axes, axesI,
+  dataBars, dataBarsI,
+  isoMesh, isoMeshI,
+  orbits, orbitsI,
+  signal, signalI,
+  circuit, circuitI,
+  modules, modulesI,
+  barcode, barcodeI,
+  cropMarks, cropMarksI,
+  columns, columnsI,
+  focusWindow, focusWindowI,
+  marginNotes, marginNotesI,
+  ghostBand, ghostBandI,
+  softBlob, softBlobI,
+  paperFold, paperFoldI,
+  inkSpread, inkSpreadI,
+  ribbon, ribbonI,
+  burst, burstI,
+  thread, threadI,
+  calendar, calendarI,
+  stack, stackI,
+  quoteMarks, quoteMarksI,
+  steps, stepsI,
+  fineFrame, fineFrameI,
+  hairline, hairlineI,
+  medallion, medallionI,
+  guilloche, guillocheI,
+  linen, linenI,
+  matte, matteI,
+  priceSeal, priceSealI,
+  shelf, shelfI,
+  hangTag, hangTagI,
+  catalog, catalogI,
+  plinth, plinthI,
+  mindMap, mindMapI,
+  chalk, chalkI,
+  marker, markerI,
+  decision, decisionI,
+  layers, layersI,
+  ticket, ticketI,
+  seatMap, seatMapI,
+  wristband, wristbandI,
+  agenda, agendaI,
+  constellation, constellationI,
+  certSeal, certSealI,
+  signature, signatureI,
+  stamp, stampI,
+  archive, archiveI,
+  audit, auditI,
+  reactions, reactionsI,
+  bubbles, bubblesI,
+  storyFrame, storyFrameI,
+  comments, commentsI,
+  socialStats, socialStatsI,
   corners, cornersI,
   vignette, vignetteI,
   watermark, watermarkI,
