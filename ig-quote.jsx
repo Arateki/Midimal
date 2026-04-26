@@ -127,7 +127,7 @@ function IgQuote04({ data, onEdit, format = 'square' }) {
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: splitH,
         borderBottom: '1px solid currentColor',
-        padding: pad, paddingBottom: 40,
+        paddingTop: pad, paddingRight: pad, paddingBottom: 40, paddingLeft: pad,
         display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -149,7 +149,7 @@ function IgQuote04({ data, onEdit, format = 'square' }) {
       {/* Corpo — citação */}
       <div style={{
         position: 'absolute', top: splitH, left: 0, right: 0, bottom: 0,
-        padding: pad, paddingTop: 40,
+        paddingTop: 40, paddingRight: pad, paddingBottom: pad, paddingLeft: pad,
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
       }}>
         <div style={{
@@ -195,9 +195,11 @@ function IgQuote05({ data, onEdit, format = 'square' }) {
     <>
       <IgHeader index="Q · 05" label="C O N T R A S T E" showLogo />
       <div style={{
-        position: 'absolute', inset: 0, padding: 'inherit',
+        position: 'absolute', inset: 0,
         paddingTop: format === 'story' ? 260 : 200,
+        paddingRight: 'inherit',
         paddingBottom: format === 'story' ? 160 : 120,
+        paddingLeft: 'inherit',
         display: 'flex', flexDirection: 'column',
       }}>
         <Voice
@@ -290,9 +292,10 @@ function IgQuote07({ data, onEdit, format = 'square' }) {
         style={{
           position: 'absolute',
           inset: 0,
-          padding: 'inherit',
           paddingTop: isStory ? 280 : 220,
+          paddingRight: 'inherit',
           paddingBottom: isStory ? 140 : 100,
+          paddingLeft: 'inherit',
           display: 'flex',
           flexDirection: 'column',
         }}

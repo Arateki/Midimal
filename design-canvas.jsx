@@ -456,6 +456,11 @@ function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorde
         style={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06)', overflow: 'hidden', width, height, background: '#fff', ...style }}>
         {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 13, fontFamily: DC.font }}>{id}</div>}
       </div>
+      {artboard.props.editor && (
+        <div style={{ width, marginTop: 10 }}>
+          {artboard.props.editor}
+        </div>
+      )}
     </div>
   );
 }
@@ -528,9 +533,9 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
   // transform on DesignCanvas's ancestors (including the canvas zoom itself).
   return ReactDOM.createPortal(
     <div onClick={() => ctx.setFocus(null)}
-      onWheel={(e) => e.preventDefault()}
+      onWheel={(e) => e.stopPropagation()}
       style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(24,20,16,.6)', backdropFilter: 'blur(14px)',
-        fontFamily: DC.font, color: '#fff' }}>
+        fontFamily: DC.font, color: '#fff', overscrollBehavior: 'contain' }}>
 
       {/* top bar: section dropdown (left) · close (right) */}
       <div onClick={(e) => e.stopPropagation()}
@@ -619,4 +624,3 @@ function DCPostIt({ children, top, left, right, bottom, rotate = -2, width = 180
 }
 
 Object.assign(window, { DesignCanvas, DCSection, DCArtboard, DCPostIt });
-

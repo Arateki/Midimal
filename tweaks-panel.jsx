@@ -78,6 +78,7 @@ const __TWEAKS_STYLE = `
     border:.5px solid rgba(0,0,0,.1);border-radius:7px;
     background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
   .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  textarea.twk-field{height:86px;resize:vertical;padding:7px 8px;line-height:1.35}
   select.twk-field{padding-right:22px;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
     background-repeat:no-repeat;background-position:right 8px center}
@@ -186,7 +187,7 @@ function useTweaks(defaults) {
 // flips off in lockstep; the host echoes __deactivate_edit_mode back which
 // is what actually hides the panel.
 function TweaksPanel({ title = 'Tweaks', children }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const dragRef = React.useRef(null);
   const offsetRef = React.useRef({ x: 16, y: 16 });
   const PAD = 16;
@@ -406,11 +407,20 @@ function TweakSelect({ label, value, options, onChange }) {
   );
 }
 
-function TweakText({ label, value, placeholder, onChange }) {
+function TweakText({ label, value, placeholder, type = 'text', onChange }) {
   return (
     <TweakRow label={label}>
-      <input className="twk-field" type="text" value={value} placeholder={placeholder}
+      <input className="twk-field" type={type} value={value} placeholder={placeholder}
              onChange={(e) => onChange(e.target.value)} />
+    </TweakRow>
+  );
+}
+
+function TweakTextarea({ label, value, placeholder, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <textarea className="twk-field" value={value} placeholder={placeholder}
+                onChange={(e) => onChange(e.target.value)} />
     </TweakRow>
   );
 }
@@ -593,5 +603,5 @@ function TweakButton({ label, onClick, secondary = false }) {
 Object.assign(window, {
   useTweaks, TweaksPanel, TweakSection, TweakRow,
   TweakSlider, TweakToggle, TweakRadio, TweakSelect,
-  TweakText, TweakNumber, TweakColor, TweakButton,
+  TweakText, TweakTextarea, TweakNumber, TweakColor, TweakButton,
 });

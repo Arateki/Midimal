@@ -35,6 +35,93 @@
   }
   [data-dc-slot]:hover .ig-export-btn { opacity: 1; }
   .ig-export-btn:hover { background: #000; color: #fff; }
+  .ig-html-btn {
+    position: absolute;
+    top: 8px;
+    right: 100px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border: 1px solid rgba(0,0,0,0.25);
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    border-radius: 2px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  [data-dc-slot]:hover .ig-html-btn { opacity: 1; }
+  .ig-html-btn:hover { background: #000; color: #fff; }
+  .ig-ai-btn {
+    position: absolute;
+    top: 8px;
+    right: 174px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border: 1px solid rgba(0,0,0,0.25);
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    border-radius: 2px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  [data-dc-slot]:hover .ig-ai-btn { opacity: 1; }
+  .ig-ai-btn:hover { background: #000; color: #fff; }
+  .ig-ai-btn[disabled] {
+    opacity: .45;
+    cursor: wait;
+  }
+  .ig-html-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ig-html-action {
+    border: 0;
+    border-radius: 4px;
+    background: rgba(0,0,0,.08);
+    color: inherit;
+    font: inherit;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+  .ig-html-action.primary {
+    background: rgba(0,0,0,.78);
+    color: #fff;
+  }
+  .ig-html-action.danger {
+    background: rgba(176,44,32,.10);
+    color: #8f2118;
+  }
+  .ig-html-action:hover {
+    filter: brightness(.94);
+  }
+  .ig-html-editor {
+    width: 100%;
+    height: 260px;
+    box-sizing: border-box;
+    resize: vertical;
+    border: 1px solid rgba(0,0,0,.16);
+    border-radius: 4px;
+    background: rgba(255,255,255,.86);
+    color: #181512;
+    font: 11px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    padding: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    outline: none;
+  }
+  .ig-html-editor:focus {
+    border-color: rgba(0,0,0,.36);
+    background: #fff;
+  }
 </style>
 </head>
 <body>
@@ -284,6 +371,54 @@ function useTemplateData(key) {
   return [d, edit, setD];
 }
 
+function flattenTextFields(value, path = []) {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return [{ path: path.join('.'), value: String(value) }];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap((item, index) => flattenTextFields(item, [...path, index]));
+  }
+  if (value && typeof value === 'object') {
+    return Object.entries(value).flatMap(([key, item]) => flattenTextFields(item, [...path, key]));
+  }
+  return [];
+}
+
+function setDeepValue(root, dottedPath, value) {
+  const path = String(dottedPath || '').split('.').filter(Boolean);
+  if (!path.length) return root;
+  const next = Array.isArray(root) ? [...root] : { ...root };
+  let cursor = next;
+  for (let i = 0; i < path.length - 1; i++) {
+    const key = /^\d+$/.test(path[i]) ? Number(path[i]) : path[i];
+    const child = cursor[key];
+    cursor[key] = Array.isArray(child) ? [...child] : { ...child };
+    cursor = cursor[key];
+  }
+  const last = path[path.length - 1];
+  cursor[/^\d+$/.test(last) ? Number(last) : last] = String(value ?? '');
+  return next;
+}
+
+function applyTextFields(data, fields) {
+  return (fields || []).reduce((acc, field) => {
+    if (!field || field.path == null) return acc;
+    return setDeepValue(acc, field.path, field.value);
+  }, data);
+}
+
+function parseAiJson(text) {
+  const cleaned = String(text || '').replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (err) {
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if (start >= 0 && end > start) return JSON.parse(cleaned.slice(start, end + 1));
+    throw err;
+  }
+}
+
 // Botão de exportar PNG no canto do artboard
 function ExportBtn({ targetId, filename, dims, scale = 1 }) {
   const onClick = async (e) => {
@@ -324,7 +459,7 @@ function ExportBtn({ targetId, filename, dims, scale = 1 }) {
 }
 
 // Wrapper que renderiza template em tamanho real + escala + export
-function TplFrame({ id, format, exportScale, children }) {
+function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, aiBusy, children }) {
   const dims = IG_DIMS[format];
   const artboardW = format === 'story' ? 540 : format === 'portrait' ? 720 : 720;
   const scale = artboardW / dims.w;
@@ -346,6 +481,25 @@ function TplFrame({ id, format, exportScale, children }) {
       >
         {children}
       </div>
+      <button
+        className="ig-html-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onToggleHtml) onToggleHtml();
+        }}
+        title="Editar HTML">
+        {htmlActive ? 'HTML ✓' : 'HTML'}
+      </button>
+      <button
+        className="ig-ai-btn"
+        disabled={!!aiBusy}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onRunAi) onRunAi();
+        }}
+        title="Modificar com IA">
+        {aiBusy ? 'IA…' : 'IA'}
+      </button>
       <ExportBtn targetId={id} filename={id} dims={dims} scale={exportScale} />
     </div>
   );
@@ -418,9 +572,166 @@ function colorRole(hex) {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.5 ? 'dark' : 'light';
 }
 
+function sanitizeHtmlFragment(html) {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  doc.querySelectorAll('script, iframe, object, embed, link[rel="import"]').forEach((el) => el.remove());
+  doc.querySelectorAll('*').forEach((el) => {
+    [...el.attributes].forEach((attr) => {
+      const name = attr.name.toLowerCase();
+      const value = String(attr.value || '').trim().toLowerCase();
+      if (name.startsWith('on') || value.startsWith('javascript:')) el.removeAttribute(attr.name);
+    });
+  });
+  return doc.body.firstElementChild ? doc.body.firstElementChild.innerHTML : html;
+}
+
+function stripFullCanvasBackgrounds(html) {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  doc.querySelectorAll('*').forEach((el) => {
+    const style = el.getAttribute('style') || '';
+    const normalized = style.toLowerCase().replace(/\s+/g, '');
+    const fullCanvas = (
+      (normalized.includes('width:100%') && normalized.includes('height:100%')) ||
+      normalized.includes('inset:0')
+    );
+    if (!fullCanvas || !normalized.includes('background')) return;
+    const cleaned = style
+      .replace(/background(?:-color)?\s*:\s*[^;]+;?/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    if (cleaned) el.setAttribute('style', cleaned);
+    else el.removeAttribute('style');
+  });
+  return doc.body.firstElementChild ? doc.body.firstElementChild.innerHTML : html;
+}
+
+function ensureAiHtmlContract(html) {
+  const cleaned = stripFullCanvasBackgrounds(sanitizeHtmlFragment(html));
+  if (/data-ai-html=["']1["']/.test(cleaned)) return cleaned;
+  return `<div data-ai-html="1" style="position:relative;width:100%;height:100%;box-sizing:border-box;padding:var(--ig-chrome-pad);color:var(--fg-1);font-family:var(--font-sans);font-weight:var(--ig-weight);overflow:hidden;">${cleaned}</div>`;
+}
+
+const AI_MODELS = {
+  openai: [
+    { value: 'gpt-5.5', label: 'GPT-5.5' },
+    { value: 'gpt-5.4', label: 'GPT-5.4' },
+    { value: 'gpt-5.4-mini', label: 'GPT-5.4 mini' },
+    { value: 'gpt-5.4-nano', label: 'GPT-5.4 nano' },
+  ],
+  anthropic: [
+    { value: 'claude-opus-4-7', label: 'Claude Opus 4.7' },
+    { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6' },
+    { value: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5' },
+  ],
+  gemini: [
+    { value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro Preview' },
+    { value: 'gemini-3-flash-preview', label: 'Gemini 3 Flash Preview' },
+    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
+    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+    { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash-Lite' },
+  ],
+};
+
+async function callAiProvider({ provider, key, model, systemPrompt, userPrompt }) {
+  if (provider === 'anthropic') {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 8192,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.error?.message || 'Falha na chamada da Anthropic.');
+    return (json.content || []).map((part) => part.text || '').join('').trim();
+  }
+
+  if (provider === 'gemini') {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': key,
+      },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+      }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.error?.message || 'Falha na chamada do Gemini.');
+    return (json.candidates?.[0]?.content?.parts || []).map((part) => part.text || '').join('').trim();
+  }
+
+  const res = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model,
+      input: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+    }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json?.error?.message || 'Falha na chamada da OpenAI.');
+  return json.output_text ||
+    (json.output || []).flatMap((item) => item.content || []).map((part) => part.text || '').join('').trim();
+}
+
+function HtmlEditor({ value, dirty, saved, onChange, onSave, onReset, onClose }) {
+  return (
+    <div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 6,
+        fontFamily: 'var(--font-sans)',
+        fontSize: 11,
+        color: 'rgba(41,38,27,.68)',
+      }}>
+        <span style={{ fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+          HTML do post {dirty ? '· não salvo' : saved ? '· salvo' : ''}
+        </span>
+        <div className="ig-html-actions">
+          <button type="button" className="ig-html-action primary" onClick={onSave}>Salvar</button>
+          <button type="button" className="ig-html-action danger" onClick={onReset}>Resetar</button>
+          <button type="button" className="ig-html-action" onClick={onClose}>Fechar</button>
+        </div>
+      </div>
+      <textarea
+        className="ig-html-editor"
+        value={value}
+        spellCheck={false}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  );
+}
+
 // Conteúdo interno (só o que vai dentro do DCArtboard)
-function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, exportScale }) {
-  const [data, edit] = useTemplateData(tplKey);
+function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, htmlOverride, onToggleHtml, htmlActive, onRunAi, aiBusy, registerSlotData, exportScale }) {
+  const [data, edit, setData] = useTemplateData(tplKey);
+  useEffect(() => {
+    if (!registerSlotData) return undefined;
+    return registerSlotData(slotId, {
+      getFields: () => flattenTextFields(data),
+      applyFields: (fields) => setData((current) => applyTextFields(current, fields)),
+    });
+  }, [slotId, data, setData, registerSlotData]);
   // Padding unificado via variável CSS — herdado por todos os elementos de chrome inline
   const pad = 'var(--ig-chrome-pad, 80px)';
   // Seed estável por slot para que as partículas não fiquem idênticas em todos os posts
@@ -439,7 +750,7 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
   const fg2 = secondaryTextColor || mixHex(effectiveColor, bgColor, 0.38);
   const fg3 = secondaryTextColor ? mixHex(secondaryTextColor, bgColor, 0.34) : mixHex(effectiveColor, bgColor, 0.58);
   return (
-    <TplFrame id={`frame-${slotId}`} format={format} exportScale={exportScale}>
+    <TplFrame id={`frame-${slotId}`} format={format} exportScale={exportScale} onToggleHtml={onToggleHtml} htmlActive={htmlActive} onRunAi={onRunAi} aiBusy={aiBusy}>
       <div className={monoTheme === 'dark' ? 'inverse' : ''}
         style={{
           position: 'absolute', inset: 0,
@@ -461,9 +772,16 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
         data-theme={monoTheme}>
         {/* Decor em bleed — cobre o canvas inteiro, por trás do padding */}
         <IgDecor decor={decor} theme={decorTheme} seed={seed} />
-        <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: pad, boxSizing: 'border-box' }}>
-          <Tpl data={data} onEdit={edit} format={format} />
-        </div>
+        {htmlOverride !== null && htmlOverride !== undefined ? (
+          <div
+            style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', boxSizing: 'border-box' }}
+            dangerouslySetInnerHTML={{ __html: htmlOverride }}
+          />
+        ) : (
+          <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: pad, boxSizing: 'border-box' }}>
+            <Tpl data={data} onEdit={edit} format={format} />
+          </div>
+        )}
       </div>
     </TplFrame>
   );
@@ -471,19 +789,74 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
 
 // Factory: retorna o JSX do DCArtboard diretamente (necessário pois
 // DCSection filtra filhos por type === DCArtboard).
-function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, exportScale }) {
+function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, savedHtml, htmlEditor, onToggleHtml, onChangeHtml, onSaveHtml, onResetHtml, onCloseHtml, onRunAi, aiBusySlot, registerSlotData, exportScale }) {
   const dims = IG_DIMS[format];
   const artboardW = format === 'story' ? 540 : 720;
   const renderedH = dims.h * (artboardW / dims.w);
+  const htmlActive = htmlEditor && htmlEditor.slotId === slotId;
+  const htmlOverride = htmlActive ? htmlEditor.draft : savedHtml[slotId] || null;
   return (
-    <DCArtboard key={slotId} id={slotId} label={label} width={artboardW} height={renderedH}>
-      <TplInner slotId={slotId} tplKey={tplKey} Tpl={Tpl} format={format} theme={theme} weight={weight} weightSmall={weightSmall} sizeScale={sizeScale} smallScale={smallScale} chromePad={chromePad} decor={decor} textColor={textColor} secondaryTextColor={secondaryTextColor} exportScale={exportScale} />
+    <DCArtboard
+      key={slotId}
+      id={slotId}
+      label={label}
+      width={artboardW}
+      height={renderedH}
+      editor={htmlActive ? (
+        <HtmlEditor
+          value={htmlEditor.draft}
+          dirty={htmlEditor.draft !== (savedHtml[slotId] || '')}
+          saved={!!savedHtml[slotId]}
+          onChange={onChangeHtml}
+          onSave={onSaveHtml}
+          onReset={() => onResetHtml(slotId)}
+          onClose={onCloseHtml}
+        />
+      ) : null}>
+      <TplInner
+        slotId={slotId}
+        tplKey={tplKey}
+        Tpl={Tpl}
+        format={format}
+        theme={theme}
+        weight={weight}
+        weightSmall={weightSmall}
+        sizeScale={sizeScale}
+        smallScale={smallScale}
+        chromePad={chromePad}
+        decor={decor}
+        textColor={textColor}
+        secondaryTextColor={secondaryTextColor}
+        htmlOverride={htmlOverride}
+        onToggleHtml={() => onToggleHtml(slotId)}
+        htmlActive={htmlActive}
+        onRunAi={() => onRunAi(slotId)}
+        aiBusy={aiBusySlot === slotId}
+        registerSlotData={registerSlotData}
+        exportScale={exportScale}
+      />
     </DCArtboard>
   );
 }
 
 function App() {
   const [tw, setTw] = useTweaks(TWEAK_DEFAULTS);
+  const [aiProvider, setAiProvider] = useState('openai');
+  const [aiKey, setAiKey] = useState('');
+  const [aiModel, setAiModel] = useState('gpt-5.5');
+  const [aiMode, setAiMode] = useState('content');
+  const [aiContext, setAiContext] = useState('');
+  const [aiStatus, setAiStatus] = useState('');
+  const [aiBusySlot, setAiBusySlot] = useState(null);
+  const [savedHtml, setSavedHtml] = useState({});
+  const [htmlEditor, setHtmlEditor] = useState(null);
+  const slotDataRef = useRef({});
+  const registerSlotData = useCallback((slotId, api) => {
+    slotDataRef.current[slotId] = api;
+    return () => {
+      if (slotDataRef.current[slotId] === api) delete slotDataRef.current[slotId];
+    };
+  }, []);
   const selectedTheme = tw.theme === 'color'
     ? {
         kind: 'color',
@@ -496,7 +869,143 @@ function App() {
   const selectedBgColor = themeBg(selectedTheme);
   const selectedTextColor = tw.textColor || (tw.theme === 'dark' ? '#ffffff' : '#000000');
   const selectedSecondaryColor = mixHex(selectedTextColor, selectedBgColor, 0.38);
-  const card = (args) => makeCard({ ...args, secondaryTextColor: tw.secondaryTextColor });
+  const openHtmlEditor = (slotId) => {
+    if (htmlEditor && htmlEditor.slotId === slotId) {
+      setHtmlEditor(null);
+      return;
+    }
+    const el = document.querySelector(`#frame-${slotId} [data-ig-real]`);
+    setHtmlEditor({
+      slotId,
+      draft: savedHtml[slotId] || (el ? el.innerHTML.trim() : ''),
+    });
+  };
+  const saveHtmlEditor = () => {
+    setHtmlEditor((current) => {
+      if (!current) return current;
+      setSavedHtml((saved) => ({ ...saved, [current.slotId]: current.draft }));
+      return current;
+    });
+  };
+  const resetHtml = (slotId) => {
+    setSavedHtml((saved) => {
+      const next = { ...saved };
+      delete next[slotId];
+      return next;
+    });
+    setHtmlEditor(null);
+  };
+  const runAiForSlot = async (slotId) => {
+    const key = aiKey.trim();
+    if (!key) {
+      setAiStatus('Informe uma API key antes de usar IA.');
+      return;
+    }
+    const el = document.querySelector(`#frame-${slotId} [data-ig-real]`);
+    const currentHtml = htmlEditor?.slotId === slotId
+      ? htmlEditor.draft
+      : savedHtml[slotId] || (el ? el.innerHTML.trim() : '');
+    const dataApi = slotDataRef.current[slotId];
+    const contentFields = dataApi?.getFields ? dataApi.getFields() : [];
+    if (aiMode === 'content' && !contentFields.length) {
+      setAiStatus('Não encontrei campos editáveis nesse post.');
+      return;
+    }
+    if (aiMode === 'html' && !currentHtml) {
+      setAiStatus('Não consegui ler o HTML desse post.');
+      return;
+    }
+
+    const modeInstruction = aiMode === 'html'
+      ? 'Voce pode reorganizar, reestilizar e modificar o HTML completo do post conforme o estilo pedido pelo usuario, mantendo um fragmento HTML valido para ser inserido dentro do canvas atual e compativel com os tweaks basicos.'
+      : 'Modifique somente os valores textuais recebidos no JSON. Nao crie HTML. Preserve as chaves path exatamente como recebidas para manter compatibilidade com os controles visuais.';
+    const systemPrompt = [
+      'Voce e um assistente de design para posts de redes sociais e pecas visuais digitais.',
+      modeInstruction,
+      'Siga a linguagem visual solicitada pelo usuario, desde que o resultado continue legivel, exportavel e coerente dentro do canvas.',
+      aiMode === 'content'
+        ? 'Responda somente JSON valido no formato {"fields":[{"path":"...","value":"..."}]}. Inclua apenas paths existentes. Nao use markdown.'
+        : 'Contrato obrigatorio do HTML: o fragmento deve assumir que sera inserido dentro de um wrapper que ja fornece var(--fg-1), var(--fg-2), var(--fg-3), var(--bg-1), var(--bg-2), var(--ig-size-scale), var(--ig-small-scale), var(--ig-weight), var(--ig-weight-small), var(--ig-chrome-pad), color:var(--fg-1) e font-family:var(--font-sans).',
+      aiMode === 'html'
+        ? 'Use color:inherit ou color:var(--fg-1) para textos principais; use color:var(--fg-2) para textos secundarios; use color:var(--fg-3) para legendas discretas; use currentColor para linhas, icones e ornamentos.'
+        : 'Nao altere layout, classes, estilos, cores, tamanhos ou estrutura; apenas substitua textos.',
+      aiMode === 'html'
+        ? 'Use font-size:calc(Npx * var(--ig-size-scale)) em titulos/display e font-size:calc(Npx * var(--ig-small-scale)) em textos pequenos/metadados. Use font-weight:var(--ig-weight) ou var(--ig-weight-small) conforme a hierarquia.'
+        : 'Mantenha quebras de linha quando forem importantes para o texto.',
+      aiMode === 'html'
+        ? 'Se criar uma estrutura nova, mantenha tudo dentro de um fragmento HTML interno do canvas, com position:relative, width:100%, height:100%, box-sizing:border-box e layouts que respeitem o espaco disponivel.'
+        : 'Preserve a quantidade e o papel dos campos; se algum campo nao precisar mudar, devolva o mesmo valor.',
+      aiMode === 'html'
+        ? 'Evite cores fixas e tamanhos fixos para elementos que devem responder aos controles globais. So use cores fixas quando forem parte explicita do pedido do usuario.'
+        : 'Nao inclua HTML nos valores, apenas texto puro.',
+      aiMode === 'html'
+        ? 'Nao crie um fundo full-canvas opaco cobrindo tudo. Deixe o background transparente por padrao para preservar as opcoes de fundo e efeitos decorativos do app; use background apenas em cards/blocos internos.'
+        : 'Preserve a hierarquia visual implícita nos nomes dos campos.',
+      aiMode === 'html'
+        ? 'Responda somente com o HTML final. Nao use markdown, explicacoes, cercas de codigo ou texto fora do HTML.'
+        : 'Nao inclua explicacoes ou texto fora do JSON.',
+      aiMode === 'html'
+        ? 'Nao inclua scripts, iframes, handlers on*, links externos ou recursos remotos.'
+        : 'Nao altere paths ou tipos dos campos.',
+      'Preserve dimensoes, legibilidade e hierarquia visual do post.',
+    ].join('\n');
+    const userPrompt = [
+      `Contexto/instrucao do usuario:\n${aiContext || 'Melhore o post mantendo o estilo visual atual.'}`,
+      aiMode === 'content'
+        ? `\nCampos textuais atuais em JSON:\n${JSON.stringify({ fields: contentFields }, null, 2)}`
+        : `\nHTML atual do post:\n${currentHtml}`,
+    ].join('\n');
+
+    setAiBusySlot(slotId);
+    setAiStatus('Gerando com IA...');
+    try {
+      const output = await callAiProvider({
+        provider: aiProvider,
+        key,
+        model: aiModel.trim() || AI_MODELS[aiProvider][0].value,
+        systemPrompt,
+        userPrompt,
+      });
+      if (aiMode === 'content') {
+        const parsed = parseAiJson(output);
+        const fields = Array.isArray(parsed?.fields) ? parsed.fields : [];
+        if (!fields.length) throw new Error('A IA não retornou campos de texto.');
+        dataApi.applyFields(fields);
+        setSavedHtml((saved) => {
+          const next = { ...saved };
+          delete next[slotId];
+          return next;
+        });
+        setHtmlEditor((editor) => editor?.slotId === slotId ? null : editor);
+        setAiStatus('Conteúdo aplicado mantendo os tweaks do post.');
+      } else {
+        const html = ensureAiHtmlContract(output.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim());
+        if (!html) throw new Error('A IA não retornou HTML.');
+        setSavedHtml((saved) => ({ ...saved, [slotId]: html }));
+        setHtmlEditor((editor) => editor?.slotId === slotId ? { ...editor, draft: html } : editor);
+        setAiStatus('HTML aplicado e salvo nesse post.');
+      }
+    } catch (err) {
+      console.error(err);
+      setAiStatus(err?.message || 'Erro ao usar IA.');
+    } finally {
+      setAiBusySlot(null);
+    }
+  };
+  const card = (args) => makeCard({
+    ...args,
+    secondaryTextColor: tw.secondaryTextColor,
+    savedHtml,
+    htmlEditor,
+    onToggleHtml: openHtmlEditor,
+    onChangeHtml: (html) => setHtmlEditor((s) => s ? { ...s, draft: html } : s),
+    onSaveHtml: saveHtmlEditor,
+    onResetHtml: resetHtml,
+    onCloseHtml: () => setHtmlEditor(null),
+    onRunAi: runAiForSlot,
+    aiBusySlot,
+    registerSlotData,
+  });
 
   const themes = (count) => {
     return Array(count).fill(selectedTheme);
@@ -688,6 +1197,52 @@ function App() {
       </DesignCanvas>
 
       <TweaksPanel title="Tweaks">
+        <TweakSection label="IA">
+          <TweakSelect
+            label="Provedor"
+            value={aiProvider}
+            options={[
+              { value: 'openai', label: 'OpenAI / ChatGPT' },
+              { value: 'anthropic', label: 'Anthropic / Claude' },
+              { value: 'gemini', label: 'Google / Gemini' },
+            ]}
+            onChange={(v) => {
+              setAiProvider(v);
+              setAiModel(AI_MODELS[v][0].value);
+            }}
+          />
+          <TweakText
+            label="API key"
+            value={aiKey}
+            type="password"
+            placeholder="sk-..."
+            onChange={setAiKey}
+          />
+          <TweakSelect
+            label="Modelo"
+            value={aiModel}
+            options={AI_MODELS[aiProvider]}
+            onChange={setAiModel}
+          />
+          <TweakRadio
+            label="Modo"
+            value={aiMode}
+            options={[
+              { value: 'content', label: 'Conteúdo' },
+              { value: 'html', label: 'HTML' },
+            ]}
+            onChange={setAiMode}
+          />
+          <TweakTextarea
+            label="Contexto"
+            value={aiContext}
+            placeholder="Ex: gere um post para lançamento B2B..."
+            onChange={setAiContext}
+          />
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: aiStatus.startsWith('Erro') || aiStatus.startsWith('Informe') ? '#8f2118' : 'rgba(41,38,27,.62)', padding: '2px 0' }}>
+            {aiStatus || 'A chave fica somente no estado desta página e é enviada direto ao provedor escolhido.'}
+          </div>
+        </TweakSection>
         <TweakSection label="Tema">
           <TweakRadio
             label="Fundo"
