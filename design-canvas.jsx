@@ -360,7 +360,10 @@ function DCSection({ id, title, subtitle, children, gap = 48 }) {
             label={(sec.labels || {})[k] ?? byId[k].props.label}
             onRename={(v) => ctx && ctx.patchSection(sid, (x) => ({ labels: { ...x.labels, [k]: v } }))}
             onReorder={(next) => ctx && ctx.patchSection(sid, { order: next })}
-            onFocus={() => ctx && ctx.setFocus(`${sid}/${k}`)} />
+            onFocus={() => {
+              byId[k].props.onFocusOpen?.();
+              ctx && ctx.setFocus(`${sid}/${k}`);
+            }} />
         ))}
       </div>
       {rest}
@@ -510,10 +513,11 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
     return () => document.removeEventListener('keydown', k);
   });
 
-  const { width = 260, height = 480, children } = artboard.props;
+  const { width = 260, height = 480, children, focusEditor } = artboard.props;
   const [vp, setVp] = React.useState({ w: window.innerWidth, h: window.innerHeight });
   React.useEffect(() => { const r = () => setVp({ w: window.innerWidth, h: window.innerHeight }); window.addEventListener('resize', r); return () => window.removeEventListener('resize', r); }, []);
-  const scale = Math.max(0.1, Math.min((vp.w - 200) / width, (vp.h - 260) / height, 2));
+  const editorW = focusEditor ? 360 : 0;
+  const scale = Math.max(0.1, Math.min((vp.w - 220 - editorW) / width, (vp.h - 260) / height, 2));
 
   const [ddOpen, setDd] = React.useState(false);
   const Arrow = ({ dir, onClick }) => (
@@ -576,17 +580,25 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
           propagation so any backdrop click (including the margins around
           the card) exits focus */}
       <div
-        style={{ position: 'absolute', top: 64, bottom: 56, left: 100, right: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-        <div onClick={(e) => e.stopPropagation()} style={{ width: width * scale, height: height * scale, position: 'relative' }}>
-          <div style={{ width, height, transform: `scale(${scale})`, transformOrigin: 'top left', background: '#fff', borderRadius: 2, overflow: 'hidden',
-            boxShadow: '0 20px 80px rgba(0,0,0,.4)' }}>
-            {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb' }}>{aid}</div>}
+        style={{ position: 'absolute', top: 64, bottom: 56, left: 100, right: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <div className="dc-focus-card" onClick={(e) => e.stopPropagation()} style={{ width: width * scale, height: height * scale, position: 'relative' }}>
+            <div style={{ width, height, transform: `scale(${scale})`, transformOrigin: 'top left', background: '#fff', borderRadius: 2, overflow: 'hidden',
+              boxShadow: '0 20px 80px rgba(0,0,0,.4)' }}>
+              {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb' }}>{aid}</div>}
+            </div>
+          </div>
+          <div onClick={(e) => e.stopPropagation()} style={{ fontSize: 14, fontWeight: 500, opacity: .85, textAlign: 'center' }}>
+            {(sec.labels || {})[aid] ?? artboard.props.label}
+            <span style={{ opacity: .5, marginLeft: 10, fontVariantNumeric: 'tabular-nums' }}>{idx + 1} / {peers.length}</span>
           </div>
         </div>
-        <div onClick={(e) => e.stopPropagation()} style={{ fontSize: 14, fontWeight: 500, opacity: .85, textAlign: 'center' }}>
-          {(sec.labels || {})[aid] ?? artboard.props.label}
-          <span style={{ opacity: .5, marginLeft: 10, fontVariantNumeric: 'tabular-nums' }}>{idx + 1} / {peers.length}</span>
-        </div>
+        {focusEditor && (
+          <div onClick={(e) => e.stopPropagation()}
+            style={{ width: editorW, maxHeight: 'calc(100vh - 150px)', overflowY: 'auto', color: '#181512' }}>
+            {focusEditor}
+          </div>
+        )}
       </div>
 
       <Arrow dir="left" onClick={() => go(-1)} />

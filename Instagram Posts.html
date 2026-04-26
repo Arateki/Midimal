@@ -34,6 +34,7 @@
     transition: opacity 0.15s;
   }
   [data-dc-slot]:hover .ig-export-btn { opacity: 1; }
+  .dc-focus-card .ig-export-btn { opacity: 1; }
   .ig-export-btn:hover { background: #000; color: #fff; }
   .ig-html-btn {
     position: absolute;
@@ -54,6 +55,7 @@
     transition: opacity 0.15s;
   }
   [data-dc-slot]:hover .ig-html-btn { opacity: 1; }
+  .dc-focus-card .ig-html-btn { opacity: 1; }
   .ig-html-btn:hover { background: #000; color: #fff; }
   .ig-ai-btn {
     position: absolute;
@@ -74,10 +76,178 @@
     transition: opacity 0.15s;
   }
   [data-dc-slot]:hover .ig-ai-btn { opacity: 1; }
+  .dc-focus-card .ig-ai-btn { opacity: 1; }
   .ig-ai-btn:hover { background: #000; color: #fff; }
   .ig-ai-btn[disabled] {
     opacity: .45;
     cursor: wait;
+  }
+  .ig-img-btn {
+    position: absolute;
+    top: 8px;
+    right: 226px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border: 1px solid rgba(0,0,0,0.25);
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    border-radius: 2px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  [data-dc-slot]:hover .ig-img-btn { opacity: 1; }
+  .dc-focus-card .ig-img-btn { opacity: 1; }
+  .ig-img-btn:hover { background: #000; color: #fff; }
+  .ig-layer-btn {
+    position: absolute;
+    top: 8px;
+    right: 282px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border: 1px solid rgba(0,0,0,0.25);
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    border-radius: 2px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  [data-dc-slot]:hover .ig-layer-btn { opacity: 1; }
+  .dc-focus-card .ig-layer-btn { opacity: 1; }
+  .ig-layer-btn:hover { background: #000; color: #fff; }
+  .ig-image-layer {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+    user-select: none;
+  }
+  .ig-image-layer img {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+  }
+  .ig-image-layer[data-selected="1"] {
+    outline: 4px solid rgba(52,199,89,.95);
+    outline-offset: 6px;
+    box-shadow: 0 0 0 10px rgba(52,199,89,.18);
+  }
+  .ig-exporting .ig-image-layer[data-selected="1"] {
+    outline: 0;
+    box-shadow: none;
+  }
+  .ig-layer-editor {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(0,0,0,.14);
+    border-radius: 6px;
+    background: rgba(255,255,255,.92);
+    color: #181512;
+    font-family: var(--font-sans);
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .ig-layer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 11px;
+  }
+  .ig-layer-title {
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .ig-layer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+  .ig-layer-row {
+    display: grid;
+    grid-template-columns: 42px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 4px 6px;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 5px;
+    background: rgba(0,0,0,.035);
+    font-size: 11px;
+  }
+  .ig-layer-row[data-selected="1"] {
+    border-color: rgba(52,199,89,.72);
+    background: rgba(52,199,89,.11);
+  }
+  .ig-layer-thumb {
+    width: 36px;
+    height: 26px;
+    border-radius: 3px;
+    object-fit: cover;
+    background: rgba(0,0,0,.08);
+  }
+  .ig-layer-html-thumb {
+    width: 36px;
+    height: 26px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,.78);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+  }
+  .ig-layer-row-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .ig-layer-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+  }
+  .ig-layer-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .ig-layer-action {
+    border: 0;
+    border-radius: 4px;
+    background: rgba(0,0,0,.08);
+    color: inherit;
+    font: inherit;
+    padding: 4px 7px;
+    cursor: pointer;
+  }
+  .ig-layer-action.primary { background: rgba(0,0,0,.78); color: #fff; }
+  .ig-layer-action.danger { background: rgba(176,44,32,.10); color: #8f2118; }
+  .ig-layer-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 10px;
+    color: rgba(24,21,18,.68);
+  }
+  .ig-layer-field input,
+  .ig-layer-field select {
+    width: 100%;
+    box-sizing: border-box;
+    accent-color: #181512;
   }
   .ig-ai-loading {
     position: absolute;
@@ -485,13 +655,14 @@ function parseAiJson(text) {
 function ExportBtn({ targetId, filename, dims, scale = 1 }) {
   const onClick = async (e) => {
     e.stopPropagation();
-    const el = document.getElementById(targetId);
+    const el = e.currentTarget.closest(`[id="${targetId}"]`) || document.getElementById(targetId);
     if (!el || !window.htmlToImage) return;
     try {
       // Captura o elemento em sua resolução real
       const inner = el.querySelector('[data-ig-real]');
       const target = inner || el;
       const s = parseInt(scale, 10) || 1;
+      target.classList.add('ig-exporting');
       
       // Forçamos dimensões físicas multiplicadas no canvas para garantir a nitidez
       const dataUrl = await window.htmlToImage.toPng(target, {
@@ -515,14 +686,19 @@ function ExportBtn({ targetId, filename, dims, scale = 1 }) {
       a.click();
     } catch (err) {
       console.error('export failed', err);
+    } finally {
+      const inner = el.querySelector('[data-ig-real]');
+      const target = inner || el;
+      target.classList.remove('ig-exporting');
     }
   };
   return <button className="ig-export-btn" onClick={onClick} title="Exportar PNG">↓ PNG {scale > 1 ? `(${scale}x)` : ''}</button>;
 }
 
 // Wrapper que renderiza template em tamanho real + escala + export
-function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, aiBusy, aiDisabled, aiDone, children }) {
+function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, onUploadImages, onOpenImageLayers, hasImageLayers, aiBusy, aiDisabled, aiDone, children }) {
   const dims = IG_DIMS[format];
+  const fileRef = useRef(null);
   const artboardW = format === 'story' ? 540 : format === 'portrait' ? 720 : 720;
   const scale = artboardW / dims.w;
   const renderedH = dims.h * scale;
@@ -553,6 +729,38 @@ function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, 
         </div>
       )}
       {aiDone && <div className="ig-ai-done-badge">Atualizado</div>}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        multiple
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          if (files.length && onUploadImages) onUploadImages(files);
+          e.target.value = '';
+        }}
+      />
+      <button
+        className="ig-img-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          fileRef.current?.click();
+        }}
+        title="Adicionar imagens">
+        IMG
+      </button>
+      {hasImageLayers && (
+        <button
+          className="ig-layer-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onOpenImageLayers) onOpenImageLayers();
+          }}
+          title="Gerenciar camadas">
+          Layers
+        </button>
+      )}
       <button
         className="ig-html-btn"
         onClick={(e) => {
@@ -677,6 +885,26 @@ function stripFullCanvasBackgrounds(html) {
   return doc.body.firstElementChild ? doc.body.firstElementChild.innerHTML : html;
 }
 
+function stripRuntimeImageLayers(html) {
+  const doc = new DOMParser().parseFromString(`<div>${html || ''}</div>`, 'text/html');
+  doc.querySelectorAll('.ig-image-layer').forEach((node) => node.remove());
+  return doc.body.firstElementChild ? doc.body.firstElementChild.innerHTML.trim() : String(html || '').trim();
+}
+
+function describeImageLayers(layers) {
+  return sortedImageLayers(layers, 'desc').map((layer) => ({
+    id: layer.id,
+    name: layer.name,
+    position: layer.z < 0 ? 'atras do HTML/template' : 'acima do HTML/template',
+    xPercent: layer.x,
+    yPercent: layer.y,
+    sizePercent: layer.size,
+    opacity: layer.opacity,
+    rotationDegrees: layer.rotation,
+    borderRadiusPx: layer.radius,
+  }));
+}
+
 function ensureAiHtmlContract(html) {
   const cleaned = stripFullCanvasBackgrounds(sanitizeHtmlFragment(html));
   if (/data-ai-html=["']1["']/.test(cleaned)) return cleaned;
@@ -794,8 +1022,140 @@ function HtmlEditor({ value, dirty, saved, onChange, onSave, onReset, onClose })
   );
 }
 
+function imageLayerZ(layer, order = 0) {
+  return layer.z < 0 ? 2 + order : 30 + order;
+}
+
+function sortedImageLayers(layers, direction = 'asc') {
+  const sorted = [...layers].sort((a, b) => {
+    if (a.z !== b.z) return a.z - b.z;
+    return (a.order || 0) - (b.order || 0);
+  });
+  return direction === 'desc' ? sorted.reverse() : sorted;
+}
+
+function ImageLayer({ layer, selected, order, onSelect }) {
+  return (
+    <div
+      className="ig-image-layer"
+      data-selected={selected ? '1' : '0'}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+        onSelect(layer.id);
+      }}
+      style={{
+        left: layer.x + '%',
+        top: layer.y + '%',
+        width: layer.size + '%',
+        opacity: layer.opacity,
+        zIndex: imageLayerZ(layer, order),
+        borderRadius: layer.radius + 'px',
+        overflow: layer.radius ? 'hidden' : 'visible',
+        transform: `translate(-50%, -50%) rotate(${layer.rotation}deg)`,
+      }}
+    >
+      <img src={layer.src} alt="" style={{ borderRadius: layer.radius + 'px' }} />
+    </div>
+  );
+}
+
+function ImageLayerEditor({ slotId, layers, selectedId, onSelect, onUpdate, onMove, onRemove, onClose }) {
+  const above = sortedImageLayers(layers.filter((layer) => layer.z >= 0), 'desc');
+  const behind = sortedImageLayers(layers.filter((layer) => layer.z < 0), 'desc');
+  const ordered = [...above, ...behind];
+  const selected = layers.find((layer) => layer.id === selectedId) || ordered.find((layer) => layer.id !== '__html') || null;
+  if (!layers.length) return null;
+  const update = (key, value) => selected && onUpdate(slotId, selected.id, { [key]: value });
+  return (
+    <div className="ig-layer-editor">
+      <div className="ig-layer-head">
+        <span className="ig-layer-title">Camadas de imagem</span>
+        <div className="ig-layer-actions">
+          <button type="button" className="ig-layer-action" onClick={onClose}>Fechar</button>
+        </div>
+      </div>
+      <div className="ig-layer-list">
+        {above.map((layer) => (
+          <div key={layer.id} className="ig-layer-row" data-selected={selected?.id === layer.id ? '1' : '0'} onClick={() => onSelect(slotId, layer.id)}>
+            <img className="ig-layer-thumb" src={layer.src} alt="" />
+            <span className="ig-layer-row-name">{layer.name}</span>
+            <div className="ig-layer-actions">
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, 1); }}>Subir</button>
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, -1); }}>Descer</button>
+            </div>
+          </div>
+        ))}
+        <div className="ig-layer-row">
+          <span className="ig-layer-html-thumb">HTML</span>
+          <span className="ig-layer-row-name">HTML / Template</span>
+          <span style={{ color: 'rgba(24,21,18,.5)', fontSize: 10 }}>referência</span>
+        </div>
+        {behind.map((layer) => (
+          <div key={layer.id} className="ig-layer-row" data-selected={selected?.id === layer.id ? '1' : '0'} onClick={() => onSelect(slotId, layer.id)}>
+            <img className="ig-layer-thumb" src={layer.src} alt="" />
+            <span className="ig-layer-row-name">{layer.name}</span>
+            <div className="ig-layer-actions">
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, 1); }}>Subir</button>
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, -1); }}>Descer</button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {selected && (
+        <>
+          <div className="ig-layer-controls">
+            <label className="ig-layer-field">
+              Tamanho {selected.size}%
+              <input type="range" min="5" max="180" step="1" value={selected.size}
+                     onChange={(e) => update('size', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Opacidade {Math.round(selected.opacity * 100)}%
+              <input type="range" min="0" max="1" step="0.05" value={selected.opacity}
+                     onChange={(e) => update('opacity', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Horizontal {selected.x}%
+              <input type="range" min="-25" max="125" step="1" value={selected.x}
+                     onChange={(e) => update('x', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Vertical {selected.y}%
+              <input type="range" min="-25" max="125" step="1" value={selected.y}
+                     onChange={(e) => update('y', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Rotação {selected.rotation}°
+              <input type="range" min="-45" max="45" step="1" value={selected.rotation}
+                     onChange={(e) => update('rotation', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Borda {selected.radius}px
+              <input type="range" min="0" max="160" step="2" value={selected.radius}
+                     onChange={(e) => update('radius', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Profundidade
+              <select value={selected.z < 0 ? 'behind' : 'front'}
+                      onChange={(e) => update('z', e.target.value === 'behind' ? -1 : 1)}>
+                <option value="front">Acima do HTML</option>
+                <option value="behind">Atrás do HTML</option>
+              </select>
+            </label>
+          </div>
+          <div className="ig-layer-actions" style={{ marginTop: 10 }}>
+            <button type="button" className="ig-layer-action primary" onClick={() => onMove(slotId, selected.id, 1)}>Subir camada</button>
+            <button type="button" className="ig-layer-action" onClick={() => onMove(slotId, selected.id, -1)}>Descer camada</button>
+            <button type="button" className="ig-layer-action danger" onClick={() => onRemove(slotId, selected.id)}>Remover</button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // Conteúdo interno (só o que vai dentro do DCArtboard)
-function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, htmlOverride, onToggleHtml, htmlActive, onRunAi, aiBusy, aiDisabled, aiDone, registerSlotData, exportScale }) {
+function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, htmlOverride, imageLayers = [], selectedImageLayer, onSelectImageLayer, onUploadImages, onOpenImageLayers, onToggleHtml, htmlActive, onRunAi, aiBusy, aiDisabled, aiDone, registerSlotData, exportScale }) {
   const [data, edit, setData] = useTemplateData(tplKey);
   useEffect(() => {
     if (!registerSlotData) return undefined;
@@ -822,7 +1182,7 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
   const fg2 = secondaryTextColor || mixHex(effectiveColor, bgColor, 0.38);
   const fg3 = secondaryTextColor ? mixHex(secondaryTextColor, bgColor, 0.34) : mixHex(effectiveColor, bgColor, 0.58);
   return (
-    <TplFrame id={`frame-${slotId}`} format={format} exportScale={exportScale} onToggleHtml={onToggleHtml} htmlActive={htmlActive} onRunAi={onRunAi} aiBusy={aiBusy} aiDisabled={aiDisabled} aiDone={aiDone}>
+    <TplFrame id={`frame-${slotId}`} format={format} exportScale={exportScale} onToggleHtml={onToggleHtml} htmlActive={htmlActive} onRunAi={onRunAi} onUploadImages={onUploadImages} onOpenImageLayers={onOpenImageLayers} hasImageLayers={imageLayers.length > 0} aiBusy={aiBusy} aiDisabled={aiDisabled} aiDone={aiDone}>
       <div className={monoTheme === 'dark' ? 'inverse' : ''}
         style={{
           position: 'absolute', inset: 0,
@@ -844,16 +1204,34 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
         data-theme={monoTheme}>
         {/* Decor em bleed — cobre o canvas inteiro, por trás do padding */}
         <IgDecor decor={decor} theme={decorTheme} seed={seed} />
+        {sortedImageLayers(imageLayers).filter((layer) => layer.z < 0).map((layer, index) => (
+          <ImageLayer
+            key={layer.id}
+            layer={layer}
+            order={index}
+            selected={selectedImageLayer?.slotId === slotId && selectedImageLayer?.layerId === layer.id}
+            onSelect={(layerId) => onSelectImageLayer(slotId, layerId)}
+          />
+        ))}
         {htmlOverride !== null && htmlOverride !== undefined ? (
           <div
-            style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', boxSizing: 'border-box' }}
+            style={{ position: 'relative', zIndex: 20, width: '100%', height: '100%', boxSizing: 'border-box' }}
             dangerouslySetInnerHTML={{ __html: htmlOverride }}
           />
         ) : (
-          <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: pad, boxSizing: 'border-box' }}>
+          <div style={{ position: 'relative', zIndex: 20, width: '100%', height: '100%', padding: pad, boxSizing: 'border-box' }}>
             <Tpl data={data} onEdit={edit} format={format} />
           </div>
         )}
+        {sortedImageLayers(imageLayers).filter((layer) => layer.z >= 0).map((layer, index) => (
+          <ImageLayer
+            key={layer.id}
+            layer={layer}
+            order={index}
+            selected={selectedImageLayer?.slotId === slotId && selectedImageLayer?.layerId === layer.id}
+            onSelect={(layerId) => onSelectImageLayer(slotId, layerId)}
+          />
+        ))}
       </div>
     </TplFrame>
   );
@@ -861,12 +1239,26 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
 
 // Factory: retorna o JSX do DCArtboard diretamente (necessário pois
 // DCSection filtra filhos por type === DCArtboard).
-function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, savedHtml, htmlEditor, onToggleHtml, onChangeHtml, onSaveHtml, onResetHtml, onCloseHtml, onRunAi, aiBusySlot, aiDoneSlot, registerSlotData, exportScale }) {
+function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, savedHtml, htmlEditor, imageLayersBySlot, selectedImageLayer, onUploadImages, onSelectImageLayer, onOpenImageLayers, onUpdateImageLayer, onMoveImageLayer, onRemoveImageLayer, onCloseImageLayer, onToggleHtml, onChangeHtml, onSaveHtml, onResetHtml, onCloseHtml, onRunAi, aiBusySlot, aiDoneSlot, registerSlotData, exportScale }) {
   const dims = IG_DIMS[format];
   const artboardW = format === 'story' ? 540 : 720;
   const renderedH = dims.h * (artboardW / dims.w);
   const htmlActive = htmlEditor && htmlEditor.slotId === slotId;
   const htmlOverride = htmlActive ? htmlEditor.draft : savedHtml[slotId] || null;
+  const imageLayers = imageLayersBySlot[slotId] || [];
+  const showLayerEditor = imageLayers.length > 0 && selectedImageLayer?.slotId === slotId;
+  const layerEditor = imageLayers.length > 0 ? (
+    <ImageLayerEditor
+      slotId={slotId}
+      layers={imageLayers}
+      selectedId={selectedImageLayer?.slotId === slotId ? selectedImageLayer.layerId : null}
+      onSelect={onSelectImageLayer}
+      onUpdate={onUpdateImageLayer}
+      onMove={onMoveImageLayer}
+      onRemove={onRemoveImageLayer}
+      onClose={onCloseImageLayer}
+    />
+  ) : null;
   return (
     <DCArtboard
       key={slotId}
@@ -874,16 +1266,23 @@ function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'ligh
       label={label}
       width={artboardW}
       height={renderedH}
-      editor={htmlActive ? (
-        <HtmlEditor
-          value={htmlEditor.draft}
-          dirty={htmlEditor.draft !== (savedHtml[slotId] || '')}
-          saved={!!savedHtml[slotId]}
-          onChange={onChangeHtml}
-          onSave={onSaveHtml}
-          onReset={() => onResetHtml(slotId)}
-          onClose={onCloseHtml}
-        />
+      onFocusOpen={() => imageLayers.length && onOpenImageLayers(slotId)}
+      focusEditor={layerEditor}
+      editor={(htmlActive || showLayerEditor) ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {showLayerEditor && layerEditor}
+          {htmlActive && (
+            <HtmlEditor
+              value={htmlEditor.draft}
+              dirty={htmlEditor.draft !== (savedHtml[slotId] || '')}
+              saved={!!savedHtml[slotId]}
+              onChange={onChangeHtml}
+              onSave={onSaveHtml}
+              onReset={() => onResetHtml(slotId)}
+              onClose={onCloseHtml}
+            />
+          )}
+        </div>
       ) : null}>
       <TplInner
         slotId={slotId}
@@ -900,6 +1299,11 @@ function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'ligh
         textColor={textColor}
         secondaryTextColor={secondaryTextColor}
         htmlOverride={htmlOverride}
+        imageLayers={imageLayers}
+        selectedImageLayer={selectedImageLayer}
+        onSelectImageLayer={onSelectImageLayer}
+        onUploadImages={(files) => onUploadImages(slotId, files)}
+        onOpenImageLayers={() => onOpenImageLayers(slotId)}
         onToggleHtml={() => onToggleHtml(slotId)}
         htmlActive={htmlActive}
         onRunAi={() => onRunAi(slotId)}
@@ -925,6 +1329,8 @@ function App() {
   const [aiDoneSlot, setAiDoneSlot] = useState(null);
   const [savedHtml, setSavedHtml] = useState({});
   const [htmlEditor, setHtmlEditor] = useState(null);
+  const [imageLayersBySlot, setImageLayersBySlot] = useState({});
+  const [selectedImageLayer, setSelectedImageLayer] = useState(null);
   const [activeTweakTab, setActiveTweakTab] = useState('visual');
   const slotDataRef = useRef({});
   useEffect(() => {
@@ -950,6 +1356,91 @@ function App() {
   const selectedBgColor = themeBg(selectedTheme);
   const selectedTextColor = tw.textColor || (tw.theme === 'dark' ? '#ffffff' : '#000000');
   const selectedSecondaryColor = mixHex(selectedTextColor, selectedBgColor, 0.38);
+  const readImageFile = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error('Não foi possível ler a imagem.'));
+    reader.readAsDataURL(file);
+  });
+  const uploadImagesForSlot = async (slotId, files) => {
+    const images = files.filter((file) => file.type.startsWith('image/'));
+    if (!images.length) return;
+    try {
+      const base = Date.now();
+      const layers = await Promise.all(images.map(async (file, index) => ({
+        id: `img_${base}_${index}`,
+        name: file.name || `Imagem ${index + 1}`,
+        src: await readImageFile(file),
+        x: 50,
+        y: 50,
+        size: 52,
+        opacity: 1,
+        rotation: 0,
+        radius: 0,
+        z: 1,
+        order: base + index,
+      })));
+      setImageLayersBySlot((current) => ({
+        ...current,
+        [slotId]: [...(current[slotId] || []), ...layers],
+      }));
+      setSelectedImageLayer({ slotId, layerId: layers[layers.length - 1].id });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const selectImageLayer = (slotId, layerId) => setSelectedImageLayer({ slotId, layerId });
+  const openImageLayerPanel = (slotId) => {
+    const layers = imageLayersBySlot[slotId] || [];
+    const topLayer = sortedImageLayers(layers, 'desc')[0];
+    if (topLayer) setSelectedImageLayer({ slotId, layerId: topLayer.id });
+  };
+  const updateImageLayer = (slotId, layerId, patch) => {
+    setImageLayersBySlot((current) => ({
+      ...current,
+      [slotId]: (current[slotId] || []).map((layer) => (
+        layer.id === layerId ? { ...layer, ...patch } : layer
+      )),
+    }));
+  };
+  const moveImageLayer = (slotId, layerId, direction) => {
+    setImageLayersBySlot((current) => {
+      const layers = current[slotId] || [];
+      const target = layers.find((layer) => layer.id === layerId);
+      if (!target) return current;
+      const sameSide = layers.filter((layer) => (layer.z < 0) === (target.z < 0));
+      const above = layers.filter((layer) => layer.z >= 0);
+      const behind = layers.filter((layer) => layer.z < 0);
+      const maxAbove = Math.max(0, ...above.map((layer) => layer.order || 0));
+      const maxBehind = Math.max(0, ...behind.map((layer) => layer.order || 0));
+      const topBehindOrder = Math.max(0, ...behind.map((layer) => layer.order || 0));
+      const bottomAboveOrder = Math.min(...above.map((layer) => layer.order || 0));
+      let patch = { order: (target.order || 0) + direction * 1000 };
+      if (target.z < 0 && direction > 0 && (target.order || 0) >= topBehindOrder) {
+        patch = { z: 1, order: maxAbove + 1000 };
+      } else if (target.z >= 0 && direction < 0 && sameSide.length && (target.order || 0) <= bottomAboveOrder) {
+        patch = { z: -1, order: maxBehind + 1000 };
+      }
+      return {
+        ...current,
+        [slotId]: layers.map((layer) => (
+          layer.id === layerId ? { ...layer, ...patch } : layer
+        )),
+      };
+    });
+  };
+  const removeImageLayer = (slotId, layerId) => {
+    setImageLayersBySlot((current) => {
+      const nextLayers = (current[slotId] || []).filter((layer) => layer.id !== layerId);
+      const next = { ...current };
+      if (nextLayers.length) next[slotId] = nextLayers;
+      else delete next[slotId];
+      return next;
+    });
+    setSelectedImageLayer((selected) => (
+      selected?.slotId === slotId && selected?.layerId === layerId ? null : selected
+    ));
+  };
   const openHtmlEditor = (slotId) => {
     if (htmlEditor && htmlEditor.slotId === slotId) {
       setHtmlEditor(null);
@@ -958,7 +1449,7 @@ function App() {
     const el = document.querySelector(`#frame-${slotId} [data-ig-real]`);
     setHtmlEditor({
       slotId,
-      draft: savedHtml[slotId] || (el ? el.innerHTML.trim() : ''),
+      draft: savedHtml[slotId] || (el ? stripRuntimeImageLayers(el.innerHTML) : ''),
     });
   };
   const saveHtmlEditor = () => {
@@ -983,9 +1474,10 @@ function App() {
       return;
     }
     const el = document.querySelector(`#frame-${slotId} [data-ig-real]`);
+    const imageLayerContext = describeImageLayers(imageLayersBySlot[slotId] || []);
     const currentHtml = htmlEditor?.slotId === slotId
       ? htmlEditor.draft
-      : savedHtml[slotId] || (el ? el.innerHTML.trim() : '');
+      : savedHtml[slotId] || (el ? stripRuntimeImageLayers(el.innerHTML) : '');
     const dataApi = slotDataRef.current[slotId];
     const contentFields = dataApi?.getFields ? dataApi.getFields() : [];
     if (aiMode === 'content' && !contentFields.length) {
@@ -1023,6 +1515,9 @@ function App() {
         ? 'Nao crie um fundo full-canvas opaco cobrindo tudo. Deixe o background transparente por padrao para preservar as opcoes de fundo e efeitos decorativos do app; use background apenas em cards/blocos internos.'
         : 'Preserve a hierarquia visual implícita nos nomes dos campos.',
       aiMode === 'html'
+        ? 'Se houver imageLayers no contexto do usuario, nao recrie essas imagens com tags img. Organize o HTML considerando que elas existem como camadas editaveis independentes.'
+        : 'Se houver imageLayers no contexto do usuario, considere essas imagens apenas como referencia visual do post.',
+      aiMode === 'html'
         ? 'Responda somente com o HTML final. Nao use markdown, explicacoes, cercas de codigo ou texto fora do HTML.'
         : 'Nao inclua explicacoes ou texto fora do JSON.',
       aiMode === 'html'
@@ -1032,6 +1527,9 @@ function App() {
     ].join('\n');
     const userPrompt = [
       `Contexto/instrucao do usuario:\n${aiContext || 'Melhore o post mantendo o estilo visual atual.'}`,
+      imageLayerContext.length
+        ? `\nCamadas de imagem existentes neste post, independentes do HTML:\n${JSON.stringify({ imageLayers: imageLayerContext }, null, 2)}`
+        : '\nEste post nao possui camadas de imagem independentes.',
       aiMode === 'content'
         ? `\nCampos textuais atuais em JSON:\n${JSON.stringify({ fields: contentFields }, null, 2)}`
         : `\nHTML atual do post:\n${currentHtml}`,
@@ -1081,6 +1579,15 @@ function App() {
     secondaryTextColor: tw.secondaryTextColor,
     savedHtml,
     htmlEditor,
+    imageLayersBySlot,
+    selectedImageLayer,
+    onUploadImages: uploadImagesForSlot,
+    onSelectImageLayer: selectImageLayer,
+    onOpenImageLayers: openImageLayerPanel,
+    onUpdateImageLayer: updateImageLayer,
+    onMoveImageLayer: moveImageLayer,
+    onRemoveImageLayer: removeImageLayer,
+    onCloseImageLayer: () => setSelectedImageLayer(null),
     onToggleHtml: openHtmlEditor,
     onChangeHtml: (html) => setHtmlEditor((s) => s ? { ...s, draft: html } : s),
     onSaveHtml: saveHtmlEditor,
