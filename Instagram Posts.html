@@ -79,6 +79,68 @@
     opacity: .45;
     cursor: wait;
   }
+  .ig-ai-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245,242,235,.78);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+  .ig-ai-loading-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border: 1px solid rgba(0,0,0,.18);
+    border-radius: 999px;
+    background: rgba(255,255,255,.92);
+    color: #181512;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  }
+  .ig-ai-spinner {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,0,0,.18);
+    border-top-color: #181512;
+    animation: ig-ai-spin .75s linear infinite;
+  }
+  .ig-ai-done::after {
+    content: "";
+    position: absolute;
+    inset: -10px;
+    border: 3px solid #34c759;
+    border-radius: 8px;
+    box-shadow: 0 0 0 6px rgba(52,199,89,.18), 0 14px 34px rgba(52,199,89,.24);
+    pointer-events: none;
+    z-index: 9;
+  }
+  .ig-ai-done-badge {
+    position: absolute;
+    top: -34px;
+    left: 0;
+    z-index: 10;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: #34c759;
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    box-shadow: 0 8px 22px rgba(52,199,89,.28);
+  }
+  @keyframes ig-ai-spin { to { transform: rotate(360deg); } }
   .ig-html-actions {
     display: flex;
     align-items: center;
@@ -459,13 +521,14 @@ function ExportBtn({ targetId, filename, dims, scale = 1 }) {
 }
 
 // Wrapper que renderiza template em tamanho real + escala + export
-function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, aiBusy, children }) {
+function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, aiBusy, aiDisabled, aiDone, children }) {
   const dims = IG_DIMS[format];
   const artboardW = format === 'story' ? 540 : format === 'portrait' ? 720 : 720;
   const scale = artboardW / dims.w;
   const renderedH = dims.h * scale;
   return (
-    <div id={id} style={{ position: 'relative', width: artboardW, height: renderedH, background: '#fff' }}>
+    <div id={id} className={aiDone ? 'ig-ai-done' : ''}
+      style={{ position: 'relative', width: artboardW, height: renderedH, background: '#fff' }}>
       <div
         data-ig-real
         className={`ig-canvas ${format === 'story' ? 'ig-size-story' : format === 'portrait' ? 'ig-size-portrait' : 'ig-size-square'}`}
@@ -481,6 +544,15 @@ function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, 
       >
         {children}
       </div>
+      {aiBusy && (
+        <div className="ig-ai-loading">
+          <div className="ig-ai-loading-box">
+            <span className="ig-ai-spinner" />
+            Gerando IA
+          </div>
+        </div>
+      )}
+      {aiDone && <div className="ig-ai-done-badge">Atualizado</div>}
       <button
         className="ig-html-btn"
         onClick={(e) => {
@@ -492,7 +564,7 @@ function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, 
       </button>
       <button
         className="ig-ai-btn"
-        disabled={!!aiBusy}
+        disabled={!!aiDisabled}
         onClick={(e) => {
           e.stopPropagation();
           if (onRunAi) onRunAi();
@@ -723,7 +795,7 @@ function HtmlEditor({ value, dirty, saved, onChange, onSave, onReset, onClose })
 }
 
 // Conteúdo interno (só o que vai dentro do DCArtboard)
-function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, htmlOverride, onToggleHtml, htmlActive, onRunAi, aiBusy, registerSlotData, exportScale }) {
+function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, htmlOverride, onToggleHtml, htmlActive, onRunAi, aiBusy, aiDisabled, aiDone, registerSlotData, exportScale }) {
   const [data, edit, setData] = useTemplateData(tplKey);
   useEffect(() => {
     if (!registerSlotData) return undefined;
@@ -750,7 +822,7 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
   const fg2 = secondaryTextColor || mixHex(effectiveColor, bgColor, 0.38);
   const fg3 = secondaryTextColor ? mixHex(secondaryTextColor, bgColor, 0.34) : mixHex(effectiveColor, bgColor, 0.58);
   return (
-    <TplFrame id={`frame-${slotId}`} format={format} exportScale={exportScale} onToggleHtml={onToggleHtml} htmlActive={htmlActive} onRunAi={onRunAi} aiBusy={aiBusy}>
+    <TplFrame id={`frame-${slotId}`} format={format} exportScale={exportScale} onToggleHtml={onToggleHtml} htmlActive={htmlActive} onRunAi={onRunAi} aiBusy={aiBusy} aiDisabled={aiDisabled} aiDone={aiDone}>
       <div className={monoTheme === 'dark' ? 'inverse' : ''}
         style={{
           position: 'absolute', inset: 0,
@@ -789,7 +861,7 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
 
 // Factory: retorna o JSX do DCArtboard diretamente (necessário pois
 // DCSection filtra filhos por type === DCArtboard).
-function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, savedHtml, htmlEditor, onToggleHtml, onChangeHtml, onSaveHtml, onResetHtml, onCloseHtml, onRunAi, aiBusySlot, registerSlotData, exportScale }) {
+function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, savedHtml, htmlEditor, onToggleHtml, onChangeHtml, onSaveHtml, onResetHtml, onCloseHtml, onRunAi, aiBusySlot, aiDoneSlot, registerSlotData, exportScale }) {
   const dims = IG_DIMS[format];
   const artboardW = format === 'story' ? 540 : 720;
   const renderedH = dims.h * (artboardW / dims.w);
@@ -832,6 +904,8 @@ function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'ligh
         htmlActive={htmlActive}
         onRunAi={() => onRunAi(slotId)}
         aiBusy={aiBusySlot === slotId}
+        aiDisabled={!!aiBusySlot}
+        aiDone={aiDoneSlot === slotId}
         registerSlotData={registerSlotData}
         exportScale={exportScale}
       />
@@ -848,9 +922,16 @@ function App() {
   const [aiContext, setAiContext] = useState('');
   const [aiStatus, setAiStatus] = useState('');
   const [aiBusySlot, setAiBusySlot] = useState(null);
+  const [aiDoneSlot, setAiDoneSlot] = useState(null);
   const [savedHtml, setSavedHtml] = useState({});
   const [htmlEditor, setHtmlEditor] = useState(null);
+  const [activeTweakTab, setActiveTweakTab] = useState('visual');
   const slotDataRef = useRef({});
+  useEffect(() => {
+    if (!aiDoneSlot) return undefined;
+    const timer = setTimeout(() => setAiDoneSlot(null), 15000);
+    return () => clearTimeout(timer);
+  }, [aiDoneSlot]);
   const registerSlotData = useCallback((slotId, api) => {
     slotDataRef.current[slotId] = api;
     return () => {
@@ -957,6 +1038,7 @@ function App() {
     ].join('\n');
 
     setAiBusySlot(slotId);
+    setAiDoneSlot(null);
     setAiStatus('Gerando com IA...');
     try {
       const output = await callAiProvider({
@@ -978,12 +1060,14 @@ function App() {
         });
         setHtmlEditor((editor) => editor?.slotId === slotId ? null : editor);
         setAiStatus('Conteúdo aplicado mantendo os tweaks do post.');
+        setAiDoneSlot(slotId);
       } else {
         const html = ensureAiHtmlContract(output.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim());
         if (!html) throw new Error('A IA não retornou HTML.');
         setSavedHtml((saved) => ({ ...saved, [slotId]: html }));
         setHtmlEditor((editor) => editor?.slotId === slotId ? { ...editor, draft: html } : editor);
         setAiStatus('HTML aplicado e salvo nesse post.');
+        setAiDoneSlot(slotId);
       }
     } catch (err) {
       console.error(err);
@@ -1004,6 +1088,7 @@ function App() {
     onCloseHtml: () => setHtmlEditor(null),
     onRunAi: runAiForSlot,
     aiBusySlot,
+    aiDoneSlot,
     registerSlotData,
   });
 
@@ -1197,52 +1282,17 @@ function App() {
       </DesignCanvas>
 
       <TweaksPanel title="Tweaks">
-        <TweakSection label="IA">
-          <TweakSelect
-            label="Provedor"
-            value={aiProvider}
-            options={[
-              { value: 'openai', label: 'OpenAI / ChatGPT' },
-              { value: 'anthropic', label: 'Anthropic / Claude' },
-              { value: 'gemini', label: 'Google / Gemini' },
-            ]}
-            onChange={(v) => {
-              setAiProvider(v);
-              setAiModel(AI_MODELS[v][0].value);
-            }}
-          />
-          <TweakText
-            label="API key"
-            value={aiKey}
-            type="password"
-            placeholder="sk-..."
-            onChange={setAiKey}
-          />
-          <TweakSelect
-            label="Modelo"
-            value={aiModel}
-            options={AI_MODELS[aiProvider]}
-            onChange={setAiModel}
-          />
-          <TweakRadio
-            label="Modo"
-            value={aiMode}
-            options={[
-              { value: 'content', label: 'Conteúdo' },
-              { value: 'html', label: 'HTML' },
-            ]}
-            onChange={setAiMode}
-          />
-          <TweakTextarea
-            label="Contexto"
-            value={aiContext}
-            placeholder="Ex: gere um post para lançamento B2B..."
-            onChange={setAiContext}
-          />
-          <div style={{ fontSize: 11, lineHeight: 1.5, color: aiStatus.startsWith('Erro') || aiStatus.startsWith('Informe') ? '#8f2118' : 'rgba(41,38,27,.62)', padding: '2px 0' }}>
-            {aiStatus || 'A chave fica somente no estado desta página e é enviada direto ao provedor escolhido.'}
-          </div>
-        </TweakSection>
+        <TweakTabs
+          value={activeTweakTab}
+          onChange={setActiveTweakTab}
+          options={[
+            { value: 'visual', label: 'Visual' },
+            { value: 'effects', label: 'Efeitos' },
+            { value: 'ai', label: 'IA' },
+            { value: 'help', label: 'Ajuda' },
+          ]}
+        >
+          <TweakTab value="visual">
         <TweakSection label="Tema">
           <TweakRadio
             label="Fundo"
@@ -1364,11 +1414,11 @@ function App() {
             label="Formato (Rede Social)"
             value={tw.format}
             options={[
-              { value: 'square',    label: 'Quadrado (1:1)' },
-              { value: 'portrait',  label: 'Retrato (4:5)' },
-              { value: 'landscape', label: 'Landscape (16:9)' },
-              { value: 'story',     label: 'Story/Mobile (9:16)' },
-              { value: 'banner',    label: 'Banner (3:1)' },
+              { value: 'square',    label: '1:1' },
+              { value: 'portrait',  label: '4:5' },
+              { value: 'landscape', label: '16:9' },
+              { value: 'story',     label: '9:16' },
+              { value: 'banner',    label: '3:1' },
             ]}
             onChange={(v) => setTw('format', v)}
           />
@@ -1397,6 +1447,8 @@ function App() {
             Passe o cursor sobre qualquer post e clique em <strong>↓ PNG</strong> para baixar.
           </div>
         </TweakSection>
+          </TweakTab>
+          <TweakTab value="effects">
         {DECOR_GROUPS.map((group) => (
           <TweakSection key={group.key} label={group.label}>
             {DECOR_TWEAKS.filter((item) => item.group === group.key).map((item) => (
@@ -1449,6 +1501,56 @@ function App() {
             ))}
           </TweakSection>
         ))}
+          </TweakTab>
+          <TweakTab value="ai">
+        <TweakSection label="IA">
+          <TweakSelect
+            label="Provedor"
+            value={aiProvider}
+            options={[
+              { value: 'openai', label: 'OpenAI / ChatGPT' },
+              { value: 'anthropic', label: 'Anthropic / Claude' },
+              { value: 'gemini', label: 'Google / Gemini' },
+            ]}
+            onChange={(v) => {
+              setAiProvider(v);
+              setAiModel(AI_MODELS[v][0].value);
+            }}
+          />
+          <TweakText
+            label="API key"
+            value={aiKey}
+            type="password"
+            placeholder="sk-..."
+            onChange={setAiKey}
+          />
+          <TweakSelect
+            label="Modelo"
+            value={aiModel}
+            options={AI_MODELS[aiProvider]}
+            onChange={setAiModel}
+          />
+          <TweakRadio
+            label="Modo"
+            value={aiMode}
+            options={[
+              { value: 'content', label: 'Conteúdo' },
+              { value: 'html', label: 'HTML' },
+            ]}
+            onChange={setAiMode}
+          />
+          <TweakTextarea
+            label="Contexto"
+            value={aiContext}
+            placeholder="Ex: gere um post para lançamento B2B..."
+            onChange={setAiContext}
+          />
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: aiStatus.startsWith('Erro') || aiStatus.startsWith('Informe') ? '#8f2118' : 'rgba(41,38,27,.62)', padding: '2px 0' }}>
+            {aiStatus || 'A chave fica somente no estado desta página e é enviada direto ao provedor escolhido.'}
+          </div>
+        </TweakSection>
+          </TweakTab>
+          <TweakTab value="help">
         <TweakSection label="Exportar">
           <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}>
             Passe o cursor sobre qualquer post e clique em <strong>↓ PNG</strong> (canto superior direito) para baixar em 1080px nativo.
@@ -1459,6 +1561,8 @@ function App() {
             Todos os textos são editáveis. Clique em qualquer título, parágrafo ou rótulo e digite. <strong>Enter</strong> confirma; <strong>Shift+Enter</strong> quebra linha.
           </div>
         </TweakSection>
+          </TweakTab>
+        </TweakTabs>
       </TweaksPanel>
     </>
   );

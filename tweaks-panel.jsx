@@ -63,6 +63,16 @@ const __TWEAKS_STYLE = `
     border:2px solid transparent;background-clip:content-box}
   .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
     border:2px solid transparent;background-clip:content-box}
+  .twk-tabs{position:sticky;top:-2px;z-index:2;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));
+    gap:3px;margin:-2px -2px 2px;padding:4px 2px 6px;
+    background:linear-gradient(to bottom,rgba(250,249,247,.96),rgba(250,249,247,.86))}
+  .twk-tab{appearance:none;border:0;border-radius:7px;height:24px;padding:0 6px;
+    background:rgba(0,0,0,.055);color:rgba(41,38,27,.66);
+    font:inherit;font-weight:600;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .twk-tab:hover{background:rgba(0,0,0,.08);color:#29261b}
+  .twk-tab[data-on="1"]{background:rgba(41,38,27,.88);color:#fff;
+    box-shadow:0 1px 2px rgba(0,0,0,.14)}
+  .twk-tab-panel{display:flex;flex-direction:column;gap:10px}
   .twk-row{display:flex;flex-direction:column;gap:5px}
   .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
   .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
@@ -295,6 +305,36 @@ function TweakRow({ label, value, children, inline = false }) {
       {children}
     </div>
   );
+}
+
+function TweakTabs({ value, options, onChange, children }) {
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const panels = React.Children.toArray(children).filter(React.isValidElement);
+  const active = panels.find((child) => child?.props?.value === value) || panels[0];
+  return (
+    <>
+      <div className="twk-tabs" role="tablist">
+        {opts.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            className="twk-tab"
+            role="tab"
+            data-on={o.value === value ? '1' : '0'}
+            aria-selected={o.value === value}
+            onClick={() => onChange(o.value)}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+      {active}
+    </>
+  );
+}
+
+function TweakTab({ children }) {
+  return <div className="twk-tab-panel" role="tabpanel">{children}</div>;
 }
 
 // ── Controls ────────────────────────────────────────────────────────────────
@@ -602,6 +642,7 @@ function TweakButton({ label, onClick, secondary = false }) {
 
 Object.assign(window, {
   useTweaks, TweaksPanel, TweakSection, TweakRow,
+  TweakTabs, TweakTab,
   TweakSlider, TweakToggle, TweakRadio, TweakSelect,
   TweakText, TweakTextarea, TweakNumber, TweakColor, TweakButton,
 });
