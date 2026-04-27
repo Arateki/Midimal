@@ -249,6 +249,18 @@
     box-sizing: border-box;
     accent-color: #181512;
   }
+  [data-ig-real] h1,
+  [data-ig-real] h2,
+  [data-ig-real] h3,
+  [data-ig-real] h4 {
+    font-family: var(--ig-font-title, var(--font-sans));
+  }
+  [data-ig-real] .ig-meta,
+  [data-ig-real] .ig-logo,
+  [data-ig-real] .ig-logo-sm,
+  [data-ig-real] .ig-footer-rail {
+    font-family: var(--ig-font-small, var(--font-sans));
+  }
   .ig-ai-loading {
     position: absolute;
     inset: 0;
@@ -395,6 +407,8 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "bgAngle": 135,
   "weight": 700,
   "weightSmall": 600,
+  "fontTitle": "montserrat",
+  "fontSmall": "montserrat",
   "sizeScale": 1,
   "smallScale": 1,
   "chromePad": 80,
@@ -526,6 +540,39 @@ const DECOR_GROUPS = [
   { key: 'trust', label: 'Institucional / confiança' },
   { key: 'creator', label: 'Creator / social' },
 ];
+
+const FONT_OPTIONS = [
+  { value: 'montserrat', label: 'Montserrat', stack: "'Montserrat', system-ui, -apple-system, Segoe UI, sans-serif" },
+  { value: 'system', label: 'Sistema', stack: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
+  { value: 'arial', label: 'Arial', stack: "Arial, Helvetica, sans-serif" },
+  { value: 'helvetica', label: 'Helvetica', stack: "Helvetica, Arial, sans-serif" },
+  { value: 'times', label: 'Times', stack: "'Times New Roman', Times, serif" },
+  { value: 'humanist', label: 'Humanista', stack: "Aptos, 'Avenir Next', Avenir, 'Segoe UI', system-ui, sans-serif" },
+  { value: 'serif', label: 'Serifada', stack: "Georgia, 'Times New Roman', serif" },
+  { value: 'editorial', label: 'Editorial', stack: "'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif" },
+  { value: 'mono', label: 'Mono', stack: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace" },
+  { value: 'condensed', label: 'Condensada', stack: "'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue Condensed', Arial, sans-serif" },
+];
+
+function quoteFontName(name) {
+  const clean = String(name || '').trim().replace(/['"]/g, '');
+  if (!clean) return '';
+  return /^[a-zA-Z-]+$/.test(clean) ? clean : `'${clean}'`;
+}
+
+function fontStack(key, runtimeFonts = []) {
+  if (String(key || '').startsWith('custom:')) {
+    const family = key.slice(7);
+    return `${quoteFontName(family)}, ${FONT_OPTIONS[0].stack}`;
+  }
+  if (String(key || '').startsWith('system:')) {
+    const family = key.slice(7);
+    return `${quoteFontName(family)}, system-ui, -apple-system, Segoe UI, sans-serif`;
+  }
+  const runtime = runtimeFonts.find((font) => font.value === key);
+  if (runtime) return runtime.stack;
+  return (FONT_OPTIONS.find((font) => font.value === key) || FONT_OPTIONS[0]).stack;
+}
 
 const DECOR_TWEAKS = [
   { group: 'minimal', key: 'grid',       label: 'Grid',             tweak: 'decorGrid',       intensity: 'decorGridIntensity' },
@@ -908,7 +955,7 @@ function describeImageLayers(layers) {
 function ensureAiHtmlContract(html) {
   const cleaned = stripFullCanvasBackgrounds(sanitizeHtmlFragment(html));
   if (/data-ai-html=["']1["']/.test(cleaned)) return cleaned;
-  return `<div data-ai-html="1" style="position:relative;width:100%;height:100%;box-sizing:border-box;padding:var(--ig-chrome-pad);color:var(--fg-1);font-family:var(--font-sans);font-weight:var(--ig-weight);overflow:hidden;">${cleaned}</div>`;
+  return `<div data-ai-html="1" style="position:relative;width:100%;height:100%;box-sizing:border-box;padding:var(--ig-chrome-pad);color:var(--fg-1);font-family:var(--ig-font-title,var(--font-sans));font-weight:var(--ig-weight);overflow:hidden;">${cleaned}</div>`;
 }
 
 const AI_MODELS = {
@@ -1155,7 +1202,7 @@ function ImageLayerEditor({ slotId, layers, selectedId, onSelect, onUpdate, onMo
 }
 
 // Conteúdo interno (só o que vai dentro do DCArtboard)
-function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, htmlOverride, imageLayers = [], selectedImageLayer, onSelectImageLayer, onUploadImages, onOpenImageLayers, onToggleHtml, htmlActive, onRunAi, aiBusy, aiDisabled, aiDone, registerSlotData, exportScale }) {
+function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, fontTitle, fontSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, htmlOverride, imageLayers = [], selectedImageLayer, onSelectImageLayer, onUploadImages, onOpenImageLayers, onToggleHtml, htmlActive, onRunAi, aiBusy, aiDisabled, aiDone, registerSlotData, exportScale }) {
   const [data, edit, setData] = useTemplateData(tplKey);
   useEffect(() => {
     if (!registerSlotData) return undefined;
@@ -1196,9 +1243,12 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
           '--ig-weight': weight,
           '--ig-weight-light': Math.max(300, weight - 100),
           '--ig-weight-small': weightSmall,
+          '--ig-font-title': fontStack(fontTitle, window.__IG_RUNTIME_FONTS__ || []),
+          '--ig-font-small': fontStack(fontSmall, window.__IG_RUNTIME_FONTS__ || []),
           '--ig-size-scale': sizeScale,
           '--ig-small-scale': smallScale,
           '--ig-chrome-pad': chromePad + 'px',
+          fontFamily: 'var(--ig-font-title)',
           boxSizing: 'border-box',
         }}
         data-theme={monoTheme}>
@@ -1239,7 +1289,7 @@ function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, siz
 
 // Factory: retorna o JSX do DCArtboard diretamente (necessário pois
 // DCSection filtra filhos por type === DCArtboard).
-function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, savedHtml, htmlEditor, imageLayersBySlot, selectedImageLayer, onUploadImages, onSelectImageLayer, onOpenImageLayers, onUpdateImageLayer, onMoveImageLayer, onRemoveImageLayer, onCloseImageLayer, onToggleHtml, onChangeHtml, onSaveHtml, onResetHtml, onCloseHtml, onRunAi, aiBusySlot, aiDoneSlot, registerSlotData, exportScale }) {
+function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, fontTitle, fontSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, savedHtml, htmlEditor, imageLayersBySlot, selectedImageLayer, onUploadImages, onSelectImageLayer, onOpenImageLayers, onUpdateImageLayer, onMoveImageLayer, onRemoveImageLayer, onCloseImageLayer, onToggleHtml, onChangeHtml, onSaveHtml, onResetHtml, onCloseHtml, onRunAi, aiBusySlot, aiDoneSlot, registerSlotData, exportScale }) {
   const dims = IG_DIMS[format];
   const artboardW = format === 'story' ? 540 : 720;
   const renderedH = dims.h * (artboardW / dims.w);
@@ -1259,6 +1309,23 @@ function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'ligh
       onClose={onCloseImageLayer}
     />
   ) : null;
+  const htmlEditorNode = htmlActive ? (
+    <HtmlEditor
+      value={htmlEditor.draft}
+      dirty={htmlEditor.draft !== (savedHtml[slotId] || '')}
+      saved={!!savedHtml[slotId]}
+      onChange={onChangeHtml}
+      onSave={onSaveHtml}
+      onReset={() => onResetHtml(slotId)}
+      onClose={onCloseHtml}
+    />
+  ) : null;
+  const focusEditor = (layerEditor || htmlEditorNode) ? (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {layerEditor}
+      {htmlEditorNode}
+    </div>
+  ) : null;
   return (
     <DCArtboard
       key={slotId}
@@ -1267,21 +1334,11 @@ function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'ligh
       width={artboardW}
       height={renderedH}
       onFocusOpen={() => imageLayers.length && onOpenImageLayers(slotId)}
-      focusEditor={layerEditor}
+      focusEditor={focusEditor}
       editor={(htmlActive || showLayerEditor) ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {showLayerEditor && layerEditor}
-          {htmlActive && (
-            <HtmlEditor
-              value={htmlEditor.draft}
-              dirty={htmlEditor.draft !== (savedHtml[slotId] || '')}
-              saved={!!savedHtml[slotId]}
-              onChange={onChangeHtml}
-              onSave={onSaveHtml}
-              onReset={() => onResetHtml(slotId)}
-              onClose={onCloseHtml}
-            />
-          )}
+          {htmlEditorNode}
         </div>
       ) : null}>
       <TplInner
@@ -1292,6 +1349,8 @@ function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'ligh
         theme={theme}
         weight={weight}
         weightSmall={weightSmall}
+        fontTitle={fontTitle}
+        fontSmall={fontSmall}
         sizeScale={sizeScale}
         smallScale={smallScale}
         chromePad={chromePad}
@@ -1331,6 +1390,8 @@ function App() {
   const [htmlEditor, setHtmlEditor] = useState(null);
   const [imageLayersBySlot, setImageLayersBySlot] = useState({});
   const [selectedImageLayer, setSelectedImageLayer] = useState(null);
+  const [runtimeFonts, setRuntimeFonts] = useState([]);
+  const [systemFontName, setSystemFontName] = useState('');
   const [activeTweakTab, setActiveTweakTab] = useState('visual');
   const slotDataRef = useRef({});
   useEffect(() => {
@@ -1338,6 +1399,9 @@ function App() {
     const timer = setTimeout(() => setAiDoneSlot(null), 15000);
     return () => clearTimeout(timer);
   }, [aiDoneSlot]);
+  useEffect(() => {
+    window.__IG_RUNTIME_FONTS__ = runtimeFonts;
+  }, [runtimeFonts]);
   const registerSlotData = useCallback((slotId, api) => {
     slotDataRef.current[slotId] = api;
     return () => {
@@ -1356,6 +1420,34 @@ function App() {
   const selectedBgColor = themeBg(selectedTheme);
   const selectedTextColor = tw.textColor || (tw.theme === 'dark' ? '#ffffff' : '#000000');
   const selectedSecondaryColor = mixHex(selectedTextColor, selectedBgColor, 0.38);
+  const fontOptions = [...FONT_OPTIONS, ...runtimeFonts];
+  const addSystemFont = () => {
+    const name = systemFontName.trim();
+    if (!name) return;
+    const value = `system:${name}`;
+    setRuntimeFonts((current) => (
+      current.some((font) => font.value === value)
+        ? current
+        : [...current, { value, label: `${name} (sistema)`, stack: `${quoteFontName(name)}, system-ui, -apple-system, Segoe UI, sans-serif` }]
+    ));
+    setSystemFontName('');
+  };
+  const uploadFontFiles = (files) => {
+    const accepted = files.filter((file) => /\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/.test(file.name));
+    accepted.forEach((file) => {
+      const rawName = file.name.replace(/\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/, '');
+      const family = `Upload ${rawName.replace(/[^a-zA-Z0-9_-]+/g, ' ').trim()} ${Date.now()}`;
+      const url = URL.createObjectURL(file);
+      const style = document.createElement('style');
+      style.textContent = `@font-face{font-family:${quoteFontName(family)};src:url("${url}") format("${file.name.toLowerCase().endsWith('.woff2') ? 'woff2' : file.name.toLowerCase().endsWith('.woff') ? 'woff' : file.name.toLowerCase().endsWith('.otf') ? 'opentype' : 'truetype'}");font-display:swap;}`;
+      document.head.appendChild(style);
+      setRuntimeFonts((current) => [...current, {
+        value: `custom:${family}`,
+        label: `${rawName} (upload)`,
+        stack: `${quoteFontName(family)}, ${FONT_OPTIONS[0].stack}`,
+      }]);
+    });
+  };
   const readImageFile = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
@@ -1498,13 +1590,16 @@ function App() {
       'Siga a linguagem visual solicitada pelo usuario, desde que o resultado continue legivel, exportavel e coerente dentro do canvas.',
       aiMode === 'content'
         ? 'Responda somente JSON valido no formato {"fields":[{"path":"...","value":"..."}]}. Inclua apenas paths existentes. Nao use markdown.'
-        : 'Contrato obrigatorio do HTML: o fragmento deve assumir que sera inserido dentro de um wrapper que ja fornece var(--fg-1), var(--fg-2), var(--fg-3), var(--bg-1), var(--bg-2), var(--ig-size-scale), var(--ig-small-scale), var(--ig-weight), var(--ig-weight-small), var(--ig-chrome-pad), color:var(--fg-1) e font-family:var(--font-sans).',
+        : 'Contrato obrigatorio do HTML: o fragmento deve assumir que sera inserido dentro de um wrapper que ja fornece var(--fg-1), var(--fg-2), var(--fg-3), var(--bg-1), var(--bg-2), var(--ig-size-scale), var(--ig-small-scale), var(--ig-weight), var(--ig-weight-small), var(--ig-font-title), var(--ig-font-small), var(--ig-chrome-pad), color:var(--fg-1) e font-family:var(--ig-font-title).',
       aiMode === 'html'
         ? 'Use color:inherit ou color:var(--fg-1) para textos principais; use color:var(--fg-2) para textos secundarios; use color:var(--fg-3) para legendas discretas; use currentColor para linhas, icones e ornamentos.'
         : 'Nao altere layout, classes, estilos, cores, tamanhos ou estrutura; apenas substitua textos.',
       aiMode === 'html'
         ? 'Use font-size:calc(Npx * var(--ig-size-scale)) em titulos/display e font-size:calc(Npx * var(--ig-small-scale)) em textos pequenos/metadados. Use font-weight:var(--ig-weight) ou var(--ig-weight-small) conforme a hierarquia.'
         : 'Mantenha quebras de linha quando forem importantes para o texto.',
+      aiMode === 'html'
+        ? 'Use font-family:var(--ig-font-title) em titulos/display e font-family:var(--ig-font-small) em metadados, legendas, botoes pequenos e textos de apoio quando fizer sentido.'
+        : 'Preserve a familia tipografica visual existente; nao altere estilos.',
       aiMode === 'html'
         ? 'Se criar uma estrutura nova, mantenha tudo dentro de um fragmento HTML interno do canvas, com position:relative, width:100%, height:100%, box-sizing:border-box e layouts que respeitem o espaco disponivel.'
         : 'Preserve a quantidade e o papel dos campos; se algum campo nao precisar mudar, devolva o mesmo valor.',
@@ -1577,6 +1672,8 @@ function App() {
   const card = (args) => makeCard({
     ...args,
     secondaryTextColor: tw.secondaryTextColor,
+    fontTitle: tw.fontTitle,
+    fontSmall: tw.fontSmall,
     savedHtml,
     htmlEditor,
     imageLayersBySlot,
@@ -1876,6 +1973,12 @@ function App() {
           )}
         </TweakSection>
         <TweakSection label="Tipografia">
+          <TweakSelect
+            label="Fonte — títulos"
+            value={tw.fontTitle || 'montserrat'}
+            options={fontOptions}
+            onChange={(v) => setTw('fontTitle', v)}
+          />
           <TweakRadio
             label="Peso — títulos"
             value={tw.weight}
@@ -1894,6 +1997,12 @@ function App() {
             max={1.4}
             step={0.05}
             onChange={(v) => setTw('sizeScale', v)}
+          />
+          <TweakSelect
+            label="Fonte — textos pequenos"
+            value={tw.fontSmall || 'montserrat'}
+            options={fontOptions}
+            onChange={(v) => setTw('fontSmall', v)}
           />
           <TweakRadio
             label="Peso — textos pequenos"
@@ -1914,6 +2023,34 @@ function App() {
             max={1.4}
             step={0.05}
             onChange={(v) => setTw('smallScale', v)}
+          />
+          <TweakFile
+            label="Upload fonte"
+            accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2"
+            multiple
+            onChange={uploadFontFiles}
+          />
+          <TweakText
+            label="Fonte do sistema"
+            value={systemFontName}
+            placeholder="Ex: Helvetica Neue"
+            onChange={setSystemFontName}
+          />
+          <div style={{
+            marginTop: -4,
+            padding: '7px 8px',
+            borderRadius: 7,
+            background: 'rgba(0,0,0,.045)',
+            color: 'rgba(41,38,27,.62)',
+            fontSize: 10.5,
+            lineHeight: 1.35,
+          }}>
+            Por segurança, o navegador não lista todas as fontes do sistema. Digite o nome exato de uma fonte instalada para usá-la aqui.
+          </div>
+          <TweakButton
+            label="Adicionar fonte do sistema"
+            secondary
+            onClick={addSystemFont}
           />
         </TweakSection>
         <TweakSection label="Layout">

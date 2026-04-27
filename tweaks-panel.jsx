@@ -640,9 +640,33 @@ function TweakButton({ label, onClick, secondary = false }) {
   );
 }
 
+function TweakFile({ label, accept, multiple = false, onChange }) {
+  const inputRef = React.useRef(null);
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={accept}
+        multiple={multiple}
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          if (files.length) onChange(files);
+          e.target.value = '';
+        }}
+      />
+      <button type="button" className="twk-btn secondary" onClick={() => inputRef.current?.click()}>
+        Upload
+      </button>
+    </div>
+  );
+}
+
 Object.assign(window, {
   useTweaks, TweaksPanel, TweakSection, TweakRow,
   TweakTabs, TweakTab,
   TweakSlider, TweakToggle, TweakRadio, TweakSelect,
-  TweakText, TweakTextarea, TweakNumber, TweakColor, TweakButton,
+  TweakText, TweakTextarea, TweakNumber, TweakColor, TweakButton, TweakFile,
 });

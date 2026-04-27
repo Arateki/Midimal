@@ -29,19 +29,19 @@ ig-decor.jsx              # independent decoration effects; exports IgDecor
 ig-data.jsx               # default data for all templates (IG_DEFAULTS)
 ig-posts.css              # post base classes (.ig-canvas, .ig-chrome-top…)
 colors_and_type.css       # Arateki brand color and typography tokens
-ig-manifesto.jsx          # 6 manifesto / brand-statement templates
-ig-announce.jsx           # 6 product launch / announcement templates
-ig-educational.jsx        # 6 educational / explainer templates
+ig-manifesto.jsx          # manifesto / brand-statement templates
+ig-announce.jsx           # product launch / announcement templates
+ig-educational.jsx        # educational / explainer templates
 ig-carousel.jsx           # 3 carousel components (cover + page + CTA)
-ig-event.jsx              # 6 event / save-the-date templates
-ig-job.jsx                # 6 job posting templates
-ig-blog.jsx               # 6 blog / article templates
-ig-transparency.jsx       # 6 transparency / metrics templates
-ig-product.jsx            # 6 product feature templates
-ig-testimonial.jsx        # 6 testimonial / quote-from-user templates
-ig-usecase.jsx            # 6 use-case / persona templates
-ig-tutorial.jsx           # 6 tutorial / how-to templates
-ig-quote.jsx              # 6 external quote / citation templates
+ig-event.jsx              # event / save-the-date templates
+ig-job.jsx                # job posting templates
+ig-blog.jsx               # blog / article templates
+ig-transparency.jsx       # transparency / metrics templates
+ig-product.jsx            # product feature templates
+ig-testimonial.jsx        # testimonial / quote-from-user templates
+ig-usecase.jsx            # use-case / persona templates
+ig-tutorial.jsx           # tutorial / how-to templates
+ig-quote.jsx              # external quote / citation templates
 ```
 
 **Script load order** in `Instagram Posts.html` is critical. Required sequence:
@@ -62,8 +62,8 @@ Each template (e.g. `IgManifesto01`) receives `{ data, onEdit, format }` and ret
 
 1. `IG_DEFAULTS[key]` → initial data (in `ig-data.jsx`)
 2. `useTemplateData(key)` (in `Instagram Posts.html`) → editable state
-3. `TplInner` → applies theme/weight/color CSS variables and wraps with `IgDecor`
-4. `TplFrame` → scales from native size (1080px) to the canvas artboard size
+3. `TplInner` → applies theme/type/color CSS variables, wraps with `IgDecor`, and renders independent image layers around the HTML/template layer
+4. `TplFrame` → scales from native size (1080px) to the canvas artboard size and owns overlay buttons (`IMG`, `Layers`, `HTML`, `IA`, `PNG`)
 5. `DCArtboard` / `DCSection` → mounts on canvas with drag-reorder and focus overlay
 
 **Adding a new template:**
@@ -92,6 +92,7 @@ Semantic theme variables: `--fg-1` (primary), `--fg-2` (secondary), `--fg-3` (te
 
 ### Typography
 - **Font:** Montserrat (self-hosted in `fonts/`), weights 100–900 + italics
+- Global font tweaks can override title/display and small/meta text separately via `--ig-font-title` and `--ig-font-small`
 - **Display:** `letter-spacing: -0.02em`, `line-height: 1.05`
 - **Labels/eyebrow:** ALL CAPS, `letter-spacing: 0.24em–0.34em`, weight 600
 - **Logo:** `letter-spacing: 0.34em`, text rendered as `A R A T E K I` (manually spaced)
@@ -109,7 +110,12 @@ Semantic theme variables: `--fg-1` (primary), `--fg-2` (secondary), `--fg-3` (te
 
 ## 5. Global tweaks system
 
-The `TweaksPanel` (bottom-right corner) controls CSS variables applied to all posts simultaneously:
+The `TweaksPanel` (bottom-right corner, open by default) controls CSS variables applied to all posts simultaneously. It is organized into tabs:
+
+- **Visual** — theme, background fills, text colors, typography, layout, export quality
+- **Efeitos** — all decoration groups and per-effect controls
+- **IA** — provider, API key, model, mode, and prompt context
+- **Ajuda** — export and inline-editing notes
 
 | Tweak key | Type | Effect |
 |---|---|---|
@@ -120,6 +126,8 @@ The `TweaksPanel` (bottom-right corner) controls CSS variables applied to all po
 | `bgAngle` | 0–360 | angle for directional custom background fills |
 | `weight` | 300/400/500/700 | `--ig-weight` (display text weight) |
 | `weightSmall` | 300/400/500/600/700 | `--ig-weight-small` (labels/logo) |
+| `fontTitle` | enum | `--ig-font-title` (title/display font stack) |
+| `fontSmall` | enum | `--ig-font-small` (metadata/small text font stack) |
 | `sizeScale` | float 0.7–1.4 | `--ig-size-scale` (display type scale) |
 | `smallScale` | float 0.7–1.4 | `--ig-small-scale` (label scale) |
 | `chromePad` | 40–140px | `--ig-chrome-pad` (top/bottom chrome padding) |
@@ -194,6 +202,13 @@ The `TweaksPanel` (bottom-right corner) controls CSS variables applied to all po
 Every `decorXxx` boolean has a paired `decorXxxIntensity` float (0.1–2) that appears inline below the toggle when active. Transformable effects also expose `decorXxxSize` (50–200%), `decorXxxX` (-50–50%), and `decorXxxY` (-50–50%).
 
 Defaults live in `TWEAK_DEFAULTS` at the top of the inline `<script>` in `Instagram Posts.html`.
+
+**Font options:** built-ins include `montserrat`, `system`, `arial`, `helvetica`, `times`, `humanist`, `serif`, `editorial`, `mono`, `condensed`. They resolve through `FONT_OPTIONS` / `fontStack()` in `Instagram Posts.html`; do not hardcode font stacks in templates unless the template is intentionally representing terminal/code content.
+
+Users can also add fonts at runtime:
+- **Upload fonte** accepts `.ttf`, `.otf`, `.woff`, `.woff2` and registers an in-memory `@font-face`.
+- **Fonte do sistema** lets the user type an exact local font name. Browsers cannot reliably list installed fonts, but a typed family name will work when installed and otherwise falls back.
+- Uploaded/system-added fonts are runtime-only and reset on page reload.
 
 ---
 
@@ -359,12 +374,56 @@ IgDecor({ decor, theme, seed })
 - `DCArtboard` → marker component (rendered by `DCArtboardFrame`)
 - Drag-reorder via grip handle; state persists to `.design-canvas.state.json`
 - Focus overlay (fullscreen) via expand button or label click; ←/→/Esc navigate between artboards
+- Focus overlay can receive `focusEditor` from `DCArtboard`; this is used to edit image layers and HTML while focused
+- In focus mode, post overlay buttons are always visible (`IMG`, `Layers`, `HTML`, `IA`, `PNG`)
 
 ---
 
 ## 8. PNG export
 
-The `↓ PNG` button appears on artboard hover. Uses `html-to-image.toPng` on the `[data-ig-real]` element (the native 1080px `div`, before scaling). `pixelRatio: 1` — export is already at native resolution.
+The `↓ PNG` button appears on artboard hover and is always visible in focus mode. Uses `html-to-image.toPng` on the `[data-ig-real]` element (the native 1080px `div`, before scaling). Export quality is controlled by `exportScale` (`1`, `2`, or `3`).
+
+When exporting from focus mode, the button must export the closest clicked frame, not the first duplicate id in the background canvas. Runtime editing affordances such as selected image outlines are hidden by the temporary `ig-exporting` class and must not leak into PNG output.
+
+---
+
+## 8.1 HTML editor and AI
+
+Each card has an `HTML` overlay button. Only one HTML editor is open at a time. The editor can appear below the card on the canvas and in the focus overlay sidebar. It has explicit **Salvar**, **Resetar**, and **Fechar** controls; saved HTML is runtime-only state and resets on page reload.
+
+HTML overrides are rendered inside `TplInner`, not as a replacement for the entire `[data-ig-real]` frame. This preserves global background, decoration effects, image layers, export behavior, and CSS variables.
+
+**Sanitization / contract:**
+- `sanitizeHtmlFragment()` removes scripts, iframes, embeds, import links, `on*` handlers, and `javascript:` URLs.
+- `stripFullCanvasBackgrounds()` removes opaque full-canvas backgrounds from AI HTML so global backgrounds/effects/image layers stay visible.
+- `stripRuntimeImageLayers()` removes app-managed image layer DOM before opening/sending HTML to AI.
+- `ensureAiHtmlContract()` wraps AI HTML with `data-ai-html="1"` and uses `var(--ig-font-title)`, `var(--fg-1)`, `var(--ig-weight)`, `var(--ig-chrome-pad)`, etc.
+
+**AI configuration:** direct browser calls using a user-provided runtime API key only; do not persist keys. Supported providers are OpenAI, Anthropic, and Gemini. Current modes:
+
+- `content` — sends editable text fields and applies returned `{ fields: [{ path, value }] }`, preserving React templates and tweaks.
+- `html` — sends current sanitized HTML and applies returned HTML override.
+
+While any AI request is running, all IA buttons are disabled. The active card shows a visible loading overlay, then a temporary success outline/badge.
+
+AI HTML prompts must mention image layer metadata when present and instruct the model not to recreate app-managed images with `<img>` tags.
+
+---
+
+## 8.2 Image layers
+
+Cards can contain multiple uploaded image layers. Images are stored as data URLs in runtime React state only.
+
+Layer behavior:
+- Upload through the `IMG` overlay button, including from focus mode.
+- `Layers` opens the layer inspector when images exist.
+- Clicking an image selects its layer; selection outline is edit-only and hidden during PNG export.
+- Inspector controls: size, X/Y position, opacity, rotation, border radius, remove, and depth.
+- Layer list shows images above the special `HTML / Template` reference, then images behind it.
+- `Subir` / `Descer` changes ordering; crossing the `HTML / Template` row changes the layer from above to behind or vice versa.
+- Image layers are rendered inside `[data-ig-real]` so they export with the post, but they are app-managed and must not be saved into HTML overrides.
+
+Do not put uploaded images into template data or `IG_DEFAULTS`. Do not serialize image data into `CLAUDE.md`, CSS files, or defaults.
 
 ---
 
@@ -583,7 +642,7 @@ style={{ padding: 'var(--ig-chrome-pad, 80px)' }}
 - **Data in `ig-data.jsx`** — all template default text lives in `IG_DEFAULTS`; do not embed strings directly in JSX
 - **`Object.assign(window, {...})`** at the bottom of every `.jsx` — this is the cross-script export mechanism for Babel
 - **No new dependencies** — everything loads via CDN with integrity hashes; do not add libraries without discussion
-- **Post formats:** `square` (1080×1080), `portrait` (1080×1350), `story` (1080×1920)
+- **Post formats:** `square` (1080×1080), `portrait` (1080×1350), `landscape` (1920×1080), `story` (1080×1920), `banner` (1620×540)
 - **Brand tracking text:** `A R A T E K I`, `V A U L T`, `L A N Ç A M E N T O` — the spaces between letters are intentional brand identity, not a typo
 
 ---
@@ -601,3 +660,6 @@ style={{ padding: 'var(--ig-chrome-pad, 80px)' }}
 9. **Layout novelty mandate:** Before designing templates for a new section, read Section 10 (Layout primitives). Each new section should use layouts not yet dominant in adjacent sections, and ideally introduce at least one structural pattern not in the table. Document any new pattern in Section 10.
 10. **`decor` is an object, not a number.** `IgDecor` receives `{ grid, gridI, dots, dotsI, … }` — not a `0–3` integer. `TplInner` builds this object from the individual `tw.decorXxx` tweak values and passes it down.
 11. **Script load order matters.** When adding a new `.jsx` file, insert it after `ig-blog.jsx` (or the last existing template file) and before the closing `</body>`. `ig-common.jsx` and `ig-data.jsx` must load before any template file.
+12. **HTML overrides must stay compatible with tweaks.** Keep them inside `TplInner`; do not replace `[data-ig-real]` or bypass the wrapper that defines `--fg-*`, `--bg-*`, `--ig-weight*`, `--ig-font-*`, `--ig-size-scale`, and `--ig-chrome-pad`.
+13. **Image layers are app-managed.** Do not embed uploaded images into AI HTML, template defaults, or saved HTML. Pass layer metadata to AI and keep the visual layer editable through the layer inspector.
+14. **Focus mode is an editing surface.** If adding a new per-card editor, expose it through `focusEditor` as well as the inline card editor so the expanded post remains fully usable.
