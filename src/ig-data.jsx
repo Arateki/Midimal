@@ -682,4 +682,4 @@ const IG_DEFAULTS = {
   },
 };
 
-window.IG_DEFAULTS = IG_DEFAULTS;
+export { IG_DEFAULTS };

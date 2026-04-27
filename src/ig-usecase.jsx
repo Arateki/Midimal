@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-usecase.jsx — 6 variações de template "Caso de uso"
 // Aplicações reais dos produtos Arateki. Diferente do educativo (conceito) e do manifesto (voz da marca).
 
@@ -533,6 +536,4 @@ function IgUseCase08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, {
-  IgUseCase01, IgUseCase02, IgUseCase03, IgUseCase04, IgUseCase05, IgUseCase06, IgUseCase07, IgUseCase08,
-});
+export { IgUseCase01, IgUseCase02, IgUseCase03, IgUseCase04, IgUseCase05, IgUseCase06, IgUseCase07, IgUseCase08 };

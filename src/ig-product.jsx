@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-product.jsx — 6 variações de template "Produto"
 // Catálogo e specs dos produtos Arateki. Layouts inéditos no projeto.
 
@@ -627,6 +630,4 @@ function IgProduct08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, {
-  IgProduct01, IgProduct02, IgProduct03, IgProduct04, IgProduct05, IgProduct06, IgProduct07, IgProduct08,
-});
+export { IgProduct01, IgProduct02, IgProduct03, IgProduct04, IgProduct05, IgProduct06, IgProduct07, IgProduct08 };

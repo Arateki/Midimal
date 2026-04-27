@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-transparency.jsx — 6 variações de template "Transparência"
 // Dados reais sobre as práticas da Arateki. Cada layout usa um mecanismo visual inédito.
 
@@ -601,6 +604,4 @@ function IgTransp08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, {
-  IgTransp01, IgTransp02, IgTransp03, IgTransp04, IgTransp05, IgTransp06, IgTransp07, IgTransp08,
-});
+export { IgTransp01, IgTransp02, IgTransp03, IgTransp04, IgTransp05, IgTransp06, IgTransp07, IgTransp08 };

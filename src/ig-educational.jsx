@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-educational.jsx — 6 variações "Dica técnica / educativo"
 
 // ── E01 · Pergunta grande + resposta numerada ────────────────────────
@@ -414,6 +417,4 @@ function IgEducational08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, {
-  IgEducational01, IgEducational02, IgEducational03, IgEducational04, IgEducational05, IgEducational06, IgEducational07, IgEducational08,
-});
+export { IgEducational01, IgEducational02, IgEducational03, IgEducational04, IgEducational05, IgEducational06, IgEducational07, IgEducational08 };

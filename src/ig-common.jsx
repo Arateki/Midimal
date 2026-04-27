@@ -1,3 +1,5 @@
+import React from 'react'
+
 // ig-common.jsx — Primitivos compartilhados para posts Instagram Arateki
 // Todos os templates usam estes blocos para manter consistência.
 
@@ -143,4 +145,4 @@ function IgArtboard({ format = 'square', artboardW, children }) {
   );
 }
 
-Object.assign(window, { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS });
+export { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS };

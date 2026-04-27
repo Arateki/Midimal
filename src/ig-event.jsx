@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-event.jsx — 6 variações "Evento / Save the date"
 
 function IgEvent01({ data, onEdit, format = 'square' }) {
@@ -427,4 +430,4 @@ function IgEvent08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, { IgEvent01, IgEvent02, IgEvent03, IgEvent04, IgEvent05, IgEvent06, IgEvent07, IgEvent08 });
+export { IgEvent01, IgEvent02, IgEvent03, IgEvent04, IgEvent05, IgEvent06, IgEvent07, IgEvent08 };

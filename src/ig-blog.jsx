@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-blog.jsx — 6 variações "Novidade do blog / Artigo"
 
 function IgBlog01({ data, onEdit, format = 'square' }) {
@@ -372,4 +375,4 @@ function IgBlog08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, { IgBlog01, IgBlog02, IgBlog03, IgBlog04, IgBlog05, IgBlog06, IgBlog07, IgBlog08 });
+export { IgBlog01, IgBlog02, IgBlog03, IgBlog04, IgBlog05, IgBlog06, IgBlog07, IgBlog08 };

@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-manifesto.jsx — 6 variações de template "Frase / Manifesto"
 // Cada componente recebe { data, onEdit, format }. format é apenas uma
 // dica — o layout se adapta para square/portrait/story.
@@ -504,6 +507,4 @@ function IgManifesto08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, {
-  IgManifesto01, IgManifesto02, IgManifesto03, IgManifesto04, IgManifesto05, IgManifesto06, IgManifesto07, IgManifesto08,
-});
+export { IgManifesto01, IgManifesto02, IgManifesto03, IgManifesto04, IgManifesto05, IgManifesto06, IgManifesto07, IgManifesto08 };

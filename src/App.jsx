@@ -1,0 +1,1838 @@
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import * as htmlToImage from 'html-to-image'
+import { IG_DIMS } from './ig-common.jsx'
+import { IgDecor } from './ig-decor.jsx'
+import { IG_DEFAULTS } from './ig-data.jsx'
+import { DesignCanvas, DCSection, DCArtboard, DCPostIt } from './design-canvas.jsx'
+import { useTweaks, TweaksPanel, TweakSection, TweakRow, TweakTabs, TweakTab, TweakSlider, TweakToggle, TweakRadio, TweakSelect, TweakText, TweakTextarea, TweakNumber, TweakColor, TweakButton, TweakFile } from './tweaks-panel.jsx'
+import { IgManifesto01, IgManifesto02, IgManifesto03, IgManifesto04, IgManifesto05, IgManifesto06, IgManifesto07, IgManifesto08 } from './ig-manifesto.jsx'
+import { IgAnnounce01, IgAnnounce02, IgAnnounce03, IgAnnounce04, IgAnnounce05, IgAnnounce06, IgAnnounce07, IgAnnounce08 } from './ig-announce.jsx'
+import { IgEducational01, IgEducational02, IgEducational03, IgEducational04, IgEducational05, IgEducational06, IgEducational07, IgEducational08 } from './ig-educational.jsx'
+import { IgCarouselA_Cover, IgCarouselA_Page, IgCarouselA_CTA } from './ig-carousel.jsx'
+import { IgEvent01, IgEvent02, IgEvent03, IgEvent04, IgEvent05, IgEvent06, IgEvent07, IgEvent08 } from './ig-event.jsx'
+import { IgJob01, IgJob02, IgJob03, IgJob04, IgJob05, IgJob06, IgJob07, IgJob08 } from './ig-job.jsx'
+import { IgBlog01, IgBlog02, IgBlog03, IgBlog04, IgBlog05, IgBlog06, IgBlog07, IgBlog08 } from './ig-blog.jsx'
+import { IgTransp01, IgTransp02, IgTransp03, IgTransp04, IgTransp05, IgTransp06, IgTransp07, IgTransp08 } from './ig-transparency.jsx'
+import { IgProduct01, IgProduct02, IgProduct03, IgProduct04, IgProduct05, IgProduct06, IgProduct07, IgProduct08 } from './ig-product.jsx'
+import { IgTestimonial01, IgTestimonial02, IgTestimonial03, IgTestimonial04, IgTestimonial05, IgTestimonial06, IgTestimonial07, IgTestimonial08 } from './ig-testimonial.jsx'
+import { IgUseCase01, IgUseCase02, IgUseCase03, IgUseCase04, IgUseCase05, IgUseCase06, IgUseCase07, IgUseCase08 } from './ig-usecase.jsx'
+import { IgTutorial01, IgTutorial02, IgTutorial03, IgTutorial04, IgTutorial05, IgTutorial06, IgTutorial07, IgTutorial08 } from './ig-tutorial.jsx'
+import { IgQuote01, IgQuote02, IgQuote03, IgQuote04, IgQuote05, IgQuote06, IgQuote07, IgQuote08 } from './ig-quote.jsx'
+
+
+// ─── Tweaks defaults ───────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "light",
+  "bgColor": "#ffffff",
+  "bgColor2": "#ece7dd",
+  "bgFill": "solid",
+  "bgAngle": 135,
+  "weight": 700,
+  "weightSmall": 600,
+  "fontTitle": "montserrat",
+  "fontSmall": "montserrat",
+  "sizeScale": 1,
+  "smallScale": 1,
+  "chromePad": 80,
+  "secondaryTextColor": "",
+  "decorGrid": true,       "decorGridIntensity": 1,
+  "decorDots": false,      "decorDotsIntensity": 1,
+  "decorDiagonals": false, "decorDiagonalsIntensity": 1,
+  "decorScanlines": false, "decorScanlinesIntensity": 1,
+  "decorGrain": false,     "decorGrainIntensity": 1,
+  "decorTopography": false,"decorTopographyIntensity": 1,
+  "decorAxes": false,      "decorAxesIntensity": 1,
+  "decorDataBars": false,  "decorDataBarsIntensity": 1,
+  "decorIsoMesh": false,   "decorIsoMeshIntensity": 1,
+  "decorOrbits": false,    "decorOrbitsIntensity": 1,
+  "decorSignal": false,    "decorSignalIntensity": 1,
+  "decorCircuit": false,   "decorCircuitIntensity": 1,
+  "decorModules": false,   "decorModulesIntensity": 1,
+  "decorBarcode": false,   "decorBarcodeIntensity": 1,
+  "decorCropMarks": false, "decorCropMarksIntensity": 1,
+  "decorColumns": false,   "decorColumnsIntensity": 1,
+  "decorFocusWindow": false,"decorFocusWindowIntensity": 1,
+  "decorMarginNotes": false,"decorMarginNotesIntensity": 1,
+  "decorGhostBand": false, "decorGhostBandIntensity": 1,
+  "decorSoftBlob": false,  "decorSoftBlobIntensity": 1,
+  "decorPaperFold": false, "decorPaperFoldIntensity": 1,
+  "decorInkSpread": false, "decorInkSpreadIntensity": 1,
+  "decorRibbon": false,    "decorRibbonIntensity": 1,
+  "decorBurst": false,     "decorBurstIntensity": 1,
+  "decorThread": false,    "decorThreadIntensity": 1,
+  "decorCalendar": false,  "decorCalendarIntensity": 1,
+  "decorStack": false,     "decorStackIntensity": 1,
+  "decorQuoteMarks": false,"decorQuoteMarksIntensity": 1,
+  "decorSteps": false,     "decorStepsIntensity": 1,
+  "decorFineFrame": false, "decorFineFrameIntensity": 1,
+  "decorHairline": false,  "decorHairlineIntensity": 1,
+  "decorMedallion": false, "decorMedallionIntensity": 1,
+  "decorGuilloche": false, "decorGuillocheIntensity": 1,
+  "decorLinen": false,     "decorLinenIntensity": 1,
+  "decorMatte": false,     "decorMatteIntensity": 1,
+  "decorPriceSeal": false, "decorPriceSealIntensity": 1,
+  "decorShelf": false,     "decorShelfIntensity": 1,
+  "decorHangTag": false,   "decorHangTagIntensity": 1,
+  "decorCatalog": false,   "decorCatalogIntensity": 1,
+  "decorPlinth": false,    "decorPlinthIntensity": 1,
+  "decorMindMap": false,   "decorMindMapIntensity": 1,
+  "decorChalk": false,     "decorChalkIntensity": 1,
+  "decorMarker": false,    "decorMarkerIntensity": 1,
+  "decorDecision": false,  "decorDecisionIntensity": 1,
+  "decorLayers": false,    "decorLayersIntensity": 1,
+  "decorTicket": false,    "decorTicketIntensity": 1,
+  "decorSeatMap": false,   "decorSeatMapIntensity": 1,
+  "decorWristband": false, "decorWristbandIntensity": 1,
+  "decorAgenda": false,    "decorAgendaIntensity": 1,
+  "decorConstellation": false,"decorConstellationIntensity": 1,
+  "decorCertSeal": false,  "decorCertSealIntensity": 1,
+  "decorSignature": false, "decorSignatureIntensity": 1,
+  "decorStamp": false,     "decorStampIntensity": 1,
+  "decorArchive": false,   "decorArchiveIntensity": 1,
+  "decorAudit": false,     "decorAuditIntensity": 1,
+  "decorReactions": false, "decorReactionsIntensity": 1,
+  "decorBubbles": false,   "decorBubblesIntensity": 1,
+  "decorStoryFrame": false,"decorStoryFrameIntensity": 1,
+  "decorComments": false,  "decorCommentsIntensity": 1,
+  "decorSocialStats": false,"decorSocialStatsIntensity": 1,
+  "decorCorners": false,   "decorCornersIntensity": 1,
+  "decorVignette": false,  "decorVignetteIntensity": 1,
+  "decorWatermark": false, "decorWatermarkIntensity": 1,
+  "decorParticles": true,  "decorParticlesIntensity": 1,
+  "decorGlow": true,       "decorGlowIntensity": 1,
+  "decorOrbitsSize": 100, "decorOrbitsX": 0, "decorOrbitsY": 0,
+  "decorGhostBandSize": 100, "decorGhostBandX": 0, "decorGhostBandY": 0,
+  "decorSoftBlobSize": 100, "decorSoftBlobX": 0, "decorSoftBlobY": 0,
+  "decorInkSpreadSize": 100, "decorInkSpreadX": 0, "decorInkSpreadY": 0,
+  "decorBurstSize": 100, "decorBurstX": 0, "decorBurstY": 0,
+  "decorMedallionSize": 100, "decorMedallionX": 0, "decorMedallionY": 0,
+  "decorPriceSealSize": 100, "decorPriceSealX": 0, "decorPriceSealY": 0,
+  "decorHangTagSize": 100, "decorHangTagX": 0, "decorHangTagY": 0,
+  "decorMindMapSize": 100, "decorMindMapX": 0, "decorMindMapY": 0,
+  "decorConstellationSize": 100, "decorConstellationX": 0, "decorConstellationY": 0,
+  "decorSignatureSize": 100, "decorSignatureX": 0, "decorSignatureY": 0,
+  "decorStampSize": 100, "decorStampX": 0, "decorStampY": 0,
+  "decorReactionsSize": 100, "decorReactionsX": 0, "decorReactionsY": 0,
+  "decorBubblesSize": 100, "decorBubblesX": 0, "decorBubblesY": 0,
+  "decorDataBarsSize": 100, "decorDataBarsX": 0, "decorDataBarsY": 0,
+  "decorSignalSize": 100, "decorSignalX": 0, "decorSignalY": 0,
+  "decorCircuitSize": 100, "decorCircuitX": 0, "decorCircuitY": 0,
+  "decorModulesSize": 100, "decorModulesX": 0, "decorModulesY": 0,
+  "decorBarcodeSize": 100, "decorBarcodeX": 0, "decorBarcodeY": 0,
+  "decorFocusWindowSize": 100, "decorFocusWindowX": 0, "decorFocusWindowY": 0,
+  "decorMarginNotesSize": 100, "decorMarginNotesX": 0, "decorMarginNotesY": 0,
+  "decorRibbonSize": 100, "decorRibbonX": 0, "decorRibbonY": 0,
+  "decorThreadSize": 100, "decorThreadX": 0, "decorThreadY": 0,
+  "decorCalendarSize": 100, "decorCalendarX": 0, "decorCalendarY": 0,
+  "decorStackSize": 100, "decorStackX": 0, "decorStackY": 0,
+  "decorQuoteMarksSize": 100, "decorQuoteMarksX": 0, "decorQuoteMarksY": 0,
+  "decorStepsSize": 100, "decorStepsX": 0, "decorStepsY": 0,
+  "decorShelfSize": 100, "decorShelfX": 0, "decorShelfY": 0,
+  "decorCatalogSize": 100, "decorCatalogX": 0, "decorCatalogY": 0,
+  "decorPlinthSize": 100, "decorPlinthX": 0, "decorPlinthY": 0,
+  "decorChalkSize": 100, "decorChalkX": 0, "decorChalkY": 0,
+  "decorMarkerSize": 100, "decorMarkerX": 0, "decorMarkerY": 0,
+  "decorDecisionSize": 100, "decorDecisionX": 0, "decorDecisionY": 0,
+  "decorLayersSize": 100, "decorLayersX": 0, "decorLayersY": 0,
+  "decorTicketSize": 100, "decorTicketX": 0, "decorTicketY": 0,
+  "decorSeatMapSize": 100, "decorSeatMapX": 0, "decorSeatMapY": 0,
+  "decorWristbandSize": 100, "decorWristbandX": 0, "decorWristbandY": 0,
+  "decorAgendaSize": 100, "decorAgendaX": 0, "decorAgendaY": 0,
+  "decorCertSealSize": 100, "decorCertSealX": 0, "decorCertSealY": 0,
+  "decorArchiveSize": 100, "decorArchiveX": 0, "decorArchiveY": 0,
+  "decorAuditSize": 100, "decorAuditX": 0, "decorAuditY": 0,
+  "decorCommentsSize": 100, "decorCommentsX": 0, "decorCommentsY": 0,
+  "decorSocialStatsSize": 100, "decorSocialStatsX": 0, "decorSocialStatsY": 0,
+  "accent": false,
+  "textColor": "",
+  "exportScale": 2,
+  "format": "square"
+}/*EDITMODE-END*/;
+
+const DECOR_GROUPS = [
+  { key: 'minimal', label: 'Minimalismo' },
+  { key: 'system', label: 'Técnico / sistema' },
+  { key: 'editorial', label: 'Editorial / movimento' },
+  { key: 'organic', label: 'Orgânico / humano' },
+  { key: 'campaign', label: 'Campanha / impacto' },
+  { key: 'luxury', label: 'Luxo / editorial' },
+  { key: 'commerce', label: 'Comercial / produto' },
+  { key: 'education', label: 'Educação / conteúdo' },
+  { key: 'event', label: 'Evento / comunidade' },
+  { key: 'trust', label: 'Institucional / confiança' },
+  { key: 'creator', label: 'Creator / social' },
+];
+
+const FONT_OPTIONS = [
+  { value: 'montserrat', label: 'Montserrat', stack: "'Montserrat', system-ui, -apple-system, Segoe UI, sans-serif" },
+  { value: 'system', label: 'Sistema', stack: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
+  { value: 'arial', label: 'Arial', stack: "Arial, Helvetica, sans-serif" },
+  { value: 'helvetica', label: 'Helvetica', stack: "Helvetica, Arial, sans-serif" },
+  { value: 'times', label: 'Times', stack: "'Times New Roman', Times, serif" },
+  { value: 'humanist', label: 'Humanista', stack: "Aptos, 'Avenir Next', Avenir, 'Segoe UI', system-ui, sans-serif" },
+  { value: 'serif', label: 'Serifada', stack: "Georgia, 'Times New Roman', serif" },
+  { value: 'editorial', label: 'Editorial', stack: "'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif" },
+  { value: 'mono', label: 'Mono', stack: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace" },
+  { value: 'condensed', label: 'Condensada', stack: "'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue Condensed', Arial, sans-serif" },
+];
+
+function quoteFontName(name) {
+  const clean = String(name || '').trim().replace(/['"]/g, '');
+  if (!clean) return '';
+  return /^[a-zA-Z-]+$/.test(clean) ? clean : `'${clean}'`;
+}
+
+function fontStack(key, runtimeFonts = []) {
+  if (String(key || '').startsWith('custom:')) {
+    const family = key.slice(7);
+    return `${quoteFontName(family)}, ${FONT_OPTIONS[0].stack}`;
+  }
+  if (String(key || '').startsWith('system:')) {
+    const family = key.slice(7);
+    return `${quoteFontName(family)}, system-ui, -apple-system, Segoe UI, sans-serif`;
+  }
+  const runtime = runtimeFonts.find((font) => font.value === key);
+  if (runtime) return runtime.stack;
+  return (FONT_OPTIONS.find((font) => font.value === key) || FONT_OPTIONS[0]).stack;
+}
+
+const DECOR_TWEAKS = [
+  { group: 'minimal', key: 'grid',       label: 'Grid',             tweak: 'decorGrid',       intensity: 'decorGridIntensity' },
+  { group: 'minimal', key: 'dots',       label: 'Grade de pontos',  tweak: 'decorDots',       intensity: 'decorDotsIntensity' },
+  { group: 'minimal', key: 'diagonals',  label: 'Diagonais',        tweak: 'decorDiagonals',  intensity: 'decorDiagonalsIntensity' },
+  { group: 'minimal', key: 'scanlines',  label: 'Scan lines',       tweak: 'decorScanlines',  intensity: 'decorScanlinesIntensity' },
+  { group: 'minimal', key: 'grain',      label: 'Microgranulado',   tweak: 'decorGrain',      intensity: 'decorGrainIntensity' },
+  { group: 'minimal', key: 'topography', label: 'Topografia',       tweak: 'decorTopography', intensity: 'decorTopographyIntensity' },
+  { group: 'minimal', key: 'corners',    label: 'Marcas de canto',  tweak: 'decorCorners',    intensity: 'decorCornersIntensity' },
+  { group: 'minimal', key: 'vignette',   label: 'Vinheta',          tweak: 'decorVignette',   intensity: 'decorVignetteIntensity' },
+  { group: 'minimal', key: 'watermark',  label: "Marca d'água",    tweak: 'decorWatermark',  intensity: 'decorWatermarkIntensity' },
+  { group: 'minimal', key: 'particles',  label: 'Rede neural',      tweak: 'decorParticles',  intensity: 'decorParticlesIntensity' },
+  { group: 'minimal', key: 'glow',       label: 'Glow',             tweak: 'decorGlow',       intensity: 'decorGlowIntensity' },
+  { group: 'system', key: 'axes',        label: 'Eixos técnicos',   tweak: 'decorAxes',       intensity: 'decorAxesIntensity' },
+  { group: 'system', key: 'dataBars',    label: 'Barras de dados',  tweak: 'decorDataBars',   intensity: 'decorDataBarsIntensity', transform: true },
+  { group: 'system', key: 'isoMesh',     label: 'Malha isométrica', tweak: 'decorIsoMesh',    intensity: 'decorIsoMeshIntensity' },
+  { group: 'system', key: 'signal',      label: 'Onda de sinal',    tweak: 'decorSignal',     intensity: 'decorSignalIntensity', transform: true },
+  { group: 'system', key: 'circuit',     label: 'Circuito linear',  tweak: 'decorCircuit',    intensity: 'decorCircuitIntensity', transform: true },
+  { group: 'system', key: 'barcode',     label: 'Código marginal',  tweak: 'decorBarcode',    intensity: 'decorBarcodeIntensity', transform: true },
+  { group: 'editorial', key: 'orbits',   label: 'Órbitas',          tweak: 'decorOrbits',     intensity: 'decorOrbitsIntensity', transform: true },
+  { group: 'editorial', key: 'modules',  label: 'Blocos modulares', tweak: 'decorModules',    intensity: 'decorModulesIntensity', transform: true },
+  { group: 'editorial', key: 'cropMarks', label: 'Recorte editorial', tweak: 'decorCropMarks', intensity: 'decorCropMarksIntensity' },
+  { group: 'editorial', key: 'columns',  label: 'Colunas de leitura', tweak: 'decorColumns',   intensity: 'decorColumnsIntensity' },
+  { group: 'editorial', key: 'focusWindow', label: 'Janela de foco', tweak: 'decorFocusWindow', intensity: 'decorFocusWindowIntensity', transform: true },
+  { group: 'editorial', key: 'marginNotes', label: 'Notas marginais', tweak: 'decorMarginNotes', intensity: 'decorMarginNotesIntensity', transform: true },
+  { group: 'editorial', key: 'ghostBand', label: 'Faixa fantasma',   tweak: 'decorGhostBand', intensity: 'decorGhostBandIntensity', transform: true },
+  { group: 'organic', key: 'softBlob',     label: 'Mancha suave',     tweak: 'decorSoftBlob',  intensity: 'decorSoftBlobIntensity', transform: true },
+  { group: 'organic', key: 'paperFold',    label: 'Dobra de papel',   tweak: 'decorPaperFold', intensity: 'decorPaperFoldIntensity' },
+  { group: 'organic', key: 'inkSpread',    label: 'Tinta difusa',     tweak: 'decorInkSpread', intensity: 'decorInkSpreadIntensity', transform: true },
+  { group: 'campaign', key: 'ribbon',      label: 'Faixa diagonal',   tweak: 'decorRibbon',    intensity: 'decorRibbonIntensity', transform: true },
+  { group: 'campaign', key: 'burst',       label: 'Explosão radial',  tweak: 'decorBurst',     intensity: 'decorBurstIntensity', transform: true },
+  { group: 'campaign', key: 'thread',      label: 'Fio social',       tweak: 'decorThread',    intensity: 'decorThreadIntensity', transform: true },
+  { group: 'campaign', key: 'calendar',    label: 'Calendário',       tweak: 'decorCalendar',  intensity: 'decorCalendarIntensity', transform: true },
+  { group: 'campaign', key: 'stack',       label: 'Stack de cards',   tweak: 'decorStack',     intensity: 'decorStackIntensity', transform: true },
+  { group: 'campaign', key: 'quoteMarks',  label: 'Aspas gigantes',   tweak: 'decorQuoteMarks', intensity: 'decorQuoteMarksIntensity', transform: true },
+  { group: 'campaign', key: 'steps',       label: 'Passos numerados', tweak: 'decorSteps',     intensity: 'decorStepsIntensity', transform: true },
+  { group: 'luxury', key: 'fineFrame',     label: 'Moldura fina',     tweak: 'decorFineFrame', intensity: 'decorFineFrameIntensity' },
+  { group: 'luxury', key: 'hairline',      label: 'Filete editorial', tweak: 'decorHairline',  intensity: 'decorHairlineIntensity' },
+  { group: 'luxury', key: 'medallion',     label: 'Medalhão',         tweak: 'decorMedallion', intensity: 'decorMedallionIntensity', transform: true },
+  { group: 'luxury', key: 'guilloche',     label: 'Guilloché',        tweak: 'decorGuilloche', intensity: 'decorGuillocheIntensity' },
+  { group: 'luxury', key: 'linen',         label: 'Textura linho',    tweak: 'decorLinen',     intensity: 'decorLinenIntensity' },
+  { group: 'luxury', key: 'matte',         label: 'Passe-partout',    tweak: 'decorMatte',     intensity: 'decorMatteIntensity' },
+  { group: 'commerce', key: 'priceSeal',   label: 'Selo comercial',   tweak: 'decorPriceSeal', intensity: 'decorPriceSealIntensity', transform: true },
+  { group: 'commerce', key: 'shelf',       label: 'Vitrine',          tweak: 'decorShelf',     intensity: 'decorShelfIntensity', transform: true },
+  { group: 'commerce', key: 'hangTag',     label: 'Etiqueta suspensa', tweak: 'decorHangTag',  intensity: 'decorHangTagIntensity', transform: true },
+  { group: 'commerce', key: 'catalog',     label: 'Grid de catálogo', tweak: 'decorCatalog',   intensity: 'decorCatalogIntensity', transform: true },
+  { group: 'commerce', key: 'plinth',      label: 'Base de produto',  tweak: 'decorPlinth',    intensity: 'decorPlinthIntensity', transform: true },
+  { group: 'education', key: 'mindMap',    label: 'Mapa mental',      tweak: 'decorMindMap',   intensity: 'decorMindMapIntensity', transform: true },
+  { group: 'education', key: 'chalk',      label: 'Quadro anotado',   tweak: 'decorChalk',     intensity: 'decorChalkIntensity', transform: true },
+  { group: 'education', key: 'marker',     label: 'Marca-texto',      tweak: 'decorMarker',    intensity: 'decorMarkerIntensity', transform: true },
+  { group: 'education', key: 'decision',   label: 'Fluxo de decisão', tweak: 'decorDecision',  intensity: 'decorDecisionIntensity', transform: true },
+  { group: 'education', key: 'layers',     label: 'Camadas didáticas', tweak: 'decorLayers',   intensity: 'decorLayersIntensity', transform: true },
+  { group: 'event', key: 'ticket',         label: 'Ingresso',         tweak: 'decorTicket',    intensity: 'decorTicketIntensity', transform: true },
+  { group: 'event', key: 'seatMap',        label: 'Mapa de assentos', tweak: 'decorSeatMap',   intensity: 'decorSeatMapIntensity', transform: true },
+  { group: 'event', key: 'wristband',      label: 'Credencial',       tweak: 'decorWristband', intensity: 'decorWristbandIntensity', transform: true },
+  { group: 'event', key: 'agenda',         label: 'Linha de agenda',  tweak: 'decorAgenda',    intensity: 'decorAgendaIntensity', transform: true },
+  { group: 'event', key: 'constellation',  label: 'Participantes',    tweak: 'decorConstellation', intensity: 'decorConstellationIntensity', transform: true },
+  { group: 'trust', key: 'certSeal',       label: 'Selo institucional', tweak: 'decorCertSeal', intensity: 'decorCertSealIntensity', transform: true },
+  { group: 'trust', key: 'signature',      label: 'Rubrica',          tweak: 'decorSignature', intensity: 'decorSignatureIntensity', transform: true },
+  { group: 'trust', key: 'stamp',          label: 'Documento carimbado', tweak: 'decorStamp',  intensity: 'decorStampIntensity', transform: true },
+  { group: 'trust', key: 'archive',        label: 'Arquivo',          tweak: 'decorArchive',   intensity: 'decorArchiveIntensity', transform: true },
+  { group: 'trust', key: 'audit',          label: 'Linha de auditoria', tweak: 'decorAudit',   intensity: 'decorAuditIntensity', transform: true },
+  { group: 'creator', key: 'reactions',    label: 'Reações',          tweak: 'decorReactions', intensity: 'decorReactionsIntensity', transform: true },
+  { group: 'creator', key: 'bubbles',      label: 'Balões abstratos', tweak: 'decorBubbles',   intensity: 'decorBubblesIntensity', transform: true },
+  { group: 'creator', key: 'storyFrame',   label: 'Moldura story',    tweak: 'decorStoryFrame', intensity: 'decorStoryFrameIntensity' },
+  { group: 'creator', key: 'comments',     label: 'Comentários',      tweak: 'decorComments',  intensity: 'decorCommentsIntensity', transform: true },
+  { group: 'creator', key: 'socialStats',  label: 'Métricas sociais', tweak: 'decorSocialStats', intensity: 'decorSocialStatsIntensity', transform: true },
+];
+
+// Hook: cria estado editável para um template, com persistência em memória
+function useTemplateData(key) {
+  const initial = IG_DEFAULTS[key];
+  const [d, setD] = useState(initial);
+  const edit = (k) => (v) => setD((s) => ({ ...s, [k]: v }));
+  return [d, edit, setD];
+}
+
+function flattenTextFields(value, path = []) {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return [{ path: path.join('.'), value: String(value) }];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap((item, index) => flattenTextFields(item, [...path, index]));
+  }
+  if (value && typeof value === 'object') {
+    return Object.entries(value).flatMap(([key, item]) => flattenTextFields(item, [...path, key]));
+  }
+  return [];
+}
+
+function setDeepValue(root, dottedPath, value) {
+  const path = String(dottedPath || '').split('.').filter(Boolean);
+  if (!path.length) return root;
+  const next = Array.isArray(root) ? [...root] : { ...root };
+  let cursor = next;
+  for (let i = 0; i < path.length - 1; i++) {
+    const key = /^\d+$/.test(path[i]) ? Number(path[i]) : path[i];
+    const child = cursor[key];
+    cursor[key] = Array.isArray(child) ? [...child] : { ...child };
+    cursor = cursor[key];
+  }
+  const last = path[path.length - 1];
+  cursor[/^\d+$/.test(last) ? Number(last) : last] = String(value ?? '');
+  return next;
+}
+
+function applyTextFields(data, fields) {
+  return (fields || []).reduce((acc, field) => {
+    if (!field || field.path == null) return acc;
+    return setDeepValue(acc, field.path, field.value);
+  }, data);
+}
+
+function parseAiJson(text) {
+  const cleaned = String(text || '').replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (err) {
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if (start >= 0 && end > start) return JSON.parse(cleaned.slice(start, end + 1));
+    throw err;
+  }
+}
+
+// Botão de exportar PNG no canto do artboard
+function ExportBtn({ targetId, filename, dims, scale = 1 }) {
+  const onClick = async (e) => {
+    e.stopPropagation();
+    const el = e.currentTarget.closest(`[id="${targetId}"]`) || document.getElementById(targetId);
+    if (!el) return;
+    try {
+      // Captura o elemento em sua resolução real
+      const inner = el.querySelector('[data-ig-real]');
+      const target = inner || el;
+      const s = parseInt(scale, 10) || 1;
+      target.classList.add('ig-exporting');
+      
+      // Forçamos dimensões físicas multiplicadas no canvas para garantir a nitidez
+      const dataUrl = await htmlToImage.toPng(target, {
+        pixelRatio: s,
+        width: dims.w,
+        height: dims.h,
+        canvasWidth: dims.w * s,
+        canvasHeight: dims.h * s,
+        style: {
+          transform: 'none',
+          left: '0',
+          top: '0',
+          position: 'relative'
+        },
+        cacheBust: true,
+        backgroundColor: getComputedStyle(target).backgroundColor,
+      });
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = filename + (s > 1 ? '@' + s + 'x' : '') + '.png';
+      a.click();
+    } catch (err) {
+      console.error('export failed', err);
+    } finally {
+      const inner = el.querySelector('[data-ig-real]');
+      const target = inner || el;
+      target.classList.remove('ig-exporting');
+    }
+  };
+  return <button className="ig-export-btn" onClick={onClick} title="Exportar PNG">↓ PNG {scale > 1 ? `(${scale}x)` : ''}</button>;
+}
+
+// Wrapper que renderiza template em tamanho real + escala + export
+function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, onUploadImages, onOpenImageLayers, hasImageLayers, aiBusy, aiDisabled, aiDone, children }) {
+  const dims = IG_DIMS[format];
+  const fileRef = useRef(null);
+  const artboardW = format === 'story' ? 540 : format === 'portrait' ? 720 : 720;
+  const scale = artboardW / dims.w;
+  const renderedH = dims.h * scale;
+  return (
+    <div id={id} className={aiDone ? 'ig-ai-done' : ''}
+      style={{ position: 'relative', width: artboardW, height: renderedH, background: '#fff' }}>
+      <div
+        data-ig-real
+        className={`ig-canvas ${format === 'story' ? 'ig-size-story' : format === 'portrait' ? 'ig-size-portrait' : 'ig-size-square'}`}
+        style={{
+          width: dims.w,
+          height: dims.h,
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+        }}
+      >
+        {children}
+      </div>
+      {aiBusy && (
+        <div className="ig-ai-loading">
+          <div className="ig-ai-loading-box">
+            <span className="ig-ai-spinner" />
+            Gerando IA
+          </div>
+        </div>
+      )}
+      {aiDone && <div className="ig-ai-done-badge">Atualizado</div>}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        multiple
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          if (files.length && onUploadImages) onUploadImages(files);
+          e.target.value = '';
+        }}
+      />
+      <button
+        className="ig-img-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          fileRef.current?.click();
+        }}
+        title="Adicionar imagens">
+        IMG
+      </button>
+      {hasImageLayers && (
+        <button
+          className="ig-layer-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onOpenImageLayers) onOpenImageLayers();
+          }}
+          title="Gerenciar camadas">
+          Layers
+        </button>
+      )}
+      <button
+        className="ig-html-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onToggleHtml) onToggleHtml();
+        }}
+        title="Editar HTML">
+        {htmlActive ? 'HTML ✓' : 'HTML'}
+      </button>
+      <button
+        className="ig-ai-btn"
+        disabled={!!aiDisabled}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onRunAi) onRunAi();
+        }}
+        title="Modificar com IA">
+        {aiBusy ? 'IA…' : 'IA'}
+      </button>
+      <ExportBtn targetId={id} filename={id} dims={dims} scale={exportScale} />
+    </div>
+  );
+}
+
+// Interpola dois hexadecimais: t=0 → hex1, t=1 → hex2
+function mixHex(hex1, hex2, t) {
+  const p = (h) => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+  const [r1,g1,b1] = p(hex1), [r2,g2,b2] = p(hex2);
+  const r = Math.round(r1*(1-t)+r2*t), g = Math.round(g1*(1-t)+g2*t), b = Math.round(b1*(1-t)+b2*t);
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+function isCustomTheme(theme) {
+  return (theme && typeof theme === 'object' && theme.kind === 'color') ||
+    (typeof theme === 'string' && theme.startsWith('color:'));
+}
+
+function themeBg(theme) {
+  if (theme && typeof theme === 'object' && theme.kind === 'color') return theme.color || '#ffffff';
+  return isCustomTheme(theme) ? theme.slice(6) : theme === 'dark' ? '#000000' : '#ffffff';
+}
+
+function themeBg2(theme) {
+  if (theme && typeof theme === 'object' && theme.kind === 'color') return theme.color2 || theme.color || '#ffffff';
+  return themeBg(theme);
+}
+
+function hexAlpha(hex, alpha) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function themeBackground(theme) {
+  if (!(theme && typeof theme === 'object' && theme.kind === 'color')) return themeBg(theme);
+  const c1 = theme.color || '#ffffff';
+  const c2 = theme.color2 || '#ece7dd';
+  const angle = Number(theme.angle ?? 135);
+  switch (theme.fill || 'solid') {
+    case 'linear':
+      return `linear-gradient(${angle}deg, ${c1} 0%, ${mixHex(c1, c2, 0.35)} 48%, ${c2} 100%)`;
+    case 'radial':
+      return `radial-gradient(circle at 32% 24%, ${c2} 0%, ${mixHex(c1, c2, 0.45)} 36%, ${c1} 78%)`;
+    case 'split':
+      return `linear-gradient(${angle}deg, ${c1} 0 49.7%, ${c2} 50.3% 100%)`;
+    case 'bands':
+      return [
+        `linear-gradient(${angle}deg, ${hexAlpha(c2, 0.26)} 0 12%, transparent 12% 28%, ${hexAlpha(c2, 0.18)} 28% 43%, transparent 43% 100%)`,
+        `linear-gradient(${angle + 90}deg, ${c1} 0%, ${mixHex(c1, c2, 0.22)} 100%)`,
+      ].join(', ');
+    case 'wash':
+      return [
+        `linear-gradient(${angle}deg, ${hexAlpha(c2, 0.36)} 0%, transparent 44%)`,
+        `radial-gradient(ellipse at 78% 18%, ${hexAlpha(c2, 0.42)} 0%, transparent 48%)`,
+        c1,
+      ].join(', ');
+    default:
+      return c1;
+  }
+}
+
+function colorRole(hex) {
+  const [r, g, b] = [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)]
+    .map((v) => {
+      const c = v / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.5 ? 'dark' : 'light';
+}
+
+function sanitizeHtmlFragment(html) {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  doc.querySelectorAll('script, iframe, object, embed, link[rel="import"]').forEach((el) => el.remove());
+  doc.querySelectorAll('*').forEach((el) => {
+    [...el.attributes].forEach((attr) => {
+      const name = attr.name.toLowerCase();
+      const value = String(attr.value || '').trim().toLowerCase();
+      if (name.startsWith('on') || value.startsWith('javascript:')) el.removeAttribute(attr.name);
+    });
+  });
+  return doc.body.firstElementChild ? doc.body.firstElementChild.innerHTML : html;
+}
+
+function stripFullCanvasBackgrounds(html) {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  doc.querySelectorAll('*').forEach((el) => {
+    const style = el.getAttribute('style') || '';
+    const normalized = style.toLowerCase().replace(/\s+/g, '');
+    const fullCanvas = (
+      (normalized.includes('width:100%') && normalized.includes('height:100%')) ||
+      normalized.includes('inset:0')
+    );
+    if (!fullCanvas || !normalized.includes('background')) return;
+    const cleaned = style
+      .replace(/background(?:-color)?\s*:\s*[^;]+;?/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    if (cleaned) el.setAttribute('style', cleaned);
+    else el.removeAttribute('style');
+  });
+  return doc.body.firstElementChild ? doc.body.firstElementChild.innerHTML : html;
+}
+
+function stripRuntimeImageLayers(html) {
+  const doc = new DOMParser().parseFromString(`<div>${html || ''}</div>`, 'text/html');
+  doc.querySelectorAll('.ig-image-layer').forEach((node) => node.remove());
+  return doc.body.firstElementChild ? doc.body.firstElementChild.innerHTML.trim() : String(html || '').trim();
+}
+
+function describeImageLayers(layers) {
+  return sortedImageLayers(layers, 'desc').map((layer) => ({
+    id: layer.id,
+    name: layer.name,
+    position: layer.z < 0 ? 'atras do HTML/template' : 'acima do HTML/template',
+    xPercent: layer.x,
+    yPercent: layer.y,
+    sizePercent: layer.size,
+    opacity: layer.opacity,
+    rotationDegrees: layer.rotation,
+    borderRadiusPx: layer.radius,
+  }));
+}
+
+function ensureAiHtmlContract(html) {
+  const cleaned = stripFullCanvasBackgrounds(sanitizeHtmlFragment(html));
+  if (/data-ai-html=["']1["']/.test(cleaned)) return cleaned;
+  return `<div data-ai-html="1" style="position:relative;width:100%;height:100%;box-sizing:border-box;padding:var(--ig-chrome-pad);color:var(--fg-1);font-family:var(--ig-font-title,var(--font-sans));font-weight:var(--ig-weight);overflow:hidden;">${cleaned}</div>`;
+}
+
+const AI_MODELS = {
+  openai: [
+    { value: 'gpt-5.5', label: 'GPT-5.5' },
+    { value: 'gpt-5.4', label: 'GPT-5.4' },
+    { value: 'gpt-5.4-mini', label: 'GPT-5.4 mini' },
+    { value: 'gpt-5.4-nano', label: 'GPT-5.4 nano' },
+  ],
+  anthropic: [
+    { value: 'claude-opus-4-7', label: 'Claude Opus 4.7' },
+    { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6' },
+    { value: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5' },
+  ],
+  gemini: [
+    { value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro Preview' },
+    { value: 'gemini-3-flash-preview', label: 'Gemini 3 Flash Preview' },
+    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
+    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+    { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash-Lite' },
+  ],
+};
+
+async function callAiProvider({ provider, key, model, systemPrompt, userPrompt }) {
+  if (provider === 'anthropic') {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 8192,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.error?.message || 'Falha na chamada da Anthropic.');
+    return (json.content || []).map((part) => part.text || '').join('').trim();
+  }
+
+  if (provider === 'gemini') {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': key,
+      },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+      }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.error?.message || 'Falha na chamada do Gemini.');
+    return (json.candidates?.[0]?.content?.parts || []).map((part) => part.text || '').join('').trim();
+  }
+
+  const res = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model,
+      input: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+    }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json?.error?.message || 'Falha na chamada da OpenAI.');
+  return json.output_text ||
+    (json.output || []).flatMap((item) => item.content || []).map((part) => part.text || '').join('').trim();
+}
+
+function HtmlEditor({ value, dirty, saved, onChange, onSave, onReset, onClose }) {
+  return (
+    <div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 6,
+        fontFamily: 'var(--font-sans)',
+        fontSize: 11,
+        color: 'rgba(41,38,27,.68)',
+      }}>
+        <span style={{ fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+          HTML do post {dirty ? '· não salvo' : saved ? '· salvo' : ''}
+        </span>
+        <div className="ig-html-actions">
+          <button type="button" className="ig-html-action primary" onClick={onSave}>Salvar</button>
+          <button type="button" className="ig-html-action danger" onClick={onReset}>Resetar</button>
+          <button type="button" className="ig-html-action" onClick={onClose}>Fechar</button>
+        </div>
+      </div>
+      <textarea
+        className="ig-html-editor"
+        value={value}
+        spellCheck={false}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  );
+}
+
+function imageLayerZ(layer, order = 0) {
+  return layer.z < 0 ? 2 + order : 30 + order;
+}
+
+function sortedImageLayers(layers, direction = 'asc') {
+  const sorted = [...layers].sort((a, b) => {
+    if (a.z !== b.z) return a.z - b.z;
+    return (a.order || 0) - (b.order || 0);
+  });
+  return direction === 'desc' ? sorted.reverse() : sorted;
+}
+
+function ImageLayer({ layer, selected, order, onSelect }) {
+  return (
+    <div
+      className="ig-image-layer"
+      data-selected={selected ? '1' : '0'}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+        onSelect(layer.id);
+      }}
+      style={{
+        left: layer.x + '%',
+        top: layer.y + '%',
+        width: layer.size + '%',
+        opacity: layer.opacity,
+        zIndex: imageLayerZ(layer, order),
+        borderRadius: layer.radius + 'px',
+        overflow: layer.radius ? 'hidden' : 'visible',
+        transform: `translate(-50%, -50%) rotate(${layer.rotation}deg)`,
+      }}
+    >
+      <img src={layer.src} alt="" style={{ borderRadius: layer.radius + 'px' }} />
+    </div>
+  );
+}
+
+function ImageLayerEditor({ slotId, layers, selectedId, onSelect, onUpdate, onMove, onRemove, onClose }) {
+  const above = sortedImageLayers(layers.filter((layer) => layer.z >= 0), 'desc');
+  const behind = sortedImageLayers(layers.filter((layer) => layer.z < 0), 'desc');
+  const ordered = [...above, ...behind];
+  const selected = layers.find((layer) => layer.id === selectedId) || ordered.find((layer) => layer.id !== '__html') || null;
+  if (!layers.length) return null;
+  const update = (key, value) => selected && onUpdate(slotId, selected.id, { [key]: value });
+  return (
+    <div className="ig-layer-editor">
+      <div className="ig-layer-head">
+        <span className="ig-layer-title">Camadas de imagem</span>
+        <div className="ig-layer-actions">
+          <button type="button" className="ig-layer-action" onClick={onClose}>Fechar</button>
+        </div>
+      </div>
+      <div className="ig-layer-list">
+        {above.map((layer) => (
+          <div key={layer.id} className="ig-layer-row" data-selected={selected?.id === layer.id ? '1' : '0'} onClick={() => onSelect(slotId, layer.id)}>
+            <img className="ig-layer-thumb" src={layer.src} alt="" />
+            <span className="ig-layer-row-name">{layer.name}</span>
+            <div className="ig-layer-actions">
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, 1); }}>Subir</button>
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, -1); }}>Descer</button>
+            </div>
+          </div>
+        ))}
+        <div className="ig-layer-row">
+          <span className="ig-layer-html-thumb">HTML</span>
+          <span className="ig-layer-row-name">HTML / Template</span>
+          <span style={{ color: 'rgba(24,21,18,.5)', fontSize: 10 }}>referência</span>
+        </div>
+        {behind.map((layer) => (
+          <div key={layer.id} className="ig-layer-row" data-selected={selected?.id === layer.id ? '1' : '0'} onClick={() => onSelect(slotId, layer.id)}>
+            <img className="ig-layer-thumb" src={layer.src} alt="" />
+            <span className="ig-layer-row-name">{layer.name}</span>
+            <div className="ig-layer-actions">
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, 1); }}>Subir</button>
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, -1); }}>Descer</button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {selected && (
+        <>
+          <div className="ig-layer-controls">
+            <label className="ig-layer-field">
+              Tamanho {selected.size}%
+              <input type="range" min="5" max="180" step="1" value={selected.size}
+                     onChange={(e) => update('size', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Opacidade {Math.round(selected.opacity * 100)}%
+              <input type="range" min="0" max="1" step="0.05" value={selected.opacity}
+                     onChange={(e) => update('opacity', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Horizontal {selected.x}%
+              <input type="range" min="-25" max="125" step="1" value={selected.x}
+                     onChange={(e) => update('x', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Vertical {selected.y}%
+              <input type="range" min="-25" max="125" step="1" value={selected.y}
+                     onChange={(e) => update('y', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Rotação {selected.rotation}°
+              <input type="range" min="-45" max="45" step="1" value={selected.rotation}
+                     onChange={(e) => update('rotation', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Borda {selected.radius}px
+              <input type="range" min="0" max="160" step="2" value={selected.radius}
+                     onChange={(e) => update('radius', Number(e.target.value))} />
+            </label>
+            <label className="ig-layer-field">
+              Profundidade
+              <select value={selected.z < 0 ? 'behind' : 'front'}
+                      onChange={(e) => update('z', e.target.value === 'behind' ? -1 : 1)}>
+                <option value="front">Acima do HTML</option>
+                <option value="behind">Atrás do HTML</option>
+              </select>
+            </label>
+          </div>
+          <div className="ig-layer-actions" style={{ marginTop: 10 }}>
+            <button type="button" className="ig-layer-action primary" onClick={() => onMove(slotId, selected.id, 1)}>Subir camada</button>
+            <button type="button" className="ig-layer-action" onClick={() => onMove(slotId, selected.id, -1)}>Descer camada</button>
+            <button type="button" className="ig-layer-action danger" onClick={() => onRemove(slotId, selected.id)}>Remover</button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Conteúdo interno (só o que vai dentro do DCArtboard)
+function TplInner({ slotId, tplKey, Tpl, format, theme, weight, weightSmall, fontTitle, fontSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, htmlOverride, imageLayers = [], selectedImageLayer, onSelectImageLayer, onUploadImages, onOpenImageLayers, onToggleHtml, htmlActive, onRunAi, aiBusy, aiDisabled, aiDone, registerSlotData, exportScale }) {
+  const [data, edit, setData] = useTemplateData(tplKey);
+  useEffect(() => {
+    if (!registerSlotData) return undefined;
+    return registerSlotData(slotId, {
+      getFields: () => flattenTextFields(data),
+      applyFields: (fields) => setData((current) => applyTextFields(current, fields)),
+    });
+  }, [slotId, data, setData, registerSlotData]);
+  // Padding unificado via variável CSS — herdado por todos os elementos de chrome inline
+  const pad = 'var(--ig-chrome-pad, 80px)';
+  // Seed estável por slot para que as partículas não fiquem idênticas em todos os posts
+  const seed = useMemo(() => {
+    let s = 0;
+    for (let i = 0; i < slotId.length; i++) s = (s * 31 + slotId.charCodeAt(i)) >>> 0;
+    return (s % 9973) + 1;
+  }, [slotId]);
+  const bgColor = themeBg(theme);
+  const bgColor2 = themeBg2(theme);
+  const bgPaint = themeBackground(theme);
+  const monoTheme = theme === 'dark' ? 'dark' : 'light';
+  const effectiveColor = textColor || (monoTheme === 'dark' ? '#ffffff' : '#000000');
+  const decorTheme = isCustomTheme(theme) ? colorRole(effectiveColor) : monoTheme;
+  // fg-2 e fg-3: interpolam entre a cor do texto e o fundo, preservando hierarquia
+  const fg2 = secondaryTextColor || mixHex(effectiveColor, bgColor, 0.38);
+  const fg3 = secondaryTextColor ? mixHex(secondaryTextColor, bgColor, 0.34) : mixHex(effectiveColor, bgColor, 0.58);
+  return (
+    <TplFrame id={`frame-${slotId}`} format={format} exportScale={exportScale} onToggleHtml={onToggleHtml} htmlActive={htmlActive} onRunAi={onRunAi} onUploadImages={onUploadImages} onOpenImageLayers={onOpenImageLayers} hasImageLayers={imageLayers.length > 0} aiBusy={aiBusy} aiDisabled={aiDisabled} aiDone={aiDone}>
+      <div className={monoTheme === 'dark' ? 'inverse' : ''}
+        style={{
+          position: 'absolute', inset: 0,
+          background: bgPaint,
+          color: effectiveColor,
+          '--fg-1': effectiveColor,
+          '--fg-2': fg2,
+          '--fg-3': fg3,
+          '--bg-1': bgColor,
+          '--bg-2': bgColor2,
+          '--ig-weight': weight,
+          '--ig-weight-light': Math.max(300, weight - 100),
+          '--ig-weight-small': weightSmall,
+          '--ig-font-title': fontStack(fontTitle, window.__IG_RUNTIME_FONTS__ || []),
+          '--ig-font-small': fontStack(fontSmall, window.__IG_RUNTIME_FONTS__ || []),
+          '--ig-size-scale': sizeScale,
+          '--ig-small-scale': smallScale,
+          '--ig-chrome-pad': chromePad + 'px',
+          fontFamily: 'var(--ig-font-title)',
+          boxSizing: 'border-box',
+        }}
+        data-theme={monoTheme}>
+        {/* Decor em bleed — cobre o canvas inteiro, por trás do padding */}
+        <IgDecor decor={decor} theme={decorTheme} seed={seed} />
+        {sortedImageLayers(imageLayers).filter((layer) => layer.z < 0).map((layer, index) => (
+          <ImageLayer
+            key={layer.id}
+            layer={layer}
+            order={index}
+            selected={selectedImageLayer?.slotId === slotId && selectedImageLayer?.layerId === layer.id}
+            onSelect={(layerId) => onSelectImageLayer(slotId, layerId)}
+          />
+        ))}
+        {htmlOverride !== null && htmlOverride !== undefined ? (
+          <div
+            style={{ position: 'relative', zIndex: 20, width: '100%', height: '100%', boxSizing: 'border-box' }}
+            dangerouslySetInnerHTML={{ __html: htmlOverride }}
+          />
+        ) : (
+          <div style={{ position: 'relative', zIndex: 20, width: '100%', height: '100%', padding: pad, boxSizing: 'border-box' }}>
+            <Tpl data={data} onEdit={edit} format={format} />
+          </div>
+        )}
+        {sortedImageLayers(imageLayers).filter((layer) => layer.z >= 0).map((layer, index) => (
+          <ImageLayer
+            key={layer.id}
+            layer={layer}
+            order={index}
+            selected={selectedImageLayer?.slotId === slotId && selectedImageLayer?.layerId === layer.id}
+            onSelect={(layerId) => onSelectImageLayer(slotId, layerId)}
+          />
+        ))}
+      </div>
+    </TplFrame>
+  );
+}
+
+// Factory: retorna o JSX do DCArtboard diretamente (necessário pois
+// DCSection filtra filhos por type === DCArtboard).
+function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'light', weight, weightSmall, fontTitle, fontSmall, sizeScale, smallScale, chromePad, decor, textColor, secondaryTextColor, savedHtml, htmlEditor, imageLayersBySlot, selectedImageLayer, onUploadImages, onSelectImageLayer, onOpenImageLayers, onUpdateImageLayer, onMoveImageLayer, onRemoveImageLayer, onCloseImageLayer, onToggleHtml, onChangeHtml, onSaveHtml, onResetHtml, onCloseHtml, onRunAi, aiBusySlot, aiDoneSlot, registerSlotData, exportScale }) {
+  const dims = IG_DIMS[format];
+  const artboardW = format === 'story' ? 540 : 720;
+  const renderedH = dims.h * (artboardW / dims.w);
+  const htmlActive = htmlEditor && htmlEditor.slotId === slotId;
+  const htmlOverride = htmlActive ? htmlEditor.draft : savedHtml[slotId] || null;
+  const imageLayers = imageLayersBySlot[slotId] || [];
+  const showLayerEditor = imageLayers.length > 0 && selectedImageLayer?.slotId === slotId;
+  const layerEditor = imageLayers.length > 0 ? (
+    <ImageLayerEditor
+      slotId={slotId}
+      layers={imageLayers}
+      selectedId={selectedImageLayer?.slotId === slotId ? selectedImageLayer.layerId : null}
+      onSelect={onSelectImageLayer}
+      onUpdate={onUpdateImageLayer}
+      onMove={onMoveImageLayer}
+      onRemove={onRemoveImageLayer}
+      onClose={onCloseImageLayer}
+    />
+  ) : null;
+  const htmlEditorNode = htmlActive ? (
+    <HtmlEditor
+      value={htmlEditor.draft}
+      dirty={htmlEditor.draft !== (savedHtml[slotId] || '')}
+      saved={!!savedHtml[slotId]}
+      onChange={onChangeHtml}
+      onSave={onSaveHtml}
+      onReset={() => onResetHtml(slotId)}
+      onClose={onCloseHtml}
+    />
+  ) : null;
+  const focusEditor = (layerEditor || htmlEditorNode) ? (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {layerEditor}
+      {htmlEditorNode}
+    </div>
+  ) : null;
+  return (
+    <DCArtboard
+      key={slotId}
+      id={slotId}
+      label={label}
+      width={artboardW}
+      height={renderedH}
+      onFocusOpen={() => imageLayers.length && onOpenImageLayers(slotId)}
+      focusEditor={focusEditor}
+      editor={(htmlActive || showLayerEditor) ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {showLayerEditor && layerEditor}
+          {htmlEditorNode}
+        </div>
+      ) : null}>
+      <TplInner
+        slotId={slotId}
+        tplKey={tplKey}
+        Tpl={Tpl}
+        format={format}
+        theme={theme}
+        weight={weight}
+        weightSmall={weightSmall}
+        fontTitle={fontTitle}
+        fontSmall={fontSmall}
+        sizeScale={sizeScale}
+        smallScale={smallScale}
+        chromePad={chromePad}
+        decor={decor}
+        textColor={textColor}
+        secondaryTextColor={secondaryTextColor}
+        htmlOverride={htmlOverride}
+        imageLayers={imageLayers}
+        selectedImageLayer={selectedImageLayer}
+        onSelectImageLayer={onSelectImageLayer}
+        onUploadImages={(files) => onUploadImages(slotId, files)}
+        onOpenImageLayers={() => onOpenImageLayers(slotId)}
+        onToggleHtml={() => onToggleHtml(slotId)}
+        htmlActive={htmlActive}
+        onRunAi={() => onRunAi(slotId)}
+        aiBusy={aiBusySlot === slotId}
+        aiDisabled={!!aiBusySlot}
+        aiDone={aiDoneSlot === slotId}
+        registerSlotData={registerSlotData}
+        exportScale={exportScale}
+      />
+    </DCArtboard>
+  );
+}
+
+function App() {
+  const [tw, setTw] = useTweaks(TWEAK_DEFAULTS);
+  const [aiProvider, setAiProvider] = useState('openai');
+  const [aiKey, setAiKey] = useState('');
+  const [aiModel, setAiModel] = useState('gpt-5.5');
+  const [aiMode, setAiMode] = useState('content');
+  const [aiContext, setAiContext] = useState('');
+  const [aiStatus, setAiStatus] = useState('');
+  const [aiBusySlot, setAiBusySlot] = useState(null);
+  const [aiDoneSlot, setAiDoneSlot] = useState(null);
+  const [savedHtml, setSavedHtml] = useState({});
+  const [htmlEditor, setHtmlEditor] = useState(null);
+  const [imageLayersBySlot, setImageLayersBySlot] = useState({});
+  const [selectedImageLayer, setSelectedImageLayer] = useState(null);
+  const [runtimeFonts, setRuntimeFonts] = useState([]);
+  const [systemFontName, setSystemFontName] = useState('');
+  const [activeTweakTab, setActiveTweakTab] = useState('visual');
+  const slotDataRef = useRef({});
+  useEffect(() => {
+    if (!aiDoneSlot) return undefined;
+    const timer = setTimeout(() => setAiDoneSlot(null), 15000);
+    return () => clearTimeout(timer);
+  }, [aiDoneSlot]);
+  useEffect(() => {
+    window.__IG_RUNTIME_FONTS__ = runtimeFonts;
+  }, [runtimeFonts]);
+  const registerSlotData = useCallback((slotId, api) => {
+    slotDataRef.current[slotId] = api;
+    return () => {
+      if (slotDataRef.current[slotId] === api) delete slotDataRef.current[slotId];
+    };
+  }, []);
+  const selectedTheme = tw.theme === 'color'
+    ? {
+        kind: 'color',
+        fill: tw.bgFill || 'solid',
+        color: tw.bgColor || '#ffffff',
+        color2: tw.bgColor2 || '#ece7dd',
+        angle: Number(tw.bgAngle ?? 135),
+      }
+    : tw.theme;
+  const selectedBgColor = themeBg(selectedTheme);
+  const selectedTextColor = tw.textColor || (tw.theme === 'dark' ? '#ffffff' : '#000000');
+  const selectedSecondaryColor = mixHex(selectedTextColor, selectedBgColor, 0.38);
+  const fontOptions = [...FONT_OPTIONS, ...runtimeFonts];
+  const addSystemFont = () => {
+    const name = systemFontName.trim();
+    if (!name) return;
+    const value = `system:${name}`;
+    setRuntimeFonts((current) => (
+      current.some((font) => font.value === value)
+        ? current
+        : [...current, { value, label: `${name} (sistema)`, stack: `${quoteFontName(name)}, system-ui, -apple-system, Segoe UI, sans-serif` }]
+    ));
+    setSystemFontName('');
+  };
+  const uploadFontFiles = (files) => {
+    const accepted = files.filter((file) => /\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/.test(file.name));
+    accepted.forEach((file) => {
+      const rawName = file.name.replace(/\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/, '');
+      const family = `Upload ${rawName.replace(/[^a-zA-Z0-9_-]+/g, ' ').trim()} ${Date.now()}`;
+      const url = URL.createObjectURL(file);
+      const style = document.createElement('style');
+      style.textContent = `@font-face{font-family:${quoteFontName(family)};src:url("${url}") format("${file.name.toLowerCase().endsWith('.woff2') ? 'woff2' : file.name.toLowerCase().endsWith('.woff') ? 'woff' : file.name.toLowerCase().endsWith('.otf') ? 'opentype' : 'truetype'}");font-display:swap;}`;
+      document.head.appendChild(style);
+      setRuntimeFonts((current) => [...current, {
+        value: `custom:${family}`,
+        label: `${rawName} (upload)`,
+        stack: `${quoteFontName(family)}, ${FONT_OPTIONS[0].stack}`,
+      }]);
+    });
+  };
+  const readImageFile = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error('Não foi possível ler a imagem.'));
+    reader.readAsDataURL(file);
+  });
+  const uploadImagesForSlot = async (slotId, files) => {
+    const images = files.filter((file) => file.type.startsWith('image/'));
+    if (!images.length) return;
+    try {
+      const base = Date.now();
+      const layers = await Promise.all(images.map(async (file, index) => ({
+        id: `img_${base}_${index}`,
+        name: file.name || `Imagem ${index + 1}`,
+        src: await readImageFile(file),
+        x: 50,
+        y: 50,
+        size: 52,
+        opacity: 1,
+        rotation: 0,
+        radius: 0,
+        z: 1,
+        order: base + index,
+      })));
+      setImageLayersBySlot((current) => ({
+        ...current,
+        [slotId]: [...(current[slotId] || []), ...layers],
+      }));
+      setSelectedImageLayer({ slotId, layerId: layers[layers.length - 1].id });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const selectImageLayer = (slotId, layerId) => setSelectedImageLayer({ slotId, layerId });
+  const openImageLayerPanel = (slotId) => {
+    const layers = imageLayersBySlot[slotId] || [];
+    const topLayer = sortedImageLayers(layers, 'desc')[0];
+    if (topLayer) setSelectedImageLayer({ slotId, layerId: topLayer.id });
+  };
+  const updateImageLayer = (slotId, layerId, patch) => {
+    setImageLayersBySlot((current) => ({
+      ...current,
+      [slotId]: (current[slotId] || []).map((layer) => (
+        layer.id === layerId ? { ...layer, ...patch } : layer
+      )),
+    }));
+  };
+  const moveImageLayer = (slotId, layerId, direction) => {
+    setImageLayersBySlot((current) => {
+      const layers = current[slotId] || [];
+      const target = layers.find((layer) => layer.id === layerId);
+      if (!target) return current;
+      const sameSide = layers.filter((layer) => (layer.z < 0) === (target.z < 0));
+      const above = layers.filter((layer) => layer.z >= 0);
+      const behind = layers.filter((layer) => layer.z < 0);
+      const maxAbove = Math.max(0, ...above.map((layer) => layer.order || 0));
+      const maxBehind = Math.max(0, ...behind.map((layer) => layer.order || 0));
+      const topBehindOrder = Math.max(0, ...behind.map((layer) => layer.order || 0));
+      const bottomAboveOrder = Math.min(...above.map((layer) => layer.order || 0));
+      let patch = { order: (target.order || 0) + direction * 1000 };
+      if (target.z < 0 && direction > 0 && (target.order || 0) >= topBehindOrder) {
+        patch = { z: 1, order: maxAbove + 1000 };
+      } else if (target.z >= 0 && direction < 0 && sameSide.length && (target.order || 0) <= bottomAboveOrder) {
+        patch = { z: -1, order: maxBehind + 1000 };
+      }
+      return {
+        ...current,
+        [slotId]: layers.map((layer) => (
+          layer.id === layerId ? { ...layer, ...patch } : layer
+        )),
+      };
+    });
+  };
+  const removeImageLayer = (slotId, layerId) => {
+    setImageLayersBySlot((current) => {
+      const nextLayers = (current[slotId] || []).filter((layer) => layer.id !== layerId);
+      const next = { ...current };
+      if (nextLayers.length) next[slotId] = nextLayers;
+      else delete next[slotId];
+      return next;
+    });
+    setSelectedImageLayer((selected) => (
+      selected?.slotId === slotId && selected?.layerId === layerId ? null : selected
+    ));
+  };
+  const openHtmlEditor = (slotId) => {
+    if (htmlEditor && htmlEditor.slotId === slotId) {
+      setHtmlEditor(null);
+      return;
+    }
+    const el = document.querySelector(`#frame-${slotId} [data-ig-real]`);
+    setHtmlEditor({
+      slotId,
+      draft: savedHtml[slotId] || (el ? stripRuntimeImageLayers(el.innerHTML) : ''),
+    });
+  };
+  const saveHtmlEditor = () => {
+    setHtmlEditor((current) => {
+      if (!current) return current;
+      setSavedHtml((saved) => ({ ...saved, [current.slotId]: current.draft }));
+      return current;
+    });
+  };
+  const resetHtml = (slotId) => {
+    setSavedHtml((saved) => {
+      const next = { ...saved };
+      delete next[slotId];
+      return next;
+    });
+    setHtmlEditor(null);
+  };
+  const runAiForSlot = async (slotId) => {
+    const key = aiKey.trim();
+    if (!key) {
+      setAiStatus('Informe uma API key antes de usar IA.');
+      return;
+    }
+    const el = document.querySelector(`#frame-${slotId} [data-ig-real]`);
+    const imageLayerContext = describeImageLayers(imageLayersBySlot[slotId] || []);
+    const currentHtml = htmlEditor?.slotId === slotId
+      ? htmlEditor.draft
+      : savedHtml[slotId] || (el ? stripRuntimeImageLayers(el.innerHTML) : '');
+    const dataApi = slotDataRef.current[slotId];
+    const contentFields = dataApi?.getFields ? dataApi.getFields() : [];
+    if (aiMode === 'content' && !contentFields.length) {
+      setAiStatus('Não encontrei campos editáveis nesse post.');
+      return;
+    }
+    if (aiMode === 'html' && !currentHtml) {
+      setAiStatus('Não consegui ler o HTML desse post.');
+      return;
+    }
+
+    const modeInstruction = aiMode === 'html'
+      ? 'Voce pode reorganizar, reestilizar e modificar o HTML completo do post conforme o estilo pedido pelo usuario, mantendo um fragmento HTML valido para ser inserido dentro do canvas atual e compativel com os tweaks basicos.'
+      : 'Modifique somente os valores textuais recebidos no JSON. Nao crie HTML. Preserve as chaves path exatamente como recebidas para manter compatibilidade com os controles visuais.';
+    const systemPrompt = [
+      'Voce e um assistente de design para posts de redes sociais e pecas visuais digitais.',
+      modeInstruction,
+      'Siga a linguagem visual solicitada pelo usuario, desde que o resultado continue legivel, exportavel e coerente dentro do canvas.',
+      aiMode === 'content'
+        ? 'Responda somente JSON valido no formato {"fields":[{"path":"...","value":"..."}]}. Inclua apenas paths existentes. Nao use markdown.'
+        : 'Contrato obrigatorio do HTML: o fragmento deve assumir que sera inserido dentro de um wrapper que ja fornece var(--fg-1), var(--fg-2), var(--fg-3), var(--bg-1), var(--bg-2), var(--ig-size-scale), var(--ig-small-scale), var(--ig-weight), var(--ig-weight-small), var(--ig-font-title), var(--ig-font-small), var(--ig-chrome-pad), color:var(--fg-1) e font-family:var(--ig-font-title).',
+      aiMode === 'html'
+        ? 'Use color:inherit ou color:var(--fg-1) para textos principais; use color:var(--fg-2) para textos secundarios; use color:var(--fg-3) para legendas discretas; use currentColor para linhas, icones e ornamentos.'
+        : 'Nao altere layout, classes, estilos, cores, tamanhos ou estrutura; apenas substitua textos.',
+      aiMode === 'html'
+        ? 'Use font-size:calc(Npx * var(--ig-size-scale)) em titulos/display e font-size:calc(Npx * var(--ig-small-scale)) em textos pequenos/metadados. Use font-weight:var(--ig-weight) ou var(--ig-weight-small) conforme a hierarquia.'
+        : 'Mantenha quebras de linha quando forem importantes para o texto.',
+      aiMode === 'html'
+        ? 'Use font-family:var(--ig-font-title) em titulos/display e font-family:var(--ig-font-small) em metadados, legendas, botoes pequenos e textos de apoio quando fizer sentido.'
+        : 'Preserve a familia tipografica visual existente; nao altere estilos.',
+      aiMode === 'html'
+        ? 'Se criar uma estrutura nova, mantenha tudo dentro de um fragmento HTML interno do canvas, com position:relative, width:100%, height:100%, box-sizing:border-box e layouts que respeitem o espaco disponivel.'
+        : 'Preserve a quantidade e o papel dos campos; se algum campo nao precisar mudar, devolva o mesmo valor.',
+      aiMode === 'html'
+        ? 'Evite cores fixas e tamanhos fixos para elementos que devem responder aos controles globais. So use cores fixas quando forem parte explicita do pedido do usuario.'
+        : 'Nao inclua HTML nos valores, apenas texto puro.',
+      aiMode === 'html'
+        ? 'Nao crie um fundo full-canvas opaco cobrindo tudo. Deixe o background transparente por padrao para preservar as opcoes de fundo e efeitos decorativos do app; use background apenas em cards/blocos internos.'
+        : 'Preserve a hierarquia visual implícita nos nomes dos campos.',
+      aiMode === 'html'
+        ? 'Se houver imageLayers no contexto do usuario, nao recrie essas imagens com tags img. Organize o HTML considerando que elas existem como camadas editaveis independentes.'
+        : 'Se houver imageLayers no contexto do usuario, considere essas imagens apenas como referencia visual do post.',
+      aiMode === 'html'
+        ? 'Responda somente com o HTML final. Nao use markdown, explicacoes, cercas de codigo ou texto fora do HTML.'
+        : 'Nao inclua explicacoes ou texto fora do JSON.',
+      aiMode === 'html'
+        ? 'Nao inclua scripts, iframes, handlers on*, links externos ou recursos remotos.'
+        : 'Nao altere paths ou tipos dos campos.',
+      'Preserve dimensoes, legibilidade e hierarquia visual do post.',
+    ].join('\n');
+    const userPrompt = [
+      `Contexto/instrucao do usuario:\n${aiContext || 'Melhore o post mantendo o estilo visual atual.'}`,
+      imageLayerContext.length
+        ? `\nCamadas de imagem existentes neste post, independentes do HTML:\n${JSON.stringify({ imageLayers: imageLayerContext }, null, 2)}`
+        : '\nEste post nao possui camadas de imagem independentes.',
+      aiMode === 'content'
+        ? `\nCampos textuais atuais em JSON:\n${JSON.stringify({ fields: contentFields }, null, 2)}`
+        : `\nHTML atual do post:\n${currentHtml}`,
+    ].join('\n');
+
+    setAiBusySlot(slotId);
+    setAiDoneSlot(null);
+    setAiStatus('Gerando com IA...');
+    try {
+      const output = await callAiProvider({
+        provider: aiProvider,
+        key,
+        model: aiModel.trim() || AI_MODELS[aiProvider][0].value,
+        systemPrompt,
+        userPrompt,
+      });
+      if (aiMode === 'content') {
+        const parsed = parseAiJson(output);
+        const fields = Array.isArray(parsed?.fields) ? parsed.fields : [];
+        if (!fields.length) throw new Error('A IA não retornou campos de texto.');
+        dataApi.applyFields(fields);
+        setSavedHtml((saved) => {
+          const next = { ...saved };
+          delete next[slotId];
+          return next;
+        });
+        setHtmlEditor((editor) => editor?.slotId === slotId ? null : editor);
+        setAiStatus('Conteúdo aplicado mantendo os tweaks do post.');
+        setAiDoneSlot(slotId);
+      } else {
+        const html = ensureAiHtmlContract(output.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim());
+        if (!html) throw new Error('A IA não retornou HTML.');
+        setSavedHtml((saved) => ({ ...saved, [slotId]: html }));
+        setHtmlEditor((editor) => editor?.slotId === slotId ? { ...editor, draft: html } : editor);
+        setAiStatus('HTML aplicado e salvo nesse post.');
+        setAiDoneSlot(slotId);
+      }
+    } catch (err) {
+      console.error(err);
+      setAiStatus(err?.message || 'Erro ao usar IA.');
+    } finally {
+      setAiBusySlot(null);
+    }
+  };
+  const card = (args) => makeCard({
+    ...args,
+    secondaryTextColor: tw.secondaryTextColor,
+    fontTitle: tw.fontTitle,
+    fontSmall: tw.fontSmall,
+    savedHtml,
+    htmlEditor,
+    imageLayersBySlot,
+    selectedImageLayer,
+    onUploadImages: uploadImagesForSlot,
+    onSelectImageLayer: selectImageLayer,
+    onOpenImageLayers: openImageLayerPanel,
+    onUpdateImageLayer: updateImageLayer,
+    onMoveImageLayer: moveImageLayer,
+    onRemoveImageLayer: removeImageLayer,
+    onCloseImageLayer: () => setSelectedImageLayer(null),
+    onToggleHtml: openHtmlEditor,
+    onChangeHtml: (html) => setHtmlEditor((s) => s ? { ...s, draft: html } : s),
+    onSaveHtml: saveHtmlEditor,
+    onResetHtml: resetHtml,
+    onCloseHtml: () => setHtmlEditor(null),
+    onRunAi: runAiForSlot,
+    aiBusySlot,
+    aiDoneSlot,
+    registerSlotData,
+  });
+
+  const themes = (count) => {
+    return Array(count).fill(selectedTheme);
+  };
+
+  const mfThemes = themes(8);
+  const anThemes = themes(8);
+  const edThemes = themes(8);
+  const evThemes = themes(8);
+  const joThemes = themes(8);
+  const blThemes = themes(8);
+  const xpThemes = themes(8);
+  const prThemes = themes(8);
+  const dpThemes = themes(8);
+  const ucThemes = themes(8);
+  const tuThemes = themes(8);
+  const qzThemes = themes(8);
+
+  // Para o carrossel: 5 cards com tema consistente.
+  const cThemes = Array(5).fill(selectedTheme);
+
+  const decor = DECOR_TWEAKS.reduce((acc, item) => {
+    acc[item.key] = !!tw[item.tweak];
+    acc[item.key + 'I'] = Number(tw[item.intensity] ?? 1);
+    if (item.transform) {
+      acc[item.key + 'Size'] = Number(tw[item.tweak + 'Size'] ?? 100);
+      acc[item.key + 'X'] = Number(tw[item.tweak + 'X'] ?? 0);
+      acc[item.key + 'Y'] = Number(tw[item.tweak + 'Y'] ?? 0);
+    }
+    return acc;
+  }, {});
+
+  const dims = IG_DIMS[tw.format];
+  const resLabel = `${dims.w}×${dims.h}`;
+
+  return (
+    <>
+      <DesignCanvas>
+        <DCSection id="manifesto" title="Frase / Manifesto" subtitle={`7 variações · ${resLabel}`}>
+          {card({ slotId: "m01", label: "M · 01 Declaração", tplKey: "manifesto01", Tpl: IgManifesto01, format: tw.format, theme: mfThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m02", label: "M · 02 Citação", tplKey: "manifesto02", Tpl: IgManifesto02, format: tw.format, theme: mfThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m03", label: "M · 03 Princípio", tplKey: "manifesto03", Tpl: IgManifesto03, format: tw.format, theme: mfThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m04", label: "M · 04 Valores", tplKey: "manifesto04", Tpl: IgManifesto04, format: tw.format, theme: mfThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m05", label: "M · 05 Dividido", tplKey: "manifesto05", Tpl: IgManifesto05, format: tw.format, theme: mfThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m06", label: "M · 06 Essência", tplKey: "manifesto06", Tpl: IgManifesto06, format: tw.format, theme: mfThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m07", label: "M · 07 Spread editorial", tplKey: "manifesto07", Tpl: IgManifesto07, format: tw.format, theme: mfThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "m08", label: "M · 08 Escada", tplKey: "manifesto08", Tpl: IgManifesto08, format: tw.format, theme: mfThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="announce" title="Anúncio de produto / lançamento" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "a01", label: "A · 01 Specs", tplKey: "announce01", Tpl: IgAnnounce01, format: tw.format, theme: anThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a02", label: "A · 02 Categoria", tplKey: "announce02", Tpl: IgAnnounce02, format: tw.format, theme: anThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a03", label: "A · 03 Ficha técnica", tplKey: "announce03", Tpl: IgAnnounce03, format: tw.format, theme: anThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a04", label: "A · 04 CTA", tplKey: "announce04", Tpl: IgAnnounce04, format: tw.format, theme: anThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a05", label: "A · 05 Manifesto", tplKey: "announce05", Tpl: IgAnnounce05, format: tw.format, theme: anThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a06", label: "A · 06 Versão", tplKey: "announce06", Tpl: IgAnnounce06, format: tw.format, theme: anThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a07", label: "A · 07 Etiqueta postal", tplKey: "announce07", Tpl: IgAnnounce07, format: tw.format, theme: anThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "a08", label: "A · 08 Vista explodida", tplKey: "announce08", Tpl: IgAnnounce08, format: tw.format, theme: anThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="educational" title="Dica técnica / educativo" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "e01", label: "E · 01 Como funciona", tplKey: "educational01", Tpl: IgEducational01, format: tw.format, theme: edThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e02", label: "E · 02 Glossário", tplKey: "educational02", Tpl: IgEducational02, format: tw.format, theme: edThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e03", label: "E · 03 Comparação", tplKey: "educational03", Tpl: IgEducational03, format: tw.format, theme: edThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e04", label: "E · 04 Dica", tplKey: "educational04", Tpl: IgEducational04, format: tw.format, theme: edThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e05", label: "E · 05 Fluxo", tplKey: "educational05", Tpl: IgEducational05, format: tw.format, theme: edThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e06", label: "E · 06 Dado", tplKey: "educational06", Tpl: IgEducational06, format: tw.format, theme: edThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e07", label: "E · 07 Mito × fato", tplKey: "educational07", Tpl: IgEducational07, format: tw.format, theme: edThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "e08", label: "E · 08 Intersecção", tplKey: "educational08", Tpl: IgEducational08, format: tw.format, theme: edThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="carousel" title="Carrossel explicativo" subtitle={`Capa + 3 páginas + CTA · ${resLabel}`}>
+          {card({ slotId: "c01", label: "Capa", tplKey: "carouselCover", Tpl: IgCarouselA_Cover, format: tw.format, theme: cThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "c02", label: "Página 1", tplKey: "carouselPage1", Tpl: IgCarouselA_Page, format: tw.format, theme: cThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "c03", label: "Página 2", tplKey: "carouselPage2", Tpl: IgCarouselA_Page, format: tw.format, theme: cThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "c04", label: "Página 3", tplKey: "carouselPage3", Tpl: IgCarouselA_Page, format: tw.format, theme: cThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "c05", label: "CTA", tplKey: "carouselCTA", Tpl: IgCarouselA_CTA, format: tw.format, theme: cThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="event" title="Evento / Save the date" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "v01", label: "V · 01 Data grande", tplKey: "event01", Tpl: IgEvent01, format: tw.format, theme: evThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v02", label: "V · 02 Metadados", tplKey: "event02", Tpl: IgEvent02, format: tw.format, theme: evThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v03", label: "V · 03 Programação", tplKey: "event03", Tpl: IgEvent03, format: tw.format, theme: evThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v04", label: "V · 04 RSVP", tplKey: "event04", Tpl: IgEvent04, format: tw.format, theme: evThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v05", label: "V · 05 Data composta", tplKey: "event05", Tpl: IgEvent05, format: tw.format, theme: evThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v06", label: "V · 06 Centralizado", tplKey: "event06", Tpl: IgEvent06, format: tw.format, theme: evThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v07", label: "V · 07 Bilhete", tplKey: "event07", Tpl: IgEvent07, format: tw.format, theme: evThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "v08", label: "V · 08 Agenda", tplKey: "event08", Tpl: IgEvent08, format: tw.format, theme: evThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="job" title="Vaga / Oportunidade" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "j01", label: "J · 01 Ficha", tplKey: "job01", Tpl: IgJob01, format: tw.format, theme: joThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j02", label: "J · 02 CTA", tplKey: "job02", Tpl: IgJob02, format: tw.format, theme: joThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j03", label: "J · 03 Requisitos", tplKey: "job03", Tpl: IgJob03, format: tw.format, theme: joThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j04", label: "J · 04 Centralizado", tplKey: "job04", Tpl: IgJob04, format: tw.format, theme: joThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j05", label: "J · 05 Procura-se", tplKey: "job05", Tpl: IgJob05, format: tw.format, theme: joThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j06", label: "J · 06 Múltiplas vagas", tplKey: "job06", Tpl: IgJob06, format: tw.format, theme: joThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j07", label: "J · 07 Benefícios", tplKey: "job07", Tpl: IgJob07, format: tw.format, theme: joThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "j08", label: "J · 08 Níveis", tplKey: "job08", Tpl: IgJob08, format: tw.format, theme: joThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="blog" title="Novidade do blog / Artigo" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "b01", label: "B · 01 Resumo", tplKey: "blog01", Tpl: IgBlog01, format: tw.format, theme: blThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b02", label: "B · 02 Tags", tplKey: "blog02", Tpl: IgBlog02, format: tw.format, theme: blThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b03", label: "B · 03 Leitura", tplKey: "blog03", Tpl: IgBlog03, format: tw.format, theme: blThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b04", label: "B · 04 Série", tplKey: "blog04", Tpl: IgBlog04, format: tw.format, theme: blThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b05", label: "B · 05 Ensaio", tplKey: "blog05", Tpl: IgBlog05, format: tw.format, theme: blThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b06", label: "B · 06 Índice", tplKey: "blog06", Tpl: IgBlog06, format: tw.format, theme: blThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b07", label: "B · 07 Jornal", tplKey: "blog07", Tpl: IgBlog07, format: tw.format, theme: blThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "b08", label: "B · 08 Sumário", tplKey: "blog08", Tpl: IgBlog08, format: tw.format, theme: blThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="transparency" title="Transparência" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "tr01", label: "TR · 01 Barras", tplKey: "transp01", Tpl: IgTransp01, format: tw.format, theme: xpThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr02", label: "TR · 02 Mosaico", tplKey: "transp02", Tpl: IgTransp02, format: tw.format, theme: xpThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr03", label: "TR · 03 Timeline vertical", tplKey: "transp03", Tpl: IgTransp03, format: tw.format, theme: xpThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr04", label: "TR · 04 Faixa diagonal", tplKey: "transp04", Tpl: IgTransp04, format: tw.format, theme: xpThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr05", label: "TR · 05 Notas de rodapé", tplKey: "transp05", Tpl: IgTransp05, format: tw.format, theme: xpThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr06", label: "TR · 06 Linhas invertidas", tplKey: "transp06", Tpl: IgTransp06, format: tw.format, theme: xpThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr07", label: "TR · 07 Donut", tplKey: "transp07", Tpl: IgTransp07, format: tw.format, theme: xpThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "tr08", label: "TR · 08 Mapa de calor", tplKey: "transp08", Tpl: IgTransp08, format: tw.format, theme: xpThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="product" title="Produto" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "prd01", label: "P · 01 Grade de specs", tplKey: "product01", Tpl: IgProduct01, format: tw.format, theme: prThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd02", label: "P · 02 Número hero", tplKey: "product02", Tpl: IgProduct02, format: tw.format, theme: prThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd03", label: "P · 03 Roadmap", tplKey: "product03", Tpl: IgProduct03, format: tw.format, theme: prThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd04", label: "P · 04 Nome vertical", tplKey: "product04", Tpl: IgProduct04, format: tw.format, theme: prThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd05", label: "P · 05 Versões", tplKey: "product05", Tpl: IgProduct05, format: tw.format, theme: prThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd06", label: "P · 06 Ficha + selo", tplKey: "product06", Tpl: IgProduct06, format: tw.format, theme: prThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd07", label: "P · 07 Comparativo", tplKey: "product07", Tpl: IgProduct07, format: tw.format, theme: prThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "prd08", label: "P · 08 Arquitetura", tplKey: "product08", Tpl: IgProduct08, format: tw.format, theme: prThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="testimonial" title="Depoimento" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "d01", label: "D · 01 Inicial", tplKey: "testimonial01", Tpl: IgTestimonial01, format: tw.format, theme: dpThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d02", label: "D · 02 Pull-quote", tplKey: "testimonial02", Tpl: IgTestimonial02, format: tw.format, theme: dpThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d03", label: "D · 03 Assimétrico", tplKey: "testimonial03", Tpl: IgTestimonial03, format: tw.format, theme: dpThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d04", label: "D · 04 Carta", tplKey: "testimonial04", Tpl: IgTestimonial04, format: tw.format, theme: dpThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d05", label: "D · 05 Sobre o produto", tplKey: "testimonial05", Tpl: IgTestimonial05, format: tw.format, theme: dpThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d06", label: "D · 06 Credencial", tplKey: "testimonial06", Tpl: IgTestimonial06, format: tw.format, theme: dpThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d07", label: "D · 07 Cartão", tplKey: "testimonial07", Tpl: IgTestimonial07, format: tw.format, theme: dpThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "d08", label: "D · 08 Vozes", tplKey: "testimonial08", Tpl: IgTestimonial08, format: tw.format, theme: dpThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="usecase" title="Caso de uso" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "u01", label: "U · 01 Persona", tplKey: "usecase01", Tpl: IgUseCase01, format: tw.format, theme: ucThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u02", label: "U · 02 Fluxo narrativo", tplKey: "usecase02", Tpl: IgUseCase02, format: tw.format, theme: ucThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u03", label: "U · 03 Setor hero", tplKey: "usecase03", Tpl: IgUseCase03, format: tw.format, theme: ucThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u04", label: "U · 04 Linha do tempo", tplKey: "usecase04", Tpl: IgUseCase04, format: tw.format, theme: ucThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u05", label: "U · 05 Ficha", tplKey: "usecase05", Tpl: IgUseCase05, format: tw.format, theme: ucThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u06", label: "U · 06 Três cenários", tplKey: "usecase06", Tpl: IgUseCase06, format: tw.format, theme: ucThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u07", label: "U · 07 KPIs", tplKey: "usecase07", Tpl: IgUseCase07, format: tw.format, theme: ucThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "u08", label: "U · 08 Feed", tplKey: "usecase08", Tpl: IgUseCase08, format: tw.format, theme: ucThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="tutorial" title="Tutorial / Como fazer" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "t01", label: "T · 01 Passos", tplKey: "tutorial01", Tpl: IgTutorial01, format: tw.format, theme: tuThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t02", label: "T · 02 Antes × Depois", tplKey: "tutorial02", Tpl: IgTutorial02, format: tw.format, theme: tuThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t03", label: "T · 03 Terminal", tplKey: "tutorial03", Tpl: IgTutorial03, format: tw.format, theme: tuThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t04", label: "T · 04 Destaque único", tplKey: "tutorial04", Tpl: IgTutorial04, format: tw.format, theme: tuThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t05", label: "T · 05 Checklist", tplKey: "tutorial05", Tpl: IgTutorial05, format: tw.format, theme: tuThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t06", label: "T · 06 Fluxo", tplKey: "tutorial06", Tpl: IgTutorial06, format: tw.format, theme: tuThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t07", label: "T · 07 Decisão", tplKey: "tutorial07", Tpl: IgTutorial07, format: tw.format, theme: tuThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "t08", label: "T · 08 Estrutura", tplKey: "tutorial08", Tpl: IgTutorial08, format: tw.format, theme: tuThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        <DCSection id="quote" title="Citação externa" subtitle={`8 variações · ${resLabel}`}>
+          {card({ slotId: "q01", label: "Q · 01 Aspas + mini-bio", tplKey: "quote01", Tpl: IgQuote01, format: tw.format, theme: qzThemes[0], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q02", label: "Q · 02 Ano histórico", tplKey: "quote02", Tpl: IgQuote02, format: tw.format, theme: qzThemes[1], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q03", label: "Q · 03 Punch card", tplKey: "quote03", Tpl: IgQuote03, format: tw.format, theme: qzThemes[2], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q04", label: "Q · 04 Split autor", tplKey: "quote04", Tpl: IgQuote04, format: tw.format, theme: qzThemes[3], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q05", label: "Q · 05 Duas vozes", tplKey: "quote05", Tpl: IgQuote05, format: tw.format, theme: qzThemes[4], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q06", label: "Q · 06 Editorial longo", tplKey: "quote06", Tpl: IgQuote06, format: tw.format, theme: qzThemes[5], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q07", label: "Q · 07 Marginália", tplKey: "quote07", Tpl: IgQuote07, format: tw.format, theme: qzThemes[6], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "q08", label: "Q · 08 Selo", tplKey: "quote08", Tpl: IgQuote08, format: tw.format, theme: qzThemes[7], weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+
+        {/* Seção de Exemplos Adicionais — mostra adaptabilidade */}
+        <DCSection id="formats" title="Exemplos Adicionais" subtitle={`Adaptabilidade do layout · ${resLabel}`}>
+          {card({ slotId: "p01", label: "Extra · Manifesto 01", tplKey: "manifesto01", Tpl: IgManifesto01, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "p02", label: "Extra · Anúncio 02", tplKey: "announce02", Tpl: IgAnnounce02, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "p03", label: "Extra · Blog 03", tplKey: "blog03", Tpl: IgBlog03, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "s01", label: "Extra · Manifesto 06", tplKey: "manifesto06", Tpl: IgManifesto06, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "s02", label: "Extra · Evento 01", tplKey: "event01", Tpl: IgEvent01, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "s03", label: "Extra · Dica 04", tplKey: "educational04", Tpl: IgEducational04, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+          {card({ slotId: "s04", label: "Extra · Vaga 04", tplKey: "job04", Tpl: IgJob04, format: tw.format, theme: selectedTheme, weight: tw.weight, weightSmall: tw.weightSmall, sizeScale: tw.sizeScale, smallScale: tw.smallScale, chromePad: tw.chromePad, decor, textColor: tw.textColor, exportScale: tw.exportScale })}
+        </DCSection>
+      </DesignCanvas>
+
+      <TweaksPanel title="Tweaks">
+        <TweakTabs
+          value={activeTweakTab}
+          onChange={setActiveTweakTab}
+          options={[
+            { value: 'visual', label: 'Visual' },
+            { value: 'effects', label: 'Efeitos' },
+            { value: 'ai', label: 'IA' },
+            { value: 'help', label: 'Ajuda' },
+          ]}
+        >
+          <TweakTab value="visual">
+        <TweakSection label="Tema">
+          <TweakRadio
+            label="Fundo"
+            value={tw.theme}
+            options={[
+              { value: 'light', label: 'Branco' },
+              { value: 'dark',  label: 'Preto' },
+              { value: 'color', label: 'Cor' },
+            ]}
+            onChange={(v) => {
+              setTw('theme', v);
+              if (v === 'light') setTw('textColor', '#000000');
+              if (v === 'dark') setTw('textColor', '#ffffff');
+            }}
+          />
+          {tw.theme === 'color' && (
+            <>
+              <TweakSelect
+                label="Preenchimento"
+                value={tw.bgFill || 'solid'}
+                options={[
+                  { value: 'solid', label: 'Sólido' },
+                  { value: 'linear', label: 'Degradê' },
+                  { value: 'radial', label: 'Radial' },
+                  { value: 'split', label: 'Corte' },
+                  { value: 'bands', label: 'Lâminas' },
+                  { value: 'wash', label: 'Véu' },
+                ]}
+                onChange={(v) => setTw('bgFill', v)}
+              />
+              <TweakColor
+                label="Fundo"
+                value={tw.bgColor || '#ffffff'}
+                onChange={(v) => setTw('bgColor', v)}
+              />
+              {(tw.bgFill || 'solid') !== 'solid' && (
+                <>
+                  <TweakColor
+                    label="Cor 2"
+                    value={tw.bgColor2 || '#ece7dd'}
+                    onChange={(v) => setTw('bgColor2', v)}
+                  />
+                  {['linear', 'split', 'bands', 'wash'].includes(tw.bgFill || 'solid') && (
+                    <TweakSlider
+                      label="Ângulo"
+                      value={tw.bgAngle}
+                      min={0}
+                      max={360}
+                      step={5}
+                      unit="°"
+                      onChange={(v) => setTw('bgAngle', v)}
+                    />
+                  )}
+                </>
+              )}
+            </>
+          )}
+          <TweakColor
+            label="Texto"
+            value={tw.textColor || (tw.theme === 'dark' ? '#ffffff' : '#000000')}
+            onChange={(v) => setTw('textColor', v)}
+          />
+          <TweakColor
+            label="Secundário"
+            value={tw.secondaryTextColor || selectedSecondaryColor}
+            onChange={(v) => setTw('secondaryTextColor', v)}
+          />
+          {tw.secondaryTextColor && (
+            <TweakButton
+              label="Resetar cor secundária"
+              secondary
+              onClick={() => setTw('secondaryTextColor', '')}
+            />
+          )}
+        </TweakSection>
+        <TweakSection label="Tipografia">
+          <TweakSelect
+            label="Fonte — títulos"
+            value={tw.fontTitle || 'montserrat'}
+            options={fontOptions}
+            onChange={(v) => setTw('fontTitle', v)}
+          />
+          <TweakRadio
+            label="Peso — títulos"
+            value={tw.weight}
+            options={[
+              { value: 300, label: 'Light' },
+              { value: 400, label: 'Regular' },
+              { value: 500, label: 'Medium' },
+              { value: 700, label: 'Bold' },
+            ]}
+            onChange={(v) => setTw('weight', v)}
+          />
+          <TweakSlider
+            label="Tamanho — títulos"
+            value={tw.sizeScale}
+            min={0.7}
+            max={1.4}
+            step={0.05}
+            onChange={(v) => setTw('sizeScale', v)}
+          />
+          <TweakSelect
+            label="Fonte — textos pequenos"
+            value={tw.fontSmall || 'montserrat'}
+            options={fontOptions}
+            onChange={(v) => setTw('fontSmall', v)}
+          />
+          <TweakRadio
+            label="Peso — textos pequenos"
+            value={tw.weightSmall}
+            options={[
+              { value: 300, label: 'Light' },
+              { value: 400, label: 'Regular' },
+              { value: 500, label: 'Medium' },
+              { value: 600, label: 'Semi' },
+              { value: 700, label: 'Bold' },
+            ]}
+            onChange={(v) => setTw('weightSmall', v)}
+          />
+          <TweakSlider
+            label="Tamanho — textos pequenos"
+            value={tw.smallScale}
+            min={0.7}
+            max={1.4}
+            step={0.05}
+            onChange={(v) => setTw('smallScale', v)}
+          />
+          <TweakFile
+            label="Upload fonte"
+            accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2"
+            multiple
+            onChange={uploadFontFiles}
+          />
+          <TweakText
+            label="Fonte do sistema"
+            value={systemFontName}
+            placeholder="Ex: Helvetica Neue"
+            onChange={setSystemFontName}
+          />
+          <div style={{
+            marginTop: -4,
+            padding: '7px 8px',
+            borderRadius: 7,
+            background: 'rgba(0,0,0,.045)',
+            color: 'rgba(41,38,27,.62)',
+            fontSize: 10.5,
+            lineHeight: 1.35,
+          }}>
+            Por segurança, o navegador não lista todas as fontes do sistema. Digite o nome exato de uma fonte instalada para usá-la aqui.
+          </div>
+          <TweakButton
+            label="Adicionar fonte do sistema"
+            secondary
+            onClick={addSystemFont}
+          />
+        </TweakSection>
+        <TweakSection label="Layout">
+          <TweakRadio
+            label="Formato (Rede Social)"
+            value={tw.format}
+            options={[
+              { value: 'square',    label: '1:1' },
+              { value: 'portrait',  label: '4:5' },
+              { value: 'landscape', label: '16:9' },
+              { value: 'story',     label: '9:16' },
+              { value: 'banner',    label: '3:1' },
+            ]}
+            onChange={(v) => setTw('format', v)}
+          />
+          <TweakSlider
+            label="Margem dos cantos"
+            value={tw.chromePad}
+            min={40}
+            max={140}
+            step={4}
+            unit="px"
+            onChange={(v) => setTw('chromePad', v)}
+          />
+        </TweakSection>
+        <TweakSection label="Exportar">
+          <TweakRadio
+            label="Qualidade do PNG"
+            value={tw.exportScale}
+            options={[
+              { value: 1, label: 'Normal (1x)' },
+              { value: 2, label: 'Alta (2x)' },
+              { value: 3, label: 'Ultra (3x)' },
+            ]}
+            onChange={(v) => setTw('exportScale', v)}
+          />
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}>
+            Passe o cursor sobre qualquer post e clique em <strong>↓ PNG</strong> para baixar.
+          </div>
+        </TweakSection>
+          </TweakTab>
+          <TweakTab value="effects">
+        {DECOR_GROUPS.map((group) => (
+          <TweakSection key={group.key} label={group.label}>
+            {DECOR_TWEAKS.filter((item) => item.group === group.key).map((item) => (
+              <React.Fragment key={item.key}>
+                <TweakToggle label={item.label} value={tw[item.tweak]} onChange={(v) => setTw(item.tweak, v)} />
+                {tw[item.tweak] && (
+                  <>
+                    <TweakSlider
+                      label="↳ intensidade"
+                      value={tw[item.intensity]}
+                      min={0.1}
+                      max={2}
+                      step={0.1}
+                      onChange={(v) => setTw(item.intensity, v)}
+                    />
+                    {item.transform && (
+                      <>
+                        <TweakSlider
+                          label="↳ tamanho"
+                          value={tw[item.tweak + 'Size'] ?? 100}
+                          min={50}
+                          max={200}
+                          step={5}
+                          unit="%"
+                          onChange={(v) => setTw(item.tweak + 'Size', v)}
+                        />
+                        <TweakSlider
+                          label="↳ horizontal"
+                          value={tw[item.tweak + 'X'] ?? 0}
+                          min={-50}
+                          max={50}
+                          step={2}
+                          unit="%"
+                          onChange={(v) => setTw(item.tweak + 'X', v)}
+                        />
+                        <TweakSlider
+                          label="↳ vertical"
+                          value={tw[item.tweak + 'Y'] ?? 0}
+                          min={-50}
+                          max={50}
+                          step={2}
+                          unit="%"
+                          onChange={(v) => setTw(item.tweak + 'Y', v)}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+              </React.Fragment>
+            ))}
+          </TweakSection>
+        ))}
+          </TweakTab>
+          <TweakTab value="ai">
+        <TweakSection label="IA">
+          <TweakSelect
+            label="Provedor"
+            value={aiProvider}
+            options={[
+              { value: 'openai', label: 'OpenAI / ChatGPT' },
+              { value: 'anthropic', label: 'Anthropic / Claude' },
+              { value: 'gemini', label: 'Google / Gemini' },
+            ]}
+            onChange={(v) => {
+              setAiProvider(v);
+              setAiModel(AI_MODELS[v][0].value);
+            }}
+          />
+          <TweakText
+            label="API key"
+            value={aiKey}
+            type="password"
+            placeholder="sk-..."
+            onChange={setAiKey}
+          />
+          <TweakSelect
+            label="Modelo"
+            value={aiModel}
+            options={AI_MODELS[aiProvider]}
+            onChange={setAiModel}
+          />
+          <TweakRadio
+            label="Modo"
+            value={aiMode}
+            options={[
+              { value: 'content', label: 'Conteúdo' },
+              { value: 'html', label: 'HTML' },
+            ]}
+            onChange={setAiMode}
+          />
+          <TweakTextarea
+            label="Contexto"
+            value={aiContext}
+            placeholder="Ex: gere um post para lançamento B2B..."
+            onChange={setAiContext}
+          />
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: aiStatus.startsWith('Erro') || aiStatus.startsWith('Informe') ? '#8f2118' : 'rgba(41,38,27,.62)', padding: '2px 0' }}>
+            {aiStatus || 'A chave fica somente no estado desta página e é enviada direto ao provedor escolhido.'}
+          </div>
+        </TweakSection>
+          </TweakTab>
+          <TweakTab value="help">
+        <TweakSection label="Exportar">
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}>
+            Passe o cursor sobre qualquer post e clique em <strong>↓ PNG</strong> (canto superior direito) para baixar em 1080px nativo.
+          </div>
+        </TweakSection>
+        <TweakSection label="Edição inline">
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}>
+            Todos os textos são editáveis. Clique em qualquer título, parágrafo ou rótulo e digite. <strong>Enter</strong> confirma; <strong>Shift+Enter</strong> quebra linha.
+          </div>
+        </TweakSection>
+          </TweakTab>
+        </TweakTabs>
+      </TweaksPanel>
+    </>
+  );
+}
+
+
+export default App

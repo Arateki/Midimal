@@ -1,3 +1,4 @@
+import React from 'react'
 
 // DesignCanvas.jsx — Figma-ish design canvas wrapper
 // Warm gray grid bg + Sections + Artboards + PostIt notes.
@@ -635,4 +636,4 @@ function DCPostIt({ children, top, left, right, bottom, rotate = -2, width = 180
   );
 }
 
-Object.assign(window, { DesignCanvas, DCSection, DCArtboard, DCPostIt });
+export { DesignCanvas, DCSection, DCArtboard, DCPostIt };

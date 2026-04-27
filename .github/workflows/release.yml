@@ -1,0 +1,42 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build single-file HTML
+        run: npm run build:single
+
+      - name: Copy medimal.html to repo root
+        run: cp dist-single/index.html medimal.html
+
+      - name: Commit medimal.html
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add medimal.html
+          git commit -m "chore: update medimal.html for ${{ github.ref_name }}" || echo "no changes"
+          git push origin HEAD:main
+
+      - name: Create GitHub Release with medimal.html
+        uses: softprops/action-gh-release@v2
+        with:
+          files: medimal.html
+          generate_release_notes: true

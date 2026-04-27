@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-announce.jsx — 6 variações "Anúncio de produto / lançamento"
 
 // ── A01 · Anúncio técnico com specs ──────────────────────────────────
@@ -456,6 +459,4 @@ function IgAnnounce08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, {
-  IgAnnounce01, IgAnnounce02, IgAnnounce03, IgAnnounce04, IgAnnounce05, IgAnnounce06, IgAnnounce07, IgAnnounce08,
-});
+export { IgAnnounce01, IgAnnounce02, IgAnnounce03, IgAnnounce04, IgAnnounce05, IgAnnounce06, IgAnnounce07, IgAnnounce08 };

@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-tutorial.jsx — 6 variações de template "Tutorial / Como fazer"
 // Conteúdo instrucional: passos numerados, comparações, CLI, dica única, checklist, fluxo.
 
@@ -576,6 +579,4 @@ function IgTutorial08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, {
-  IgTutorial01, IgTutorial02, IgTutorial03, IgTutorial04, IgTutorial05, IgTutorial06, IgTutorial07, IgTutorial08,
-});
+export { IgTutorial01, IgTutorial02, IgTutorial03, IgTutorial04, IgTutorial05, IgTutorial06, IgTutorial07, IgTutorial08 };

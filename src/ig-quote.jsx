@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-quote.jsx — 6 variações de template "Citação externa"
 // Curadoria de vozes que reforçam os valores da Arateki.
 // Diferente do Manifesto (voz da marca), aqui a voz é de terceiros.
@@ -529,6 +532,4 @@ function IgQuote08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, {
-  IgQuote01, IgQuote02, IgQuote03, IgQuote04, IgQuote05, IgQuote06, IgQuote07, IgQuote08,
-});
+export { IgQuote01, IgQuote02, IgQuote03, IgQuote04, IgQuote05, IgQuote06, IgQuote07, IgQuote08 };

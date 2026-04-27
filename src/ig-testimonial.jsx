@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-testimonial.jsx — 6 variações de template "Depoimento"
 // Voz real de usuários e parceiros. Layouts intencionalmente distintos das demais seções.
 
@@ -572,7 +575,4 @@ function IgTestimonial08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, {
-  IgTestimonial01, IgTestimonial02, IgTestimonial03,
-  IgTestimonial04, IgTestimonial05, IgTestimonial06, IgTestimonial07, IgTestimonial08,
-});
+export { IgTestimonial01, IgTestimonial02, IgTestimonial03, IgTestimonial04, IgTestimonial05, IgTestimonial06, IgTestimonial07, IgTestimonial08 };

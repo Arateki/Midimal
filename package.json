@@ -1,0 +1,23 @@
+{
+  "name": "medimal",
+  "version": "0.1.0",
+  "description": "Browser-based social media post generator — minimalist, open-source",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:single": "vite build --config vite.config.single.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "html-to-image": "^1.11.11",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.3.5",
+    "vite-plugin-singlefile": "^2.0.2"
+  }
+}

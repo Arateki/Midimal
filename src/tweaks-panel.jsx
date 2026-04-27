@@ -1,3 +1,4 @@
+import React from 'react'
 
 // tweaks-panel.jsx
 // Reusable Tweaks shell + form-control helpers.
@@ -664,9 +665,9 @@ function TweakFile({ label, accept, multiple = false, onChange }) {
   );
 }
 
-Object.assign(window, {
+export {
   useTweaks, TweaksPanel, TweakSection, TweakRow,
   TweakTabs, TweakTab,
   TweakSlider, TweakToggle, TweakRadio, TweakSelect,
   TweakText, TweakTextarea, TweakNumber, TweakColor, TweakButton, TweakFile,
-});
+};

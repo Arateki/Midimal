@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-carousel.jsx — Carrossel explicativo (capa + 3 conteúdos + CTA) × 2 variações de estilo
 
 // VARIAÇÃO A — minimalista tipográfico
@@ -62,4 +65,4 @@ function IgCarouselA_CTA({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, { IgCarouselA_Cover, IgCarouselA_Page, IgCarouselA_CTA });
+export { IgCarouselA_Cover, IgCarouselA_Page, IgCarouselA_CTA };

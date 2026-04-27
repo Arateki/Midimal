@@ -1,8 +1,8 @@
+import React, { useEffect, useRef, useMemo } from 'react'
+
 // ig-decor.jsx — Camadas decorativas dos posts Instagram Arateki
 // Cada efeito recebe `intensity` (0.1–2) para controle individual de força.
 // IgDecor recebe um objeto `decor` com shape { grid, gridI, dots, dotsI, ... }
-
-const { useEffect, useRef, useMemo } = React;
 
 // ── Grid tracejado ──────────────────────────────────────────────────
 function DecorGrid({ intensity = 1 }) {
@@ -1233,4 +1233,4 @@ function IgDecor({ decor = {}, theme = 'light', seed = 7 }) {
   );
 }
 
-Object.assign(window, { IgDecor });
+export { IgDecor };

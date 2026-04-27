@@ -1,3 +1,6 @@
+import React from 'react'
+import { IgMono, IgEdit, IgLogo, IgRule, IgHeader, IgFooter, IgCanvas, IgArtboard, IG_DIMS } from './ig-common.jsx'
+
 // ig-job.jsx — 6 variações "Vaga / Oportunidade"
 
 function IgJob01({ data, onEdit, format = 'square' }) {
@@ -343,4 +346,4 @@ function IgJob08({ data, onEdit, format = 'square' }) {
   );
 }
 
-Object.assign(window, { IgJob01, IgJob02, IgJob03, IgJob04, IgJob05, IgJob06, IgJob07, IgJob08 });
+export { IgJob01, IgJob02, IgJob03, IgJob04, IgJob05, IgJob06, IgJob07, IgJob08 };
