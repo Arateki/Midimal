@@ -4,8 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Arateki — Instagram Posts</title>
-<link rel="stylesheet" href="colors_and_type.css" />
-<link rel="stylesheet" href="ig-posts.css" />
+<link rel="stylesheet" href="src/colors_and_type.css" />
+<link rel="stylesheet" href="src/ig-posts.css" />
 <style>
   html, body { margin: 0; background: #f0eee9; }
   /* Melhoria de renderização de fontes global */
@@ -376,24 +376,25 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
 
-<script type="text/babel" src="design-canvas.jsx"></script>
-<script type="text/babel" src="tweaks-panel.jsx"></script>
-<script type="text/babel" src="ig-common.jsx"></script>
-<script type="text/babel" src="ig-decor.jsx"></script>
-<script type="text/babel" src="ig-data.jsx"></script>
-<script type="text/babel" src="ig-manifesto.jsx"></script>
-<script type="text/babel" src="ig-announce.jsx"></script>
-<script type="text/babel" src="ig-educational.jsx"></script>
-<script type="text/babel" src="ig-carousel.jsx"></script>
-<script type="text/babel" src="ig-event.jsx"></script>
-<script type="text/babel" src="ig-job.jsx"></script>
-<script type="text/babel" src="ig-blog.jsx"></script>
-<script type="text/babel" src="ig-transparency.jsx"></script>
-<script type="text/babel" src="ig-product.jsx"></script>
-<script type="text/babel" src="ig-testimonial.jsx"></script>
-<script type="text/babel" src="ig-usecase.jsx"></script>
-<script type="text/babel" src="ig-tutorial.jsx"></script>
-<script type="text/babel" src="ig-quote.jsx"></script>
+<script type="text/babel" src="src/i18n.jsx"></script>
+<script type="text/babel" src="src/design-canvas.jsx"></script>
+<script type="text/babel" src="src/tweaks-panel.jsx"></script>
+<script type="text/babel" src="src/ig-common.jsx"></script>
+<script type="text/babel" src="src/ig-decor.jsx"></script>
+<script type="text/babel" src="src/ig-data.jsx"></script>
+<script type="text/babel" src="src/ig-manifesto.jsx"></script>
+<script type="text/babel" src="src/ig-announce.jsx"></script>
+<script type="text/babel" src="src/ig-educational.jsx"></script>
+<script type="text/babel" src="src/ig-carousel.jsx"></script>
+<script type="text/babel" src="src/ig-event.jsx"></script>
+<script type="text/babel" src="src/ig-job.jsx"></script>
+<script type="text/babel" src="src/ig-blog.jsx"></script>
+<script type="text/babel" src="src/ig-transparency.jsx"></script>
+<script type="text/babel" src="src/ig-product.jsx"></script>
+<script type="text/babel" src="src/ig-testimonial.jsx"></script>
+<script type="text/babel" src="src/ig-usecase.jsx"></script>
+<script type="text/babel" src="src/ig-tutorial.jsx"></script>
+<script type="text/babel" src="src/ig-quote.jsx"></script>
 
 <script type="text/babel" data-presets="env,react">
 const { useState, useEffect, useMemo, useCallback, useRef } = React;
@@ -746,6 +747,7 @@ function ExportBtn({ targetId, filename, dims, scale = 1 }) {
 function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, onUploadImages, onOpenImageLayers, hasImageLayers, aiBusy, aiDisabled, aiDone, children }) {
   const dims = IG_DIMS[format];
   const fileRef = useRef(null);
+  const { t } = useT();
   const artboardW = format === 'story' ? 540 : format === 'portrait' ? 720 : 720;
   const scale = artboardW / dims.w;
   const renderedH = dims.h * scale;
@@ -771,11 +773,11 @@ function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, 
         <div className="ig-ai-loading">
           <div className="ig-ai-loading-box">
             <span className="ig-ai-spinner" />
-            Gerando IA
+            {t('status.ai.generating')}
           </div>
         </div>
       )}
-      {aiDone && <div className="ig-ai-done-badge">Atualizado</div>}
+      {aiDone && <div className="ig-ai-done-badge">{t('status.ai.done')}</div>}
       <input
         ref={fileRef}
         type="file"
@@ -794,8 +796,8 @@ function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, 
           e.stopPropagation();
           fileRef.current?.click();
         }}
-        title="Adicionar imagens">
-        IMG
+        title={t('btn.img.title')}>
+        {t('btn.img')}
       </button>
       {hasImageLayers && (
         <button
@@ -804,8 +806,8 @@ function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, 
             e.stopPropagation();
             if (onOpenImageLayers) onOpenImageLayers();
           }}
-          title="Gerenciar camadas">
-          Layers
+          title={t('btn.layers.title')}>
+          {t('btn.layers')}
         </button>
       )}
       <button
@@ -814,8 +816,8 @@ function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, 
           e.stopPropagation();
           if (onToggleHtml) onToggleHtml();
         }}
-        title="Editar HTML">
-        {htmlActive ? 'HTML ✓' : 'HTML'}
+        title={t('btn.html.title')}>
+        {htmlActive ? t('btn.html.active') : t('btn.html')}
       </button>
       <button
         className="ig-ai-btn"
@@ -824,8 +826,8 @@ function TplFrame({ id, format, exportScale, onToggleHtml, htmlActive, onRunAi, 
           e.stopPropagation();
           if (onRunAi) onRunAi();
         }}
-        title="Modificar com IA">
-        {aiBusy ? 'IA…' : 'IA'}
+        title={t('btn.ai.title')}>
+        {aiBusy ? t('btn.ai.busy') : t('btn.ai')}
       </button>
       <ExportBtn targetId={id} filename={id} dims={dims} scale={exportScale} />
     </div>
@@ -1039,6 +1041,7 @@ async function callAiProvider({ provider, key, model, systemPrompt, userPrompt }
 }
 
 function HtmlEditor({ value, dirty, saved, onChange, onSave, onReset, onClose }) {
+  const { t } = useT();
   return (
     <div>
       <div style={{
@@ -1051,12 +1054,12 @@ function HtmlEditor({ value, dirty, saved, onChange, onSave, onReset, onClose })
         color: 'rgba(41,38,27,.68)',
       }}>
         <span style={{ fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-          HTML do post {dirty ? '· não salvo' : saved ? '· salvo' : ''}
+          {t('html.editor.title')} {dirty ? t('html.editor.unsaved') : saved ? t('html.editor.saved') : ''}
         </span>
         <div className="ig-html-actions">
-          <button type="button" className="ig-html-action primary" onClick={onSave}>Salvar</button>
-          <button type="button" className="ig-html-action danger" onClick={onReset}>Resetar</button>
-          <button type="button" className="ig-html-action" onClick={onClose}>Fechar</button>
+          <button type="button" className="ig-html-action primary" onClick={onSave}>{t('html.save')}</button>
+          <button type="button" className="ig-html-action danger" onClick={onReset}>{t('html.reset')}</button>
+          <button type="button" className="ig-html-action" onClick={onClose}>{t('html.close')}</button>
         </div>
       </div>
       <textarea
@@ -1111,14 +1114,15 @@ function ImageLayerEditor({ slotId, layers, selectedId, onSelect, onUpdate, onMo
   const behind = sortedImageLayers(layers.filter((layer) => layer.z < 0), 'desc');
   const ordered = [...above, ...behind];
   const selected = layers.find((layer) => layer.id === selectedId) || ordered.find((layer) => layer.id !== '__html') || null;
+  const { t } = useT();
   if (!layers.length) return null;
   const update = (key, value) => selected && onUpdate(slotId, selected.id, { [key]: value });
   return (
     <div className="ig-layer-editor">
       <div className="ig-layer-head">
-        <span className="ig-layer-title">Camadas de imagem</span>
+        <span className="ig-layer-title">{t('layers.title')}</span>
         <div className="ig-layer-actions">
-          <button type="button" className="ig-layer-action" onClick={onClose}>Fechar</button>
+          <button type="button" className="ig-layer-action" onClick={onClose}>{t('layers.close')}</button>
         </div>
       </div>
       <div className="ig-layer-list">
@@ -1127,23 +1131,23 @@ function ImageLayerEditor({ slotId, layers, selectedId, onSelect, onUpdate, onMo
             <img className="ig-layer-thumb" src={layer.src} alt="" />
             <span className="ig-layer-row-name">{layer.name}</span>
             <div className="ig-layer-actions">
-              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, 1); }}>Subir</button>
-              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, -1); }}>Descer</button>
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, 1); }}>{t('layers.up')}</button>
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, -1); }}>{t('layers.down')}</button>
             </div>
           </div>
         ))}
         <div className="ig-layer-row">
           <span className="ig-layer-html-thumb">HTML</span>
-          <span className="ig-layer-row-name">HTML / Template</span>
-          <span style={{ color: 'rgba(24,21,18,.5)', fontSize: 10 }}>referência</span>
+          <span className="ig-layer-row-name">{t('layers.html')}</span>
+          <span style={{ color: 'rgba(24,21,18,.5)', fontSize: 10 }}>{t('layers.reference')}</span>
         </div>
         {behind.map((layer) => (
           <div key={layer.id} className="ig-layer-row" data-selected={selected?.id === layer.id ? '1' : '0'} onClick={() => onSelect(slotId, layer.id)}>
             <img className="ig-layer-thumb" src={layer.src} alt="" />
             <span className="ig-layer-row-name">{layer.name}</span>
             <div className="ig-layer-actions">
-              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, 1); }}>Subir</button>
-              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, -1); }}>Descer</button>
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, 1); }}>{t('layers.up')}</button>
+              <button type="button" className="ig-layer-action" onClick={(e) => { e.stopPropagation(); onMove(slotId, layer.id, -1); }}>{t('layers.down')}</button>
             </div>
           </div>
         ))}
@@ -1152,48 +1156,48 @@ function ImageLayerEditor({ slotId, layers, selectedId, onSelect, onUpdate, onMo
         <>
           <div className="ig-layer-controls">
             <label className="ig-layer-field">
-              Tamanho {selected.size}%
+              {t('layer.size')} {selected.size}%
               <input type="range" min="5" max="180" step="1" value={selected.size}
                      onChange={(e) => update('size', Number(e.target.value))} />
             </label>
             <label className="ig-layer-field">
-              Opacidade {Math.round(selected.opacity * 100)}%
+              {t('layer.opacity')} {Math.round(selected.opacity * 100)}%
               <input type="range" min="0" max="1" step="0.05" value={selected.opacity}
                      onChange={(e) => update('opacity', Number(e.target.value))} />
             </label>
             <label className="ig-layer-field">
-              Horizontal {selected.x}%
+              {t('layer.x')} {selected.x}%
               <input type="range" min="-25" max="125" step="1" value={selected.x}
                      onChange={(e) => update('x', Number(e.target.value))} />
             </label>
             <label className="ig-layer-field">
-              Vertical {selected.y}%
+              {t('layer.y')} {selected.y}%
               <input type="range" min="-25" max="125" step="1" value={selected.y}
                      onChange={(e) => update('y', Number(e.target.value))} />
             </label>
             <label className="ig-layer-field">
-              Rotação {selected.rotation}°
+              {t('layer.rotation')} {selected.rotation}°
               <input type="range" min="-45" max="45" step="1" value={selected.rotation}
                      onChange={(e) => update('rotation', Number(e.target.value))} />
             </label>
             <label className="ig-layer-field">
-              Borda {selected.radius}px
+              {t('layer.radius')} {selected.radius}px
               <input type="range" min="0" max="160" step="2" value={selected.radius}
                      onChange={(e) => update('radius', Number(e.target.value))} />
             </label>
             <label className="ig-layer-field">
-              Profundidade
+              {t('layer.depth')}
               <select value={selected.z < 0 ? 'behind' : 'front'}
                       onChange={(e) => update('z', e.target.value === 'behind' ? -1 : 1)}>
-                <option value="front">Acima do HTML</option>
-                <option value="behind">Atrás do HTML</option>
+                <option value="front">{t('layer.above')}</option>
+                <option value="behind">{t('layer.behind')}</option>
               </select>
             </label>
           </div>
           <div className="ig-layer-actions" style={{ marginTop: 10 }}>
-            <button type="button" className="ig-layer-action primary" onClick={() => onMove(slotId, selected.id, 1)}>Subir camada</button>
-            <button type="button" className="ig-layer-action" onClick={() => onMove(slotId, selected.id, -1)}>Descer camada</button>
-            <button type="button" className="ig-layer-action danger" onClick={() => onRemove(slotId, selected.id)}>Remover</button>
+            <button type="button" className="ig-layer-action primary" onClick={() => onMove(slotId, selected.id, 1)}>{t('layers.up')}</button>
+            <button type="button" className="ig-layer-action" onClick={() => onMove(slotId, selected.id, -1)}>{t('layers.down')}</button>
+            <button type="button" className="ig-layer-action danger" onClick={() => onRemove(slotId, selected.id)}>{t('layers.remove')}</button>
           </div>
         </>
       )}
@@ -1377,6 +1381,17 @@ function makeCard({ slotId, label, tplKey, Tpl, format = 'square', theme = 'ligh
 }
 
 function App() {
+  const [locale, setLocale] = useState(() => localStorage.getItem('ig_locale') || 'pt');
+  const t = useCallback(
+    (key, fallback) => {
+      const tr = TRANSLATIONS[locale];
+      if (tr && key in tr) return tr[key];
+      if (key in TRANSLATIONS.pt) return TRANSLATIONS.pt[key];
+      return fallback !== undefined ? fallback : key;
+    },
+    [locale]
+  );
+  useEffect(() => { localStorage.setItem('ig_locale', locale); }, [locale]);
   const [tw, setTw] = useTweaks(TWEAK_DEFAULTS);
   const [aiProvider, setAiProvider] = useState('openai');
   const [aiKey, setAiKey] = useState('');
@@ -1421,6 +1436,14 @@ function App() {
   const selectedTextColor = tw.textColor || (tw.theme === 'dark' ? '#ffffff' : '#000000');
   const selectedSecondaryColor = mixHex(selectedTextColor, selectedBgColor, 0.38);
   const fontOptions = [...FONT_OPTIONS, ...runtimeFonts];
+  const translatedFontOptions = useMemo(
+    () => fontOptions.map((opt) => {
+      const tk = 'font.option.' + opt.value;
+      const translated = t(tk, null);
+      return translated ? { ...opt, label: translated } : opt;
+    }),
+    [fontOptions, t]
+  );
   const addSystemFont = () => {
     const name = systemFontName.trim();
     if (!name) return;
@@ -1562,7 +1585,7 @@ function App() {
   const runAiForSlot = async (slotId) => {
     const key = aiKey.trim();
     if (!key) {
-      setAiStatus('Informe uma API key antes de usar IA.');
+      setAiStatus('__no_key__');
       return;
     }
     const el = document.querySelector(`#frame-${slotId} [data-ig-real]`);
@@ -1573,11 +1596,11 @@ function App() {
     const dataApi = slotDataRef.current[slotId];
     const contentFields = dataApi?.getFields ? dataApi.getFields() : [];
     if (aiMode === 'content' && !contentFields.length) {
-      setAiStatus('Não encontrei campos editáveis nesse post.');
+      setAiStatus(t('ai.status.no.fields'));
       return;
     }
     if (aiMode === 'html' && !currentHtml) {
-      setAiStatus('Não consegui ler o HTML desse post.');
+      setAiStatus(t('ai.status.no.html'));
       return;
     }
 
@@ -1632,7 +1655,7 @@ function App() {
 
     setAiBusySlot(slotId);
     setAiDoneSlot(null);
-    setAiStatus('Gerando com IA...');
+    setAiStatus(t('ai.status.generating'));
     try {
       const output = await callAiProvider({
         provider: aiProvider,
@@ -1652,19 +1675,19 @@ function App() {
           return next;
         });
         setHtmlEditor((editor) => editor?.slotId === slotId ? null : editor);
-        setAiStatus('Conteúdo aplicado mantendo os tweaks do post.');
+        setAiStatus(t('ai.status.content.applied'));
         setAiDoneSlot(slotId);
       } else {
         const html = ensureAiHtmlContract(output.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim());
         if (!html) throw new Error('A IA não retornou HTML.');
         setSavedHtml((saved) => ({ ...saved, [slotId]: html }));
         setHtmlEditor((editor) => editor?.slotId === slotId ? { ...editor, draft: html } : editor);
-        setAiStatus('HTML aplicado e salvo nesse post.');
+        setAiStatus(t('ai.status.html.applied'));
         setAiDoneSlot(slotId);
       }
     } catch (err) {
       console.error(err);
-      setAiStatus(err?.message || 'Erro ao usar IA.');
+      setAiStatus(err?.message || t('ai.status.error'));
     } finally {
       setAiBusySlot(null);
     }
@@ -1731,6 +1754,7 @@ function App() {
   const resLabel = `${dims.w}×${dims.h}`;
 
   return (
+    <I18nContext.Provider value={{ locale, t, setLocale }}>
     <>
       <DesignCanvas>
         <DCSection id="manifesto" title="Frase / Manifesto" subtitle={`7 variações · ${resLabel}`}>
@@ -1890,21 +1914,33 @@ function App() {
           value={activeTweakTab}
           onChange={setActiveTweakTab}
           options={[
-            { value: 'visual', label: 'Visual' },
-            { value: 'effects', label: 'Efeitos' },
-            { value: 'ai', label: 'IA' },
-            { value: 'help', label: 'Ajuda' },
+            { value: 'visual',  label: t('tab.visual') },
+            { value: 'effects', label: t('tab.effects') },
+            { value: 'ai',      label: t('tab.ai') },
+            { value: 'help',    label: t('tab.help') },
           ]}
         >
           <TweakTab value="visual">
-        <TweakSection label="Tema">
+        <TweakSection label={t('section.language')}>
           <TweakRadio
-            label="Fundo"
+            label=""
+            value={locale}
+            options={[
+              { value: 'en', label: 'English' },
+              { value: 'pt', label: 'Português' },
+              { value: 'es', label: 'Español' },
+            ]}
+            onChange={setLocale}
+          />
+        </TweakSection>
+        <TweakSection label={t('section.theme')}>
+          <TweakRadio
+            label={t('theme.background')}
             value={tw.theme}
             options={[
-              { value: 'light', label: 'Branco' },
-              { value: 'dark',  label: 'Preto' },
-              { value: 'color', label: 'Cor' },
+              { value: 'light', label: t('theme.white') },
+              { value: 'dark',  label: t('theme.black') },
+              { value: 'color', label: t('theme.color') },
             ]}
             onChange={(v) => {
               setTw('theme', v);
@@ -1915,33 +1951,33 @@ function App() {
           {tw.theme === 'color' && (
             <>
               <TweakSelect
-                label="Preenchimento"
+                label={t('theme.fill')}
                 value={tw.bgFill || 'solid'}
                 options={[
-                  { value: 'solid', label: 'Sólido' },
-                  { value: 'linear', label: 'Degradê' },
-                  { value: 'radial', label: 'Radial' },
-                  { value: 'split', label: 'Corte' },
-                  { value: 'bands', label: 'Lâminas' },
-                  { value: 'wash', label: 'Véu' },
+                  { value: 'solid',  label: t('fill.solid') },
+                  { value: 'linear', label: t('fill.linear') },
+                  { value: 'radial', label: t('fill.radial') },
+                  { value: 'split',  label: t('fill.split') },
+                  { value: 'bands',  label: t('fill.bands') },
+                  { value: 'wash',   label: t('fill.wash') },
                 ]}
                 onChange={(v) => setTw('bgFill', v)}
               />
               <TweakColor
-                label="Fundo"
+                label={t('theme.bg')}
                 value={tw.bgColor || '#ffffff'}
                 onChange={(v) => setTw('bgColor', v)}
               />
               {(tw.bgFill || 'solid') !== 'solid' && (
                 <>
                   <TweakColor
-                    label="Cor 2"
+                    label={t('theme.color2')}
                     value={tw.bgColor2 || '#ece7dd'}
                     onChange={(v) => setTw('bgColor2', v)}
                   />
                   {['linear', 'split', 'bands', 'wash'].includes(tw.bgFill || 'solid') && (
                     <TweakSlider
-                      label="Ângulo"
+                      label={t('theme.angle')}
                       value={tw.bgAngle}
                       min={0}
                       max={360}
@@ -1955,43 +1991,43 @@ function App() {
             </>
           )}
           <TweakColor
-            label="Texto"
+            label={t('theme.text')}
             value={tw.textColor || (tw.theme === 'dark' ? '#ffffff' : '#000000')}
             onChange={(v) => setTw('textColor', v)}
           />
           <TweakColor
-            label="Secundário"
+            label={t('theme.secondary')}
             value={tw.secondaryTextColor || selectedSecondaryColor}
             onChange={(v) => setTw('secondaryTextColor', v)}
           />
           {tw.secondaryTextColor && (
             <TweakButton
-              label="Resetar cor secundária"
+              label={t('theme.secondary.reset')}
               secondary
               onClick={() => setTw('secondaryTextColor', '')}
             />
           )}
         </TweakSection>
-        <TweakSection label="Tipografia">
+        <TweakSection label={t('section.typography')}>
           <TweakSelect
-            label="Fonte — títulos"
+            label={t('font.title')}
             value={tw.fontTitle || 'montserrat'}
-            options={fontOptions}
+            options={translatedFontOptions}
             onChange={(v) => setTw('fontTitle', v)}
           />
           <TweakRadio
-            label="Peso — títulos"
+            label={t('weight.title')}
             value={tw.weight}
             options={[
-              { value: 300, label: 'Light' },
-              { value: 400, label: 'Regular' },
-              { value: 500, label: 'Medium' },
-              { value: 700, label: 'Bold' },
+              { value: 300, label: t('weight.light') },
+              { value: 400, label: t('weight.regular') },
+              { value: 500, label: t('weight.medium') },
+              { value: 700, label: t('weight.bold') },
             ]}
             onChange={(v) => setTw('weight', v)}
           />
           <TweakSlider
-            label="Tamanho — títulos"
+            label={t('size.title')}
             value={tw.sizeScale}
             min={0.7}
             max={1.4}
@@ -1999,25 +2035,25 @@ function App() {
             onChange={(v) => setTw('sizeScale', v)}
           />
           <TweakSelect
-            label="Fonte — textos pequenos"
+            label={t('font.small')}
             value={tw.fontSmall || 'montserrat'}
-            options={fontOptions}
+            options={translatedFontOptions}
             onChange={(v) => setTw('fontSmall', v)}
           />
           <TweakRadio
-            label="Peso — textos pequenos"
+            label={t('weight.small')}
             value={tw.weightSmall}
             options={[
-              { value: 300, label: 'Light' },
-              { value: 400, label: 'Regular' },
-              { value: 500, label: 'Medium' },
-              { value: 600, label: 'Semi' },
-              { value: 700, label: 'Bold' },
+              { value: 300, label: t('weight.light') },
+              { value: 400, label: t('weight.regular') },
+              { value: 500, label: t('weight.medium') },
+              { value: 600, label: t('weight.semi') },
+              { value: 700, label: t('weight.bold') },
             ]}
             onChange={(v) => setTw('weightSmall', v)}
           />
           <TweakSlider
-            label="Tamanho — textos pequenos"
+            label={t('size.small')}
             value={tw.smallScale}
             min={0.7}
             max={1.4}
@@ -2025,15 +2061,15 @@ function App() {
             onChange={(v) => setTw('smallScale', v)}
           />
           <TweakFile
-            label="Upload fonte"
+            label={t('font.upload')}
             accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2"
             multiple
             onChange={uploadFontFiles}
           />
           <TweakText
-            label="Fonte do sistema"
+            label={t('font.system')}
             value={systemFontName}
-            placeholder="Ex: Helvetica Neue"
+            placeholder={t('font.system.placeholder')}
             onChange={setSystemFontName}
           />
           <div style={{
@@ -2045,17 +2081,17 @@ function App() {
             fontSize: 10.5,
             lineHeight: 1.35,
           }}>
-            Por segurança, o navegador não lista todas as fontes do sistema. Digite o nome exato de uma fonte instalada para usá-la aqui.
+            {t('font.system.note')}
           </div>
           <TweakButton
-            label="Adicionar fonte do sistema"
+            label={t('font.system.add')}
             secondary
             onClick={addSystemFont}
           />
         </TweakSection>
-        <TweakSection label="Layout">
+        <TweakSection label={t('section.layout')}>
           <TweakRadio
-            label="Formato (Rede Social)"
+            label={t('format.label')}
             value={tw.format}
             options={[
               { value: 'square',    label: '1:1' },
@@ -2067,7 +2103,7 @@ function App() {
             onChange={(v) => setTw('format', v)}
           />
           <TweakSlider
-            label="Margem dos cantos"
+            label={t('layout.padding')}
             value={tw.chromePad}
             min={40}
             max={140}
@@ -2076,32 +2112,31 @@ function App() {
             onChange={(v) => setTw('chromePad', v)}
           />
         </TweakSection>
-        <TweakSection label="Exportar">
+        <TweakSection label={t('section.export')}>
           <TweakRadio
-            label="Qualidade do PNG"
+            label={t('export.quality')}
             value={tw.exportScale}
             options={[
-              { value: 1, label: 'Normal (1x)' },
-              { value: 2, label: 'Alta (2x)' },
-              { value: 3, label: 'Ultra (3x)' },
+              { value: 1, label: t('export.normal') },
+              { value: 2, label: t('export.high') },
+              { value: 3, label: t('export.ultra') },
             ]}
             onChange={(v) => setTw('exportScale', v)}
           />
-          <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}>
-            Passe o cursor sobre qualquer post e clique em <strong>↓ PNG</strong> para baixar.
-          </div>
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}
+            dangerouslySetInnerHTML={{ __html: t('export.hint') }} />
         </TweakSection>
           </TweakTab>
           <TweakTab value="effects">
         {DECOR_GROUPS.map((group) => (
-          <TweakSection key={group.key} label={group.label}>
+          <TweakSection key={group.key} label={t('decor.group.' + group.key, group.label)}>
             {DECOR_TWEAKS.filter((item) => item.group === group.key).map((item) => (
               <React.Fragment key={item.key}>
-                <TweakToggle label={item.label} value={tw[item.tweak]} onChange={(v) => setTw(item.tweak, v)} />
+                <TweakToggle label={t('decor.' + item.key, item.label)} value={tw[item.tweak]} onChange={(v) => setTw(item.tweak, v)} />
                 {tw[item.tweak] && (
                   <>
                     <TweakSlider
-                      label="↳ intensidade"
+                      label={t('effect.intensity')}
                       value={tw[item.intensity]}
                       min={0.1}
                       max={2}
@@ -2111,7 +2146,7 @@ function App() {
                     {item.transform && (
                       <>
                         <TweakSlider
-                          label="↳ tamanho"
+                          label={t('effect.size')}
                           value={tw[item.tweak + 'Size'] ?? 100}
                           min={50}
                           max={200}
@@ -2120,7 +2155,7 @@ function App() {
                           onChange={(v) => setTw(item.tweak + 'Size', v)}
                         />
                         <TweakSlider
-                          label="↳ horizontal"
+                          label={t('effect.x')}
                           value={tw[item.tweak + 'X'] ?? 0}
                           min={-50}
                           max={50}
@@ -2129,7 +2164,7 @@ function App() {
                           onChange={(v) => setTw(item.tweak + 'X', v)}
                         />
                         <TweakSlider
-                          label="↳ vertical"
+                          label={t('effect.y')}
                           value={tw[item.tweak + 'Y'] ?? 0}
                           min={-50}
                           max={50}
@@ -2147,14 +2182,14 @@ function App() {
         ))}
           </TweakTab>
           <TweakTab value="ai">
-        <TweakSection label="IA">
+        <TweakSection label={t('section.ai')}>
           <TweakSelect
-            label="Provedor"
+            label={t('ai.provider')}
             value={aiProvider}
             options={[
-              { value: 'openai', label: 'OpenAI / ChatGPT' },
-              { value: 'anthropic', label: 'Anthropic / Claude' },
-              { value: 'gemini', label: 'Google / Gemini' },
+              { value: 'openai',    label: t('ai.openai') },
+              { value: 'anthropic', label: t('ai.anthropic') },
+              { value: 'gemini',    label: t('ai.google') },
             ]}
             onChange={(v) => {
               setAiProvider(v);
@@ -2162,53 +2197,52 @@ function App() {
             }}
           />
           <TweakText
-            label="API key"
+            label={t('ai.apikey')}
             value={aiKey}
             type="password"
-            placeholder="sk-..."
+            placeholder={t('ai.apikey.placeholder')}
             onChange={setAiKey}
           />
           <TweakSelect
-            label="Modelo"
+            label={t('ai.model')}
             value={aiModel}
             options={AI_MODELS[aiProvider]}
             onChange={setAiModel}
           />
           <TweakRadio
-            label="Modo"
+            label={t('ai.mode')}
             value={aiMode}
             options={[
-              { value: 'content', label: 'Conteúdo' },
-              { value: 'html', label: 'HTML' },
+              { value: 'content', label: t('ai.mode.content') },
+              { value: 'html',    label: t('ai.mode.html') },
             ]}
             onChange={setAiMode}
           />
           <TweakTextarea
-            label="Contexto"
+            label={t('ai.context')}
             value={aiContext}
-            placeholder="Ex: gere um post para lançamento B2B..."
+            placeholder={t('ai.context.placeholder')}
             onChange={setAiContext}
           />
-          <div style={{ fontSize: 11, lineHeight: 1.5, color: aiStatus.startsWith('Erro') || aiStatus.startsWith('Informe') ? '#8f2118' : 'rgba(41,38,27,.62)', padding: '2px 0' }}>
-            {aiStatus || 'A chave fica somente no estado desta página e é enviada direto ao provedor escolhido.'}
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: aiStatus === '__no_key__' || aiStatus.startsWith('Erro') ? '#8f2118' : 'rgba(41,38,27,.62)', padding: '2px 0' }}>
+            {aiStatus === '__no_key__' ? t('ai.no.key') : aiStatus || t('ai.key.note')}
           </div>
         </TweakSection>
           </TweakTab>
           <TweakTab value="help">
-        <TweakSection label="Exportar">
-          <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}>
-            Passe o cursor sobre qualquer post e clique em <strong>↓ PNG</strong> (canto superior direito) para baixar em 1080px nativo.
-          </div>
+        <TweakSection label={t('section.export')}>
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}
+            dangerouslySetInnerHTML={{ __html: t('help.export.hint') }} />
         </TweakSection>
-        <TweakSection label="Edição inline">
-          <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}>
-            Todos os textos são editáveis. Clique em qualquer título, parágrafo ou rótulo e digite. <strong>Enter</strong> confirma; <strong>Shift+Enter</strong> quebra linha.
-          </div>
+        <TweakSection label={t('section.inline.edit')}>
+          <div style={{ fontSize: 11, lineHeight: 1.5, color: 'rgba(41,38,27,.6)', padding: '4px 0' }}
+            dangerouslySetInnerHTML={{ __html: t('help.edit.hint') }} />
         </TweakSection>
           </TweakTab>
         </TweakTabs>
       </TweaksPanel>
     </>
+    </I18nContext.Provider>
   );
 }
 
@@ -2217,7 +2251,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 // Botão local para abrir o painel de Tweaks (ativo apenas fora do Claude design)
 if (window.parent === window) {
   const btn = document.createElement('button');
-  btn.textContent = 'Tweaks ↑';
+  const savedLocale = localStorage.getItem('ig_locale') || 'pt';
+  const tweaksBtnLabels = { en: 'Tweaks ↑', pt: 'Tweaks ↑', es: 'Ajustes ↑' };
+  btn.textContent = tweaksBtnLabels[savedLocale] || 'Tweaks ↑';
   Object.assign(btn.style, {
     position: 'fixed', bottom: '16px', right: '16px', zIndex: '2147483645',
     padding: '7px 14px', border: 'none', borderRadius: '8px',

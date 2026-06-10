@@ -376,6 +376,7 @@ function DCSection({ id, title, subtitle, children, gap = 48 }) {
 function DCArtboard() { return null; }
 
 function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorder, onFocus }) {
+  const { t } = React.useContext(I18nContext);
   const { id: rawId, label: rawLabel, width = 260, height = 480, children, style = {} } = artboard.props;
   const id = rawId ?? rawLabel;
   const ref = React.useRef(null);
@@ -445,15 +446,15 @@ function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorde
   return (
     <div ref={ref} data-dc-slot={id} style={{ position: 'relative', flexShrink: 0 }}>
       <div className="dc-labelrow" style={{ position: 'absolute', bottom: '100%', left: -4, marginBottom: 4, color: DC.label }}>
-        <div className="dc-grip" onPointerDown={onGripDown} title="Drag to reorder">
+        <div className="dc-grip" onPointerDown={onGripDown} title={t('canvas.grip')}>
           <svg width="9" height="13" viewBox="0 0 9 13" fill="currentColor"><circle cx="2" cy="2" r="1.1"/><circle cx="7" cy="2" r="1.1"/><circle cx="2" cy="6.5" r="1.1"/><circle cx="7" cy="6.5" r="1.1"/><circle cx="2" cy="11" r="1.1"/><circle cx="7" cy="11" r="1.1"/></svg>
         </div>
-        <div className="dc-labeltext" onClick={onFocus} title="Click to focus">
+        <div className="dc-labeltext" onClick={onFocus} title={t('canvas.focus')}>
           <DCEditable value={label} onChange={onRename} onClick={(e) => e.stopPropagation()}
             style={{ fontSize: 15, fontWeight: 500, color: DC.label, lineHeight: 1 }} />
         </div>
       </div>
-      <button className="dc-expand" onClick={onFocus} onPointerDown={(e) => e.stopPropagation()} title="Focus">
+      <button className="dc-expand" onClick={onFocus} onPointerDown={(e) => e.stopPropagation()} title={t('canvas.expand')}>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M7 1h4v4M5 11H1V7M11 1L7.5 4.5M1 11l3.5-3.5"/></svg>
       </button>
       <div className="dc-card"

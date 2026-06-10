@@ -20,37 +20,43 @@ Browser-based Instagram post generator for Arateki, a minimalist-aesthetic compa
 
 ## 2. File architecture
 
+All source files live in `src/`. The HTML entrypoint is at the project root.
+
 ```
-Instagram Posts.html      # entrypoint — loads all scripts and mounts the app
-design-canvas.jsx         # Figma-like canvas (pan/zoom, artboards, sections, post-its)
-tweaks-panel.jsx          # global tweaks sidebar (theme, weight, decor…)
-ig-common.jsx             # shared primitives: IgCanvas, IgHeader, IgFooter, IgEdit, IgMono, IgRule…
-ig-decor.jsx              # independent decoration effects; exports IgDecor
-ig-data.jsx               # default data for all templates (IG_DEFAULTS)
-ig-posts.css              # post base classes (.ig-canvas, .ig-chrome-top…)
-colors_and_type.css       # Arateki brand color and typography tokens
-ig-manifesto.jsx          # manifesto / brand-statement templates
-ig-announce.jsx           # product launch / announcement templates
-ig-educational.jsx        # educational / explainer templates
-ig-carousel.jsx           # 3 carousel components (cover + page + CTA)
-ig-event.jsx              # event / save-the-date templates
-ig-job.jsx                # job posting templates
-ig-blog.jsx               # blog / article templates
-ig-transparency.jsx       # transparency / metrics templates
-ig-product.jsx            # product feature templates
-ig-testimonial.jsx        # testimonial / quote-from-user templates
-ig-usecase.jsx            # use-case / persona templates
-ig-tutorial.jsx           # tutorial / how-to templates
-ig-quote.jsx              # external quote / citation templates
+Instagram Posts.html        # entrypoint — loads all scripts and mounts the app
+src/
+  i18n.jsx                  # translations (EN/PT/ES), I18nContext, useT() hook
+  design-canvas.jsx         # Figma-like canvas (pan/zoom, artboards, sections, post-its)
+  tweaks-panel.jsx          # global tweaks sidebar (theme, weight, decor…)
+  ig-common.jsx             # shared primitives: IgCanvas, IgHeader, IgFooter, IgEdit, IgMono, IgRule…
+  ig-decor.jsx              # independent decoration effects; exports IgDecor
+  ig-data.jsx               # default data for all templates (IG_DEFAULTS) — lorem ipsum placeholders
+  ig-posts.css              # post base classes (.ig-canvas, .ig-chrome-top…)
+  colors_and_type.css       # Arateki brand color and typography tokens
+  ig-manifesto.jsx          # manifesto / brand-statement templates
+  ig-announce.jsx           # product launch / announcement templates
+  ig-educational.jsx        # educational / explainer templates
+  ig-carousel.jsx           # 3 carousel components (cover + page + CTA)
+  ig-event.jsx              # event / save-the-date templates
+  ig-job.jsx                # job posting templates
+  ig-blog.jsx               # blog / article templates
+  ig-transparency.jsx       # transparency / metrics templates
+  ig-product.jsx            # product feature templates
+  ig-testimonial.jsx        # testimonial / quote-from-user templates
+  ig-usecase.jsx            # use-case / persona templates
+  ig-tutorial.jsx           # tutorial / how-to templates
+  ig-quote.jsx              # external quote / citation templates
+  fonts/                    # self-hosted Montserrat weights
 ```
 
 **Script load order** in `Instagram Posts.html` is critical. Required sequence:
 
-1. `design-canvas.jsx` and `tweaks-panel.jsx` — UI shell
-2. `ig-common.jsx` — shared primitives used by all templates
-3. `ig-decor.jsx` — `IgDecor` used by `TplInner`
-4. `ig-data.jsx` — `IG_DEFAULTS` used by `useTemplateData`
-5. Template files in any order (they only reference `window` globals from 1–4)
+1. `src/i18n.jsx` — **must be first**: defines `I18nContext`, `useT`, `TRANSLATIONS` on `window`
+2. `src/design-canvas.jsx` and `src/tweaks-panel.jsx` — UI shell
+3. `src/ig-common.jsx` — shared primitives used by all templates
+4. `src/ig-decor.jsx` — `IgDecor` used by `TplInner`
+5. `src/ig-data.jsx` — `IG_DEFAULTS` used by `useTemplateData`
+6. Template files in any order (they only reference `window` globals from 1–5)
 
 ---
 
@@ -427,6 +433,85 @@ Do not put uploaded images into template data or `IG_DEFAULTS`. Do not serialize
 
 ---
 
+## 8.3 Internacionalização (i18n)
+
+A interface do usuário suporta três idiomas: **Inglês (en)**, **Português (pt)** e **Espanhol (es)**. O idioma selecionado persiste em `localStorage` com a chave `ig_locale`.
+
+### Arquitetura
+
+| Peça | Localização | Papel |
+|---|---|---|
+| `TRANSLATIONS` | `src/i18n.jsx` | Objeto com todas as chaves de UI nos 3 locales |
+| `I18nContext` | `src/i18n.jsx` | React Context que fornece `{ locale, t, setLocale }` |
+| `useT()` | `src/i18n.jsx` | Hook que retorna o contexto i18n |
+| Provider | `Instagram Posts.html` (`App`) | Envolve todo o app; `locale` é state com persistência |
+| Seletor | TweaksPanel → aba Visual → seção "Idioma" | Radio EN / PT / ES |
+
+### A função `t()`
+
+```js
+const t = (key, fallback) => {
+  // 1. Tenta tradução do locale atual
+  // 2. Fallback para PT (locale base)
+  // 3. Se fallback foi passado explicitamente, retorna fallback
+  // 4. Caso contrário, retorna a própria key
+};
+```
+
+Chamar com fallback explícito (pode ser `null`): `t('minha.chave', null)` → retorna `null` se a chave não existir.
+
+### Como usar em componentes
+
+**Componentes no script inline do HTML** (App scope — `t` está disponível por closure):
+```jsx
+<TweakSection label={t('section.theme')}>
+```
+
+**Componentes definidos como funções separadas** (TplFrame, HtmlEditor, ImageLayerEditor):
+```jsx
+function MeuComponente() {
+  const { t } = useT();  // lê do I18nContext
+  return <button>{t('minha.chave')}</button>;
+}
+```
+
+**Arquivos `.jsx` externos** (design-canvas.jsx):
+```js
+const { t } = React.useContext(I18nContext);  // I18nContext é global via window
+```
+
+### Estrutura de chaves em `TRANSLATIONS`
+
+As chaves seguem um namespace flat com `.` como separador:
+
+| Prefixo | Domínio |
+|---|---|
+| `btn.*` | Botões de overlay (IMG, Layers, HTML, IA) |
+| `html.*` | Editor HTML |
+| `layers.*`, `layer.*` | Gerenciador de camadas |
+| `tab.*` | Abas do TweaksPanel |
+| `section.*` | Cabeçalhos de seção no painel |
+| `theme.*`, `fill.*` | Tema e preenchimento |
+| `font.*`, `weight.*`, `size.*` | Tipografia |
+| `format.*`, `layout.*` | Layout |
+| `export.*` | Exportação |
+| `effect.*` | Controles de efeitos (intensidade, tamanho, x, y) |
+| `ai.*` | Painel e status da IA |
+| `help.*` | Aba de ajuda |
+| `canvas.*` | Tooltips do design canvas |
+| `decor.group.*` | Labels dos grupos de efeitos |
+| `decor.*` | Labels individuais de cada efeito |
+| `font.option.*` | Labels das opções de fonte no select |
+
+### Adicionando novas strings
+
+1. Adicionar a chave nos três locales em `src/i18n.jsx`
+2. Usar `t('nova.chave')` no componente
+
+**Nunca** colocar strings de UI hardcoded em PT (ou qualquer idioma) em componentes — sempre passar por `t()`.
+
+---
+
 ## 9. Template inventory
 
 **14 sections, 81 distinct template functions, 96 artboard slots.**
@@ -639,11 +724,13 @@ style={{ padding: 'var(--ig-chrome-pad, 80px)' }}
 - **No `console.log`** — there's no backend; export errors go to `console.error`
 - **CSS via variables** — do not hardcode colors in JSX; use `--fg-1`, `--bg-1`, etc.
 - **Inline editing** — use `IgEdit` (a `contentEditable` wrapper) for editable text in posts
-- **Data in `ig-data.jsx`** — all template default text lives in `IG_DEFAULTS`; do not embed strings directly in JSX
+- **Data in `ig-data.jsx`** — all template default text lives in `IG_DEFAULTS` as **lorem ipsum placeholders**; do not embed strings directly in JSX and do not replace placeholder content with brand-specific copy
 - **`Object.assign(window, {...})`** at the bottom of every `.jsx` — this is the cross-script export mechanism for Babel
 - **No new dependencies** — everything loads via CDN with integrity hashes; do not add libraries without discussion
 - **Post formats:** `square` (1080×1080), `portrait` (1080×1350), `landscape` (1920×1080), `story` (1080×1920), `banner` (1620×540)
 - **Brand tracking text:** `A R A T E K I`, `V A U L T`, `L A N Ç A M E N T O` — the spaces between letters are intentional brand identity, not a typo
+- **UI strings must use `t()`** — never hardcode interface text in any language; always declare the key in all three locales (`en`, `pt`, `es`) in `src/i18n.jsx` and use `t('chave')` no componente
+- **All source files live in `src/`** — when referencing from `Instagram Posts.html`, use `src/filename.jsx` paths
 
 ---
 
@@ -659,7 +746,9 @@ style={{ padding: 'var(--ig-chrome-pad, 80px)' }}
 8. **SlotId collision:** `p01–p03` and `s01–s04` are reserved for portrait/story format previews in "Formatos alternativos". For new product or concept sections, use multi-character prefixes (`prd`, `tr`, `uc`, etc.). Never assign a single-letter prefix without checking existing slots first.
 9. **Layout novelty mandate:** Before designing templates for a new section, read Section 10 (Layout primitives). Each new section should use layouts not yet dominant in adjacent sections, and ideally introduce at least one structural pattern not in the table. Document any new pattern in Section 10.
 10. **`decor` is an object, not a number.** `IgDecor` receives `{ grid, gridI, dots, dotsI, … }` — not a `0–3` integer. `TplInner` builds this object from the individual `tw.decorXxx` tweak values and passes it down.
-11. **Script load order matters.** When adding a new `.jsx` file, insert it after `ig-blog.jsx` (or the last existing template file) and before the closing `</body>`. `ig-common.jsx` and `ig-data.jsx` must load before any template file.
+11. **Script load order matters.** `src/i18n.jsx` **must be the first** `<script type="text/babel">` tag — all other files depend on `I18nContext` and `useT` being on `window`. When adding a new `.jsx` template file, insert it after the last existing template and before `</body>`. `ig-common.jsx` and `ig-data.jsx` must load before any template file.
 12. **HTML overrides must stay compatible with tweaks.** Keep them inside `TplInner`; do not replace `[data-ig-real]` or bypass the wrapper that defines `--fg-*`, `--bg-*`, `--ig-weight*`, `--ig-font-*`, `--ig-size-scale`, and `--ig-chrome-pad`.
 13. **Image layers are app-managed.** Do not embed uploaded images into AI HTML, template defaults, or saved HTML. Pass layer metadata to AI and keep the visual layer editable through the layer inspector.
 14. **Focus mode is an editing surface.** If adding a new per-card editor, expose it through `focusEditor` as well as the inline card editor so the expanded post remains fully usable.
+15. **i18n is mandatory for UI text.** Any string visible to the user must go through `t('chave')`. Add the key in all three locales (`en`, `pt`, `es`) in `src/i18n.jsx` before using it. Components in the App scope use `t` directly (closure); separate function components use `const { t } = useT()`; files outside the inline script (e.g. `design-canvas.jsx`) use `React.useContext(I18nContext)`.
+16. **Template data (`IG_DEFAULTS`) stays lorem ipsum.** Do not fill `ig-data.jsx` with brand-specific or production copy — it is intentionally generic placeholder content. Users customize posts via inline editing at runtime.
