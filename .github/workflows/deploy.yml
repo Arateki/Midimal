@@ -1,0 +1,28 @@
+name: Deploy Midimal
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+env:
+  DEPLOY_DIR: /opt/home-server/websites/midimal
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Deploy to server
+        run: rsync -a --delete dist/ "$DEPLOY_DIR/"
