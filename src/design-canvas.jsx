@@ -1,4 +1,6 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
+import { I18nContext } from './i18n.jsx'
 
 // DesignCanvas.jsx — Figma-ish design canvas wrapper
 // Warm gray grid bg + Sections + Artboards + PostIt notes.
@@ -51,6 +53,11 @@ if (typeof document !== 'undefined' && !document.getElementById('dc-styles')) {
     '  background:transparent;color:rgba(60,50,40,.7);display:flex;align-items:center;justify-content:center}',
     '.dc-expand:hover{background:rgba(0,0,0,.06);color:#2a251f}',
     '[data-dc-slot]:hover .dc-expand{opacity:1}',
+    // Slide-in animations for focus overlay card navigation
+    '.dc-slide-in-left{animation:dc-slide-left .22s cubic-bezier(.2,.7,.3,1)}',
+    '.dc-slide-in-right{animation:dc-slide-right .22s cubic-bezier(.2,.7,.3,1)}',
+    '@keyframes dc-slide-left{from{transform:translateX(-36px);opacity:0}to{transform:translateX(0);opacity:1}}',
+    '@keyframes dc-slide-right{from{transform:translateX(36px);opacity:0}to{transform:translateX(0);opacity:1}}',
   ].join('\n');
   document.head.appendChild(s);
 }
@@ -69,7 +76,7 @@ const DCCtx = React.createContext(null);
 // ─────────────────────────────────────────────────────────────
 const DC_STATE_FILE = '.design-canvas.state.json';
 
-function DesignCanvas({ children, minScale, maxScale, style }) {
+function DesignCanvas({ children, style }) {
   const [state, setState] = React.useState({ sections: {}, focus: null });
   // Hold rendering until the sidecar read settles so the saved order/titles
   // appear on first paint (no source-order flash). didRead gates writes until
@@ -159,7 +166,7 @@ function DesignCanvas({ children, minScale, maxScale, style }) {
 
   return (
     <DCCtx.Provider value={api}>
-      <DCViewport minScale={minScale} maxScale={maxScale} style={style}>{ready && children}</DCViewport>
+      <DCViewport style={style}>{ready && children}</DCViewport>
       {state.focus && registry[state.focus] && (
         <DCFocusOverlay entry={registry[state.focus]} sectionMeta={sectionMeta} sectionOrder={sectionOrder} />
       )}
@@ -180,148 +187,21 @@ function DesignCanvas({ children, minScale, maxScale, style }) {
 // (translate3d + will-change) so wheel ticks don't go through React —
 // keeps pans at 60fps on dense canvases.
 // ─────────────────────────────────────────────────────────────
-function DCViewport({ children, minScale = 0.1, maxScale = 8, style = {} }) {
-  const vpRef = React.useRef(null);
-  const worldRef = React.useRef(null);
-  const tf = React.useRef({ x: 0, y: 0, scale: 1 });
-
-  const apply = React.useCallback(() => {
-    const { x, y, scale } = tf.current;
-    const el = worldRef.current;
-    if (el) el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
-  }, []);
-
-  React.useEffect(() => {
-    const vp = vpRef.current;
-    if (!vp) return;
-
-    const zoomAt = (cx, cy, factor) => {
-      const r = vp.getBoundingClientRect();
-      const px = cx - r.left, py = cy - r.top;
-      const t = tf.current;
-      const next = Math.min(maxScale, Math.max(minScale, t.scale * factor));
-      const k = next / t.scale;
-      // keep the world point under the cursor fixed
-      t.x = px - (px - t.x) * k;
-      t.y = py - (py - t.y) * k;
-      t.scale = next;
-      apply();
-    };
-
-    // Mouse-wheel vs trackpad-scroll heuristic. A physical wheel sends
-    // line-mode deltas (Firefox) or large integer pixel deltas with no X
-    // component (Chrome/Safari, typically multiples of 100/120). Trackpad
-    // two-finger scroll sends small/fractional pixel deltas, often with
-    // non-zero deltaX. ctrlKey is set by the browser for trackpad pinch.
-    const isMouseWheel = (e) =>
-      e.deltaMode !== 0 ||
-      (e.deltaX === 0 && Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 40);
-
-    const onWheel = (e) => {
-      e.preventDefault();
-      if (isGesturing) return; // Safari: gesture* owns the pinch — discard concurrent wheels
-      if (e.ctrlKey) {
-        // trackpad pinch (or explicit ctrl+wheel)
-        zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
-      } else if (isMouseWheel(e)) {
-        // notched mouse wheel — fixed-ratio step per click
-        zoomAt(e.clientX, e.clientY, Math.exp(-Math.sign(e.deltaY) * 0.18));
-      } else {
-        // trackpad two-finger scroll — pan
-        tf.current.x -= e.deltaX;
-        tf.current.y -= e.deltaY;
-        apply();
-      }
-    };
-
-    // Safari sends native gesture* events for trackpad pinch with a smooth
-    // e.scale; preferring these over the ctrl+wheel fallback gives a much
-    // better feel there. No-ops on other browsers. Safari also fires
-    // ctrlKey wheel events during the same pinch — isGesturing makes
-    // onWheel drop those entirely so they neither zoom nor pan.
-    let gsBase = 1;
-    let isGesturing = false;
-    const onGestureStart = (e) => { e.preventDefault(); isGesturing = true; gsBase = tf.current.scale; };
-    const onGestureChange = (e) => {
-      e.preventDefault();
-      zoomAt(e.clientX, e.clientY, (gsBase * e.scale) / tf.current.scale);
-    };
-    const onGestureEnd = (e) => { e.preventDefault(); isGesturing = false; };
-
-    // Drag-pan: middle button anywhere, or primary button on canvas
-    // background (anything that isn't an artboard or an inline editor).
-    let drag = null;
-    const onPointerDown = (e) => {
-      const onBg = !e.target.closest('[data-dc-slot], .dc-editable');
-      if (!(e.button === 1 || (e.button === 0 && onBg))) return;
-      e.preventDefault();
-      vp.setPointerCapture(e.pointerId);
-      drag = { id: e.pointerId, lx: e.clientX, ly: e.clientY };
-      vp.style.cursor = 'grabbing';
-    };
-    const onPointerMove = (e) => {
-      if (!drag || e.pointerId !== drag.id) return;
-      tf.current.x += e.clientX - drag.lx;
-      tf.current.y += e.clientY - drag.ly;
-      drag.lx = e.clientX; drag.ly = e.clientY;
-      apply();
-    };
-    const onPointerUp = (e) => {
-      if (!drag || e.pointerId !== drag.id) return;
-      vp.releasePointerCapture(e.pointerId);
-      drag = null;
-      vp.style.cursor = '';
-    };
-
-    vp.addEventListener('wheel', onWheel, { passive: false });
-    vp.addEventListener('gesturestart', onGestureStart, { passive: false });
-    vp.addEventListener('gesturechange', onGestureChange, { passive: false });
-    vp.addEventListener('gestureend', onGestureEnd, { passive: false });
-    vp.addEventListener('pointerdown', onPointerDown);
-    vp.addEventListener('pointermove', onPointerMove);
-    vp.addEventListener('pointerup', onPointerUp);
-    vp.addEventListener('pointercancel', onPointerUp);
-    return () => {
-      vp.removeEventListener('wheel', onWheel);
-      vp.removeEventListener('gesturestart', onGestureStart);
-      vp.removeEventListener('gesturechange', onGestureChange);
-      vp.removeEventListener('gestureend', onGestureEnd);
-      vp.removeEventListener('pointerdown', onPointerDown);
-      vp.removeEventListener('pointermove', onPointerMove);
-      vp.removeEventListener('pointerup', onPointerUp);
-      vp.removeEventListener('pointercancel', onPointerUp);
-    };
-  }, [apply, minScale, maxScale]);
-
+function DCViewport({ children, style = {} }) {
   const gridSvg = `url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M120 0H0v120' fill='none' stroke='${encodeURIComponent(DC.grid)}' stroke-width='1'/%3E%3C/svg%3E")`;
   return (
-    <div
-      ref={vpRef}
-      className="design-canvas"
-      style={{
-        height: '100vh', width: '100vw',
-        background: DC.bg,
-        overflow: 'hidden',
-        overscrollBehavior: 'none',
-        touchAction: 'none',
-        position: 'relative',
-        fontFamily: DC.font,
-        boxSizing: 'border-box',
-        ...style,
-      }}
-    >
-      <div
-        ref={worldRef}
-        style={{
-          position: 'absolute', top: 0, left: 0,
-          transformOrigin: '0 0',
-          willChange: 'transform',
-          width: 'max-content', minWidth: '100%',
-          minHeight: '100%',
-          padding: '60px 0 80px',
-        }}
-      >
-        <div style={{ position: 'absolute', inset: -6000, backgroundImage: gridSvg, backgroundSize: '120px 120px', pointerEvents: 'none', zIndex: -1 }} />
+    <div className="design-canvas" style={{
+      height: '100vh', width: '100vw',
+      background: DC.bg,
+      backgroundImage: gridSvg,
+      backgroundSize: '120px 120px',
+      overflowY: 'auto', overflowX: 'hidden',
+      position: 'relative',
+      fontFamily: DC.font,
+      boxSizing: 'border-box',
+      ...style,
+    }}>
+      <div style={{ padding: '60px 0 80px' }}>
         {children}
       </div>
     </div>
@@ -331,7 +211,7 @@ function DCViewport({ children, minScale = 0.1, maxScale = 8, style = {} }) {
 // ─────────────────────────────────────────────────────────────
 // DCSection — editable title + h-row of artboards in persisted order
 // ─────────────────────────────────────────────────────────────
-function DCSection({ id, title, subtitle, children, gap = 48 }) {
+function DCSection({ id, title, subtitle, children, gap = 48, expanded, onToggle }) {
   const ctx = React.useContext(DCCtx);
   const sid = id ?? title;
   const all = React.Children.toArray(children);
@@ -339,6 +219,13 @@ function DCSection({ id, title, subtitle, children, gap = 48 }) {
   const rest = all.filter((c) => !(c && c.type === DCArtboard));
   const srcOrder = artboards.map((a) => a.props.id ?? a.props.label);
   const sec = (ctx && sid && ctx.section(sid)) || {};
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
+  React.useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const handler = (e) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const order = React.useMemo(() => {
     const kept = (sec.order || []).filter((k) => srcOrder.includes(k));
@@ -346,36 +233,115 @@ function DCSection({ id, title, subtitle, children, gap = 48 }) {
   }, [sec.order, srcOrder.join('|')]);
 
   const byId = Object.fromEntries(artboards.map((a) => [a.props.id ?? a.props.label, a]));
+  const isAccordion = !!onToggle;
+
+  // Measure container width so cards fill a responsive 2/3-column grid
+  const containerRef = React.useRef(null);
+  const [containerWidth, setContainerWidth] = React.useState(0);
+  React.useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setContainerWidth(e.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [expanded]);
+
+  const gridGap = isMobile ? 8 : 16;
+  const gridCols = isMobile ? 2 : 3;
+  const cardWidth = containerWidth > 0
+    ? Math.floor((containerWidth - gridGap * (gridCols - 1)) / gridCols)
+    : 200;
 
   return (
-    <div data-dc-section={sid} style={{ marginBottom: 80, position: 'relative' }}>
-      <div style={{ padding: '0 60px 56px' }}>
-        <DCEditable tag="div" value={sec.title ?? title}
-          onChange={(v) => ctx && sid && ctx.patchSection(sid, { title: v })}
-          style={{ fontSize: 28, fontWeight: 600, color: DC.title, letterSpacing: -0.4, marginBottom: 6, display: 'inline-block' }} />
-        {subtitle && <div style={{ fontSize: 16, color: DC.subtitle }}>{subtitle}</div>}
+    <>
+    <div data-dc-section={sid} style={{ marginBottom: isAccordion ? 0 : 80, position: 'relative', borderBottom: isAccordion ? (expanded ? '1px solid rgba(0,0,0,0.06)' : 'none') : 'none' }}>
+      <div style={{
+        position: isAccordion ? 'sticky' : undefined,
+        top: isAccordion ? 0 : undefined,
+        zIndex: isAccordion ? 5 : undefined,
+        padding: isAccordion ? (isMobile ? '12px 16px' : '14px 60px') : '0 60px 56px',
+        cursor: isAccordion ? 'pointer' : 'default',
+        userSelect: 'none',
+        background: isAccordion ? DC.bg : 'transparent',
+        transition: 'background .12s',
+        borderRadius: 4,
+      }}
+        onPointerDown={isAccordion ? (e) => { e.stopPropagation(); onToggle(); } : undefined}
+        onMouseEnter={isAccordion ? (e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.04)'; } : undefined}
+        onMouseLeave={isAccordion ? (e) => { e.currentTarget.style.background = DC.bg; } : undefined}>
+        {isAccordion ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke={DC.label} strokeWidth="1.8"
+              style={{ transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform .15s', flexShrink: 0 }}>
+              <path d="M4 5.5l3 3 3-3" />
+            </svg>
+            <span style={{ fontSize: isMobile ? 15 : 17, fontWeight: 600, color: DC.title, letterSpacing: -0.2 }}>{sec.title ?? title}</span>
+            {subtitle && <span style={{ fontSize: isMobile ? 11 : 13, color: DC.subtitle }}>{subtitle}</span>}
+          </div>
+        ) : (
+          <>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+              <DCEditable tag="div" value={sec.title ?? title}
+                onChange={(v) => ctx && sid && ctx.patchSection(sid, { title: v })}
+                style={{ fontSize: 28, fontWeight: 600, color: DC.title, letterSpacing: -0.4, marginBottom: 6, display: 'inline-block' }} />
+            </div>
+            {subtitle && <div style={{ fontSize: 16, color: DC.subtitle }}>{subtitle}</div>}
+          </>
+        )}
       </div>
-      <div style={{ display: 'flex', gap, padding: '0 60px', alignItems: 'flex-start', width: 'max-content' }}>
-        {order.map((k) => (
-          <DCArtboardFrame key={k} sectionId={sid} artboard={byId[k]} order={order}
-            label={(sec.labels || {})[k] ?? byId[k].props.label}
-            onRename={(v) => ctx && ctx.patchSection(sid, (x) => ({ labels: { ...x.labels, [k]: v } }))}
-            onReorder={(next) => ctx && ctx.patchSection(sid, { order: next })}
-            onFocus={() => {
-              byId[k].props.onFocusOpen?.();
-              ctx && ctx.setFocus(`${sid}/${k}`);
-            }} />
-        ))}
-      </div>
+      {(!isAccordion || expanded) && (
+        isAccordion ? (
+          <div ref={containerRef} style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
+            gap: gridGap,
+            padding: isMobile ? '12px 12px 24px' : '20px 60px 40px',
+            width: '100%',
+            boxSizing: 'border-box',
+          }}>
+            {order.map((k) => (
+              <DCArtboardFrame key={k} sectionId={sid} artboard={byId[k]} order={order}
+                label={(sec.labels || {})[k] ?? byId[k].props.label}
+                onRename={(v) => ctx && ctx.patchSection(sid, (x) => ({ labels: { ...x.labels, [k]: v } }))}
+                onReorder={(next) => ctx && ctx.patchSection(sid, { order: next })}
+                thumbnail={cardWidth}
+                onFocus={() => {
+                  byId[k].props.onFocusOpen?.();
+                  ctx && ctx.setFocus(`${sid}/${k}`);
+                }} />
+            ))}
+          </div>
+        ) : (
+          <div style={{
+            display: 'flex', gap,
+            padding: '0 60px 56px',
+            alignItems: 'flex-start',
+            width: 'max-content',
+            boxSizing: 'border-box',
+          }}>
+            {order.map((k) => (
+              <DCArtboardFrame key={k} sectionId={sid} artboard={byId[k]} order={order}
+                label={(sec.labels || {})[k] ?? byId[k].props.label}
+                onRename={(v) => ctx && ctx.patchSection(sid, (x) => ({ labels: { ...x.labels, [k]: v } }))}
+                onReorder={(next) => ctx && ctx.patchSection(sid, { order: next })}
+                onFocus={() => {
+                  byId[k].props.onFocusOpen?.();
+                  ctx && ctx.setFocus(`${sid}/${k}`);
+                }} />
+            ))}
+          </div>
+        )
+      )}
       {rest}
     </div>
+    </>
   );
 }
 
 // DCArtboard — marker; rendered by DCArtboardFrame via DCSection.
 function DCArtboard() { return null; }
 
-function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorder, onFocus }) {
+function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorder, onFocus, thumbnail }) {
   const { t } = React.useContext(I18nContext);
   const { id: rawId, label: rawLabel, width = 260, height = 480, children, style = {} } = artboard.props;
   const id = rawId ?? rawLabel;
@@ -387,9 +353,6 @@ function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorde
   const onGripDown = (e) => {
     e.preventDefault(); e.stopPropagation();
     const me = ref.current;
-    // translateX is applied in local (pre-scale) space but pointer deltas and
-    // getBoundingClientRect().left are screen-space — divide by the viewport's
-    // current scale so the dragged card tracks the cursor at any zoom level.
     const scale = me.getBoundingClientRect().width / me.offsetWidth || 1;
     const peers = Array.from(document.querySelectorAll(`[data-dc-section="${sectionId}"] [data-dc-slot]`));
     const homes = peers.map((el) => ({ el, id: el.dataset.dcSlot, x: el.getBoundingClientRect().left }));
@@ -429,8 +392,6 @@ function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorde
       const finalSlot = liveOrder.indexOf(id);
       me.classList.remove('dc-dragging');
       me.style.transform = `translateX(${(slotXs[finalSlot] - homes[startIdx].x) / scale}px)`;
-      // After the settle transition, kill transitions + clear transforms +
-      // commit the reorder in the same frame so there's no visual snap-back.
       setTimeout(() => {
         for (const h of homes) { h.el.style.transition = 'none'; h.el.style.transform = ''; }
         if (liveOrder.join('|') !== order.join('|')) onReorder(liveOrder);
@@ -443,25 +404,49 @@ function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorde
     document.addEventListener('pointerup', up);
   };
 
+  const cardH = thumbnail ? height * (thumbnail / width) : height;
+
   return (
-    <div ref={ref} data-dc-slot={id} style={{ position: 'relative', flexShrink: 0 }}>
-      <div className="dc-labelrow" style={{ position: 'absolute', bottom: '100%', left: -4, marginBottom: 4, color: DC.label }}>
-        <div className="dc-grip" onPointerDown={onGripDown} title={t('canvas.grip')}>
-          <svg width="9" height="13" viewBox="0 0 9 13" fill="currentColor"><circle cx="2" cy="2" r="1.1"/><circle cx="7" cy="2" r="1.1"/><circle cx="2" cy="6.5" r="1.1"/><circle cx="7" cy="6.5" r="1.1"/><circle cx="2" cy="11" r="1.1"/><circle cx="7" cy="11" r="1.1"/></svg>
+    <div ref={ref} data-dc-slot={id} style={{
+      position: 'relative',
+      cursor: thumbnail ? 'pointer' : 'default',
+    }} onClick={thumbnail ? (e) => { e.stopPropagation(); onFocus(); } : undefined}>
+      {!thumbnail && (
+        <div className="dc-labelrow" style={{ position: 'absolute', bottom: '100%', left: -4, marginBottom: 4, color: DC.label }}>
+          <div className="dc-grip" onPointerDown={onGripDown} title={t('canvas.grip')}>
+            <svg width="9" height="13" viewBox="0 0 9 13" fill="currentColor"><circle cx="2" cy="2" r="1.1"/><circle cx="7" cy="2" r="1.1"/><circle cx="2" cy="6.5" r="1.1"/><circle cx="7" cy="6.5" r="1.1"/><circle cx="2" cy="11" r="1.1"/><circle cx="7" cy="11" r="1.1"/></svg>
+          </div>
+          <div className="dc-labeltext" onClick={onFocus} title={t('canvas.focus')}>
+            <DCEditable value={label} onChange={onRename} onClick={(e) => e.stopPropagation()}
+              style={{ fontSize: 15, fontWeight: 500, color: DC.label, lineHeight: 1 }} />
+          </div>
         </div>
-        <div className="dc-labeltext" onClick={onFocus} title={t('canvas.focus')}>
-          <DCEditable value={label} onChange={onRename} onClick={(e) => e.stopPropagation()}
-            style={{ fontSize: 15, fontWeight: 500, color: DC.label, lineHeight: 1 }} />
-        </div>
-      </div>
-      <button className="dc-expand" onClick={onFocus} onPointerDown={(e) => e.stopPropagation()} title={t('canvas.expand')}>
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M7 1h4v4M5 11H1V7M11 1L7.5 4.5M1 11l3.5-3.5"/></svg>
-      </button>
+      )}
+      {!thumbnail && (
+        <button className="dc-expand" onClick={onFocus} onPointerDown={(e) => e.stopPropagation()} title={t('canvas.expand')}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M7 1h4v4M5 11H1V7M11 1L7.5 4.5M1 11l3.5-3.5"/></svg>
+        </button>
+      )}
       <div className="dc-card"
-        style={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06)', overflow: 'hidden', width, height, background: '#fff', ...style }}>
-        {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 13, fontFamily: DC.font }}>{id}</div>}
+        style={{
+          borderRadius: thumbnail ? 3 : 2,
+          boxShadow: thumbnail ? '0 1px 4px rgba(0,0,0,.12)' : '0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06)',
+          overflow: 'hidden',
+          width: thumbnail || width,
+          height: cardH,
+          background: '#fff',
+          ...(thumbnail ? {} : style),
+          position: 'relative',
+        }}>
+        {thumbnail ? (
+          <div style={{ width, height, transform: `scale(${thumbnail / width})`, transformOrigin: 'top left' }}>
+            {children}
+          </div>
+        ) : (
+          children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 13, fontFamily: DC.font }}>{id}</div>
+        )}
       </div>
-      {artboard.props.editor && (
+      {!thumbnail && artboard.props.editor && (
         <div style={{ width, marginTop: 10 }}>
           {artboard.props.editor}
         </div>
@@ -504,6 +489,7 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
     if (first) ctx.setFocus(`${ns}/${first}`);
   };
 
+  // Keyboard navigation — re-attach only when relevant values change
   React.useEffect(() => {
     const k = (e) => {
       if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
@@ -513,18 +499,63 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
     };
     document.addEventListener('keydown', k);
     return () => document.removeEventListener('keydown', k);
-  });
+  }, [idx, peers.length, sectionId, sectionOrder.length, secIdx]);
+
+  // Lock body scroll while overlay is open
+  React.useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
 
   const { width = 260, height = 480, children, focusEditor } = artboard.props;
   const [vp, setVp] = React.useState({ w: window.innerWidth, h: window.innerHeight });
   React.useEffect(() => { const r = () => setVp({ w: window.innerWidth, h: window.innerHeight }); window.addEventListener('resize', r); return () => window.removeEventListener('resize', r); }, []);
-  const editorW = focusEditor ? 360 : 0;
-  const scale = Math.max(0.1, Math.min((vp.w - 220 - editorW) / width, (vp.h - 260) / height, 2));
+  const isMobile = vp.w < 768;
+  const marginH = isMobile ? 16 : 100;
+  const editorW = focusEditor ? (isMobile ? 0 : 360) : 0;
+  const fitScale = Math.max(0.1, Math.min((vp.w - marginH * 2 - (editorW ? 24 : 0)) / width, (vp.h - 230) / height, 2));
+  // postZoom: 1 = auto-fit; range 0.3–4
+  const [postZoom, setPostZoom] = React.useState(1);
+  const cardScale = fitScale * postZoom;
+
+  // ── Slide animation direction ──────────────────────────────
+  const animDirRef = React.useRef('right');
+  const prevKeyRef = React.useRef(null);
+  const entryKey = `${sectionId}/${aid}`;
+  if (prevKeyRef.current && prevKeyRef.current !== entryKey) {
+    const [prevSid, prevAid] = prevKeyRef.current.split('/');
+    if (prevSid === sectionId) {
+      const pPeers = sectionMeta[prevSid]?.slotIds || [];
+      animDirRef.current = idx > pPeers.indexOf(prevAid) ? 'right' : 'left';
+    } else {
+      animDirRef.current = secIdx > sectionOrder.indexOf(prevSid) ? 'right' : 'left';
+    }
+  }
+  prevKeyRef.current = entryKey;
+  const animClass = `dc-slide-in-${animDirRef.current}`;
+
+  // ── Touch swipe ────────────────────────────────────────────
+  const touchRef = React.useRef(null);
+  const swipedRef = React.useRef(false);
+  const onTouchStart = (e) => { touchRef.current = { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY }; };
+  const onTouchEnd = (e) => {
+    if (!touchRef.current) return;
+    const dx = e.changedTouches[0].clientX - touchRef.current.x;
+    const dy = e.changedTouches[0].clientY - touchRef.current.y;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      e.preventDefault();
+      swipedRef.current = true;
+      go(dx < 0 ? 1 : -1);
+      setTimeout(() => { swipedRef.current = false; }, 300);
+    }
+    touchRef.current = null;
+  };
 
   const [ddOpen, setDd] = React.useState(false);
   const Arrow = ({ dir, onClick }) => (
     <button onClick={(e) => { e.stopPropagation(); onClick(); }}
-      style={{ position: 'absolute', top: '50%', [dir]: 28, transform: 'translateY(-50%)',
+      style={{ position: 'absolute', top: '50%', [dir]: isMobile ? 4 : 28, transform: 'translateY(-50%)',
         border: 'none', background: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.9)',
         width: 44, height: 44, borderRadius: 22, fontSize: 18, cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .15s' }}
@@ -538,14 +569,16 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
   // Portal to body so position:fixed is the real viewport regardless of any
   // transform on DesignCanvas's ancestors (including the canvas zoom itself).
   return ReactDOM.createPortal(
-    <div onClick={() => ctx.setFocus(null)}
+    <div onClick={() => { if (!swipedRef.current) ctx.setFocus(null); }}
       onWheel={(e) => e.stopPropagation()}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
       style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(24,20,16,.6)', backdropFilter: 'blur(14px)',
         fontFamily: DC.font, color: '#fff', overscrollBehavior: 'contain' }}>
 
       {/* top bar: section dropdown (left) · close (right) */}
       <div onClick={(e) => e.stopPropagation()}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 72, display: 'flex', alignItems: 'flex-start', padding: '16px 20px 0', gap: 16 }}>
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 72, display: 'flex', alignItems: 'flex-start', padding: isMobile ? '12px 12px 0' : '16px 20px 0', gap: isMobile ? 8 : 16 }}>
         <div style={{ position: 'relative' }}>
           <button onClick={() => setDd((o) => !o)}
             style={{ border: 'none', background: 'transparent', color: '#fff', cursor: 'pointer', padding: '6px 8px',
@@ -570,6 +603,30 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
             </div>
           )}
         </div>
+
+        {/* zoom controls — only scale the card, not the UI around it */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginLeft: isMobile ? 4 : 8 }}>
+          <button onClick={(e) => { e.stopPropagation(); setPostZoom(z => Math.max(0.3, z - 0.15)); }}
+            style={{ border: 'none', background: 'rgba(255,255,255,.07)', color: '#fff', width: isMobile ? 26 : 24, height: isMobile ? 26 : 24,
+              borderRadius: 5, cursor: 'pointer', fontSize: 14, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'background .12s' }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.15)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.07)')}>−</button>
+          <span style={{ fontSize: 11, opacity: .55, minWidth: isMobile ? 28 : 32, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>{Math.round(postZoom * 100)}%</span>
+          <button onClick={(e) => { e.stopPropagation(); setPostZoom(z => Math.min(4, z + 0.15)); }}
+            style={{ border: 'none', background: 'rgba(255,255,255,.07)', color: '#fff', width: isMobile ? 26 : 24, height: isMobile ? 26 : 24,
+              borderRadius: 5, cursor: 'pointer', fontSize: 14, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'background .12s' }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.15)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.07)')}>+</button>
+          <button onClick={(e) => { e.stopPropagation(); setPostZoom(1); }}
+            style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,.5)', width: isMobile ? 20 : 18, height: isMobile ? 20 : 18,
+              borderRadius: 4, cursor: 'pointer', fontSize: 10, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'color .12s', marginLeft: 1 }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,.5)')}>⊡</button>
+        </div>
+
         <div style={{ flex: 1 }} />
         <button onClick={() => ctx.setFocus(null)}
           onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.12)')}
@@ -582,10 +639,12 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
           propagation so any backdrop click (including the margins around
           the card) exits focus */}
       <div
-        style={{ position: 'absolute', top: 64, bottom: 56, left: 100, right: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+        style={{ position: 'absolute', top: isMobile ? 56 : 64, bottom: 56, left: marginH, right: marginH, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-          <div className="dc-focus-card" onClick={(e) => e.stopPropagation()} style={{ width: width * scale, height: height * scale, position: 'relative' }}>
-            <div style={{ width, height, transform: `scale(${scale})`, transformOrigin: 'top left', background: '#fff', borderRadius: 2, overflow: 'hidden',
+          <div key={entryKey} className={`dc-focus-card ${animClass}`} onClick={(e) => e.stopPropagation()}
+               onWheel={(e) => { if (e.ctrlKey) { e.preventDefault(); setPostZoom(z => Math.max(0.3, Math.min(4, z * Math.exp(-e.deltaY * 0.01)))); } }}
+               style={{ width: width * cardScale, height: height * cardScale, position: 'relative' }}>
+            <div style={{ width, height, transform: `scale(${cardScale})`, transformOrigin: 'top left', background: '#fff', borderRadius: 2, overflow: 'hidden',
               boxShadow: '0 20px 80px rgba(0,0,0,.4)' }}>
               {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb' }}>{aid}</div>}
             </div>

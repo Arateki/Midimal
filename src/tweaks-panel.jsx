@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 
 // tweaks-panel.jsx
 // Reusable Tweaks shell + form-control helpers.
@@ -176,6 +177,15 @@ const __TWEAKS_STYLE = `
   .twk-color-presets{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-top:10px}
   .twk-color-preset{appearance:none;border:.5px solid rgba(0,0,0,.14);border-radius:5px;
     height:18px;padding:0;cursor:default}
+  .twk-ball{position:fixed;z-index:2147483646;width:40px;height:40px;
+    border-radius:50%;background:rgba(250,249,247,.82);color:#29261b;
+    -webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.55);
+    box-shadow:0 2px 12px rgba(0,0,0,.16),0 1px 0 rgba(255,255,255,.5) inset;
+    display:flex;align-items:center;justify-content:center;
+    cursor:grab;user-select:none;transition:transform .15s,box-shadow .15s}
+  .twk-ball:hover{transform:scale(1.07);box-shadow:0 4px 20px rgba(0,0,0,.22),0 1px 0 rgba(255,255,255,.5) inset}
+  .twk-ball:active{cursor:grabbing}
 `;
 
 // ── useTweaks ───────────────────────────────────────────────────────────────
@@ -198,27 +208,30 @@ function useTweaks(defaults) {
 // flips off in lockstep; the host echoes __deactivate_edit_mode back which
 // is what actually hides the panel.
 function TweaksPanel({ title = 'Tweaks', children }) {
-  const [open, setOpen] = React.useState(true);
-  const dragRef = React.useRef(null);
+  const [mode, setMode] = React.useState('panel'); // 'panel' | 'ball'
+  const panelRef = React.useRef(null);
+  const ballRef = React.useRef(null);
   const offsetRef = React.useRef({ x: 16, y: 16 });
+  const dragHappened = React.useRef(false);
   const PAD = 16;
 
+  const activeRef = () => (mode === 'panel' ? panelRef : ballRef);
+
   const clampToViewport = React.useCallback(() => {
-    const panel = dragRef.current;
-    if (!panel) return;
-    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const el = activeRef().current;
+    if (!el) return;
+    const w = el.offsetWidth, h = el.offsetHeight;
     const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
     const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
     offsetRef.current = {
       x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
       y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y)),
     };
-    panel.style.right = offsetRef.current.x + 'px';
-    panel.style.bottom = offsetRef.current.y + 'px';
-  }, []);
+    el.style.right = offsetRef.current.x + 'px';
+    el.style.bottom = offsetRef.current.y + 'px';
+  }, [mode]);
 
   React.useEffect(() => {
-    if (!open) return;
     clampToViewport();
     if (typeof ResizeObserver === 'undefined') {
       window.addEventListener('resize', clampToViewport);
@@ -227,32 +240,29 @@ function TweaksPanel({ title = 'Tweaks', children }) {
     const ro = new ResizeObserver(clampToViewport);
     ro.observe(document.documentElement);
     return () => ro.disconnect();
-  }, [open, clampToViewport]);
+  }, [mode, clampToViewport]);
 
   React.useEffect(() => {
     const onMsg = (e) => {
       const t = e?.data?.type;
-      if (t === '__activate_edit_mode') setOpen(true);
-      else if (t === '__deactivate_edit_mode') setOpen(false);
+      if (t === '__activate_edit_mode') setMode('panel');
+      else if (t === '__deactivate_edit_mode') setMode('ball');
     };
     window.addEventListener('message', onMsg);
     window.parent.postMessage({ type: '__edit_mode_available' }, '*');
     return () => window.removeEventListener('message', onMsg);
   }, []);
 
-  const dismiss = () => {
-    setOpen(false);
-    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
-  };
-
-  const onDragStart = (e) => {
-    const panel = dragRef.current;
-    if (!panel) return;
-    const r = panel.getBoundingClientRect();
+  const startDrag = (e, el) => {
+    if (!el) return;
+    dragHappened.current = false;
+    const r = el.getBoundingClientRect();
     const sx = e.clientX, sy = e.clientY;
     const startRight = window.innerWidth - r.right;
     const startBottom = window.innerHeight - r.bottom;
     const move = (ev) => {
+      const dx = ev.clientX - sx, dy = ev.clientY - sy;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragHappened.current = true;
       offsetRef.current = {
         x: startRight - (ev.clientX - sx),
         y: startBottom - (ev.clientY - sy),
@@ -260,27 +270,44 @@ function TweaksPanel({ title = 'Tweaks', children }) {
       clampToViewport();
     };
     const up = () => {
-      window.removeEventListener('mousemove', move);
-      window.removeEventListener('mouseup', up);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
     };
-    window.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', up);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
   };
 
-  if (!open) return null;
+  const onPanelDrag = (e) => startDrag(e, panelRef.current);
+  const onBallDrag = (e) => { e.preventDefault(); startDrag(e, ballRef.current); };
+  const restore = () => { if (!dragHappened.current) setMode('panel'); };
+
   return (
     <>
       <style>{__TWEAKS_STYLE}</style>
-      <div ref={dragRef} className="twk-panel"
-           style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
-        <div className="twk-hd" onMouseDown={onDragStart}>
-          <b>{title}</b>
-          <button className="twk-x" aria-label="Close tweaks"
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onClick={dismiss}>✕</button>
+      {mode === 'panel' ? (
+        <div ref={panelRef} className="twk-panel"
+             style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+          <div className="twk-hd" onPointerDown={onPanelDrag}>
+            <b>{title}</b>
+            <button className="twk-x" aria-label="Minimize tweaks"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => setMode('ball')}>✕</button>
+          </div>
+          <div className="twk-body">{children}</div>
         </div>
-        <div className="twk-body">{children}</div>
-      </div>
+      ) : (
+        <div ref={ballRef} className="twk-ball"
+             style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}
+             onPointerDown={onBallDrag}
+             onClick={restore}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+               strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"
+               style={{ pointerEvents: 'none' }}>
+            <circle cx="8" cy="8" r="2.5"/>
+            <path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3 3l1.4 1.4M11.6 11.6l1.4 1.4M11.6 4.4L13 3M3 13l1.4-1.4"/>
+          </svg>
+        </div>
+      )}
     </>
   );
 }

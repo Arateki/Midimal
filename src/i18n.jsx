@@ -1,3 +1,5 @@
+import React from 'react'
+
 // i18n.jsx — Traduções da interface (EN · PT · ES)
 
 const TRANSLATIONS = {
@@ -729,4 +731,5 @@ function useT() {
   return React.useContext(I18nContext);
 }
 
+export { TRANSLATIONS, I18nContext, useT };
 Object.assign(window, { TRANSLATIONS, I18nContext, useT });
